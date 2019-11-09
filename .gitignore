@@ -1,0 +1,10 @@
+package-lock.json
+/node_modules
+/.pnp
+.pnp.js
+/build
+openhome-backend/bin
+openhome-backend/target
+.DS_Store
+*.class
+*.jar
