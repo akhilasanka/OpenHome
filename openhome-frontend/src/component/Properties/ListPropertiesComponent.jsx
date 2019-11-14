@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PropertyDataService from '../service/PropertyDataService';
+import PropertyDataService from '../../service/PropertyDataService';
 
 class ListPropertiesComponent extends Component {
   constructor(props) {
