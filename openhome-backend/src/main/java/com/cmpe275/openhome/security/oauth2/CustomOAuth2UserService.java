@@ -70,6 +70,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setImageUrl(oAuth2UserInfo.getImageUrl());
+        String email = oAuth2UserInfo.getEmail();
+        if(email.substring(email.indexOf("@")).equals("@sjsu.edu")){
+            user.setRole("host");
+        }
+        else{
+            user.setRole("guest");
+        }
+
         return userRepository.save(user);
     }
 
