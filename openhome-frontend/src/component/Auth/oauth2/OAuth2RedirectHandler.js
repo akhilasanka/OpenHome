@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { ACCESS_TOKEN } from '../../constants';
-import { Redirect } from 'react-router-dom'
+import { API_BASE_URL, ACCESS_TOKEN } from '../../constants';
+import { Redirect } from 'react-router-dom';
+import axios from 'axios';
 
 class OAuth2RedirectHandler extends Component {
     getUrlParameter(name) {
@@ -17,6 +18,20 @@ class OAuth2RedirectHandler extends Component {
 
         if(token) {
             localStorage.setItem(ACCESS_TOKEN, token);
+            axios({
+                method: 'get',
+                url: API_BASE_URL+"/user/me",
+                headers: {"Authorization" : `Bearer ${token}`}
+            })
+            .then(response => {
+                if(response.data) {
+                    console.log(response.data);
+                    localStorage.setItem("id", response.data.id);
+                    localStorage.setItem("role", response.data.role);
+                }
+              }).catch(error => {
+                console.log(error);
+              }); 
             return <Redirect to={{
                 pathname: "/home",
                 state: { from: this.props.location }

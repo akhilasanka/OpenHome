@@ -12,7 +12,7 @@ public class OpenhomeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(OpenhomeApplication.class, args);
 		
-		System.out.println("Hello World!");
+		System.out.println("Server has started running on port 8080");
 	}
 
 }
