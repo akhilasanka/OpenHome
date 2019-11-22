@@ -21,6 +21,8 @@ class Home extends Component {
 
     handleLogout = () => {
         localStorage.removeItem(ACCESS_TOKEN);
+        localStorage.removeItem("id");
+        localStorage.removeItem("role");
         this.setState({
         });
         console.log("safely logged out!");
