@@ -8,71 +8,41 @@ class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            searchResults: [],
-            showResults: false,
-            startIndex: 0,
-            currentPage: 1,
-            searchResultsDisplaySet: [],
-            pagesPerPage: 3
         }
-        this.handlePagination = this.handlePagination.bind(this);
     }
 
     componentWillMount() {
-        this.setState({
-            searchResults: [],
-            showResults: false
-        });
     }
 
-    handlePagination(event) {
-
-        var target = event.target;
-        var id = target.id;
-        var flag = true;
-        if (id == "prev") {
-            if (this.state.startIndex > 0) {
-                console.log("start index", this.state.startIndex);
-                console.log("pages per page", this.state.pagesPerPage);
-                var startIndex = this.state.startIndex - this.state.pagesPerPage;
-            }
-            else {
-                flag = false;
-                swal("No more records to show");
-            }
+    handleSearch = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        let validInput = true;
+        var token = localStorage.getItem("accessToken");
+        if (formData.get("city") == '' && formData.get("zipcode") == '') {
+            swal("Oops!", "City or Zipcode is required", "error");
+            validInput = false;
         }
         else {
-            var startIndex = this.state.startIndex + this.state.pagesPerPage;
-            if (startIndex >= this.state.searchResults.length) {
-                flag = false;
-                swal("No more records to show");
+            var to = formData.get("to");
+            var from = formData.get("from");
+            if (to < from) {
+                swal("Oops!", "From Date must be before To.", "error");
+                validInput = false;
+            }
+            else {
+                var priceMin = formData.get("priceFrom");
+                var priceMax = formData.get("priceTo");
+                if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
+                    swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                    validInput = false;
+                }
             }
         }
 
-        if (flag === true) {
 
-
-            var endIndex = startIndex + this.state.pagesPerPage - 1;
-            var results = this.state.searchResults;
-            var displaySet = results.filter(function (element, index) {
-                return index >= startIndex && index <= endIndex;
-            });
-            this.setState({
-                searchResultsDisplaySet: displaySet,
-                startIndex: startIndex
-            });
-        }
     }
-
     render() {
-        let searchResults = this.state.searchResultsDisplaySet.map((record, index) => {
-            return (
-                <tr key={record.id}>
-                    <td>{record.id}</td>
-                    <td>{record.id}</td>
-                </tr>
-            )
-        });
 
         return (
             <div>
@@ -86,24 +56,24 @@ class SearchProperty extends Component {
                                     <div className="border-bottom row" style={{ marginBottom: "3%", marginTop: "2%" }}>
                                         <h3>Search For Properties</h3>
                                     </div>
-                                    <form method="post">
+                                    <form onSubmit={this.handleSearch} method="post">
                                         <div className="row">
                                             <div className="form-group row">
-                                                <label htmlFor="location" className="col-sm-3 col-form-label"  style={{marginLeft:"-1em"}}>Location:</label>
+                                                <label htmlFor="location" className="col-sm-3 col-form-label" style={{ marginLeft: "-1em" }}>Location:*</label>
                                                 <div className="col-sm-6">
                                                     <input type="text" className="form-control" name="city" placeholder="Enter City Name" />
                                                     <label htmlFor="or" className="col-sm-5 col-form-label">OR</label>
-                                                    <input type="text" className="form-control" name="zipcode" placeholder="Enter Zipcode" />
+                                                    <input type="text" className="form-control" name="zipcode" placeholder="Enter Zipcode" pattern="^\d{5}$" />
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <label htmlFor="from" className="col-sm-4 col-form-label">From:</label>
+                                                <label htmlFor="from" className="col-sm-4 col-form-label">From:*</label>
                                                 <div className="col-sm-8">
                                                     <input type="date" className="form-control" name="from" required />
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <label htmlFor="to" className="col-sm-3 col-form-label">&nbsp;&nbsp;&nbsp;To:</label>
+                                                <label htmlFor="to" className="col-sm-3 col-form-label">&nbsp;&nbsp;To:*</label>
                                                 <div className="col-sm-9">
                                                     <input type="date" className="form-control" name="to" required />
                                                 </div>
@@ -117,6 +87,7 @@ class SearchProperty extends Component {
                                             <div className="form-group row">
                                                 <label htmlFor="propertyType" className="col-form-label" style={{ marginLeft: "1.5em" }} >Property Type:</label>
                                                 <select className="form-control col-sm-6" name="propertyType" style={{ marginLeft: "1.7em" }}>
+                                                    <option value="any">Any</option>
                                                     <option value="house">House</option>
                                                     <option value="condoApt">Condo/Apartment</option>
 
@@ -130,15 +101,15 @@ class SearchProperty extends Component {
 
                                             </div>
                                             <div className="form-group row">
-                                            <label htmlFor="rangeFrom" className="col-sm-3 col-form-label">Price Range:</label>
-                                                <label htmlFor="rangeFrom" className="col-form-label">Min</label>
+                                                <label htmlFor="rangeFrom" className="col-sm-3 col-form-label">Price Range:</label>
+                                                <label htmlFor="rangeFrom" className="col-form-label">Min($)</label>
                                                 <div className="col-sm-2">
                                                     <input type="number" className="form-control" name="priceFrom" />
                                                 </div>
-                                                <label htmlFor="rangeFrom" className=" col-form-label">Max</label>
-                                                
+                                                <label htmlFor="rangeTo" className=" col-form-label">Max($)</label>
+
                                                 <div className="col-sm-2">
-                                                    <input type="number" className="form-control" name="priceTo"  />
+                                                    <input type="number" className="form-control" name="priceTo" />
                                                 </div>
                                             </div>
                                             <div className="form-group row">
