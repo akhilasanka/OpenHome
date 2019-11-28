@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
-import '../Styles/Signin.css';
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import { ACCESS_TOKEN } from '../constants';
+import Alert from 'react-s-alert';
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/slide.css';
+
 
 class Home extends Component {
     //call the constructor method
@@ -26,6 +29,7 @@ class Home extends Component {
         this.setState({
         });
         console.log("safely logged out!");
+        Alert.success("You're safely logged out!");
       }
 
     render() {
