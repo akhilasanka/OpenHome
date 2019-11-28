@@ -1,0 +1,24 @@
+
+
+.backgroundImg{
+    background-image: url('../img/img-house2.jpg');
+     /* Full height */
+  height: 100vh; 
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.card-css{
+    background: #ffffff !important;
+    border-radius: 4px !important;
+    margin: 1em;
+    margin-left:5em;
+    padding: 32px !important;
+    padding-bottom: 24px !important;
+    width: 620px !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12) !important;
+}
+
