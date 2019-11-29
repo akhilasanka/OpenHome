@@ -16,3 +16,46 @@
 .card{
     margin-bottom: 1.5em;
 }
+
+.pagination{
+  margin: auto;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  padding-right: 50px;
+}
+.pagination li{
+  margin-right: 12px;
+  width: 30px;
+  height: 35px;
+  line-height: 33px;
+  text-align: center;
+  border: 2px #1a72b6 solid;
+  border-radius: 5px;
+  color:#1a72b6;
+  font-weight: bold;
+  margin-top: 1px;
+  cursor: pointer;
+}
+.pagination li a{
+  color: #1a72b6;
+  text-decoration: none;
+}
+.previous, .next{
+  width: 86px !important;
+  height: 40px !important;
+  line-height: 36px !important;
+  /* background-color: #0055a2; */
+  margin-top: -2px !important;
+  font-size: 15px;
+  font-weight: 400 !important;
+}
+.previous a, .next a{
+  color: #1a72b6!important;
+  text-decoration: none;
+}
+.profile-search-pic{
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  margin-right: 6px;
+}
