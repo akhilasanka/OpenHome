@@ -9,7 +9,9 @@ import com.cmpe275.openhome.payload.LoginRequest;
 import com.cmpe275.openhome.payload.SignUpRequest;
 import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.TokenProvider;
+import com.cmpe275.openhome.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,6 +40,10 @@ public class AuthController {
 
     @Autowired
     private TokenProvider tokenProvider;
+
+    @Autowired
+    private AuthService authService;
+
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -55,29 +62,23 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if(userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new BadRequestException("Email address already in use.");
         }
 
-        // Creating user's account
-        User user = new User();
-        user.setName(signUpRequest.getName());
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(signUpRequest.getPassword());
-        user.setProvider(AuthProvider.local);
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        String email = signUpRequest.getEmail();
-        if(email.substring(email.indexOf("@")).equals("@sjsu.edu")){
-            user.setRole("host");
+        User result = null;
+        try {
+            User user = new User();
+            user.setName(signUpRequest.getName());
+            user.setEmail(signUpRequest.getEmail());
+            user.setPassword(signUpRequest.getPassword());
+            user.setProvider(AuthProvider.local);
+            result = authService.signupUser(user);
+        } catch (Exception e) {
+            //send a failure status code like 500
+            e.printStackTrace();
         }
-        else{
-            user.setRole("guest");
-        }
-
-        User result = userRepository.save(user);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/user/me")
@@ -85,6 +86,21 @@ public class AuthController {
 
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "User registered successfully@"));
+    }
+
+    @RequestMapping(value = "/verify", method = RequestMethod.POST )
+    public ResponseEntity<?> verify( @RequestBody Map<String, Object> payload) {
+        System.out.println(payload);
+        String authcode = (String) payload.get("authcode");
+        try {
+            if (authService.verify(authcode)) {
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("verified");
+            } else {
+                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Invalid authcode");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(e);
+        }
     }
 
 }

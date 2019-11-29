@@ -7,6 +7,7 @@ import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.security.oauth2.user.OAuth2UserInfo;
 import com.cmpe275.openhome.security.oauth2.user.OAuth2UserInfoFactory;
+import com.cmpe275.openhome.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -24,6 +25,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthService authService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -78,7 +82,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setRole("guest");
         }
 
-        return userRepository.save(user);
+       // return userRepository.save(user);
+
+        try {
+            return authService.signupUser(user);
+        } catch (Exception e) {
+            //log error
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {

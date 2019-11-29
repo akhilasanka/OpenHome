@@ -13,7 +13,7 @@ const request = (options) => {
     options = Object.assign({}, defaults, options);
 
     return fetch(options.url, options)
-    .then(response => 
+    .then(response =>
         response.json().then(json => {
             if(!response.ok) {
                 return Promise.reject(json);
@@ -37,4 +37,12 @@ export function signup(signupRequest) {
         method: 'POST',
         body: JSON.stringify(signupRequest)
     });
+}
+
+export function createReservation(createReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/create",
+      method: 'POST',
+      body: JSON.stringify(createReservationRequest)
+  });
 }

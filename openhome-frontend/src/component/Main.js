@@ -13,6 +13,7 @@ import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
+import ReservationCreate from './Reservation/ReservationCreate'
 
 class Main extends Component {
     render() {
@@ -26,6 +27,7 @@ class Main extends Component {
                 <Route exact path="/search" component={SearchProperty} />
                 <Route exact path="/property/result" component={SearchResult}/>
                 <Route exact path="/addpayment" component={AddPayMethod} />
+                <Route exact path="/reservation/create" component={ReservationCreate} />
             </div>
         )
         }
@@ -38,7 +40,7 @@ class Main extends Component {
                     <Route exact path="/home" component={Home} />
                     <Route exact path="/addpayment" component={Login} />
                     <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}/>
-                    <Alert stack={{limit: 3}} 
+                    <Alert stack={{limit: 3}}
                       timeout = {3000}
                       position='top-right' effect='slide' offset={65} />
                 </div>

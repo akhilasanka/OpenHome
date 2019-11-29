@@ -1,5 +1,7 @@
 package com.cmpe275.openhome.controller;
 
+import com.cmpe275.openhome.exception.PayTransactionException;
+import com.cmpe275.openhome.model.ChargeType;
 import com.cmpe275.openhome.model.PaymentMethod;
 import com.cmpe275.openhome.payload.AddPayRequest;
 import com.cmpe275.openhome.payload.ApiResponse;
@@ -7,6 +9,7 @@ import com.cmpe275.openhome.payload.PayMethodResponse;
 import com.cmpe275.openhome.repository.PaymentMethodRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
+import com.cmpe275.openhome.util.PayProcessingUtil;
 import com.cmpe275.openhome.util.SystemDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,9 @@ import javax.validation.Valid;
 public class PaymentController {
     @Autowired
     PaymentMethodRepository paymentMethodRepository;
+
+    @Autowired
+    PayProcessingUtil payProcessingUtil;
     @PostMapping("/addpaymethod")
     public ResponseEntity<?> addPayMethod(@Valid @RequestBody AddPayRequest request) {
         if(request == null || !request.validate()) {
@@ -53,5 +59,21 @@ public class PaymentController {
             return new PayMethodResponse(null);
         else
             return new PayMethodResponse(payMethod);
+    }
+
+    @GetMapping("/insertsampletransaction")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> insertSampleTransaction(@CurrentUser UserPrincipal userPrincipal) {
+        try {
+            // host is charged a penalty
+            payProcessingUtil.recordPayment(1L, ChargeType.HOSTPENALTY, 10.0);
+            // guest is charged a penalty
+            payProcessingUtil.recordPayment(2L, ChargeType.GUESTPENALTY, 100.0);
+            // guest checks in & is charged
+            payProcessingUtil.recordPayment(3L, ChargeType.GUESTCHECKIN, 500.0);
+            return ResponseEntity.ok(null);
+        } catch (PayTransactionException e) {
+            return ResponseEntity.status(500).body(null);
+        }
     }
 }
