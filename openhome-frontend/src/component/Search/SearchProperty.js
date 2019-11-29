@@ -3,15 +3,14 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import swal from 'sweetalert';
 import '../Styles/Search.css';
+import { API_BASE_URL } from '../constants';
 
 class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            results: []
         }
-    }
-
-    componentWillMount() {
     }
 
     handleSearch = async (event) => {
@@ -19,20 +18,23 @@ class SearchProperty extends Component {
         const formData = new FormData(event.target);
         let validInput = true;
         var token = localStorage.getItem("accessToken");
+
+        var to = formData.get("to");
+        var from = formData.get("from");
+
+        var priceMin = formData.get("priceFrom");
+        var priceMax = formData.get("priceTo");
+
         if (formData.get("city") == '' && formData.get("zipcode") == '') {
             swal("Oops!", "City or Zipcode is required", "error");
             validInput = false;
         }
         else {
-            var to = formData.get("to");
-            var from = formData.get("from");
             if (to < from) {
                 swal("Oops!", "From Date must be before To.", "error");
                 validInput = false;
             }
             else {
-                var priceMin = formData.get("priceFrom");
-                var priceMax = formData.get("priceTo");
                 if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
                     swal("Oops!", "Please make sure Max price is greater Min price.", "error");
                     validInput = false;
@@ -40,6 +42,49 @@ class SearchProperty extends Component {
             }
         }
 
+        if (validInput == true) {
+            var data = {
+                "city": formData.get("city"), "zip": formData.get("zipcode"),
+                "to": to, "from": from, "sharingType": formData.get("sharingType"),
+                "propertyType": formData.get("propertyType"), "internet": formData.get("internet"),
+                "minPrice": parseInt(priceMin), "maxPrice": parseInt(priceMax), "desc": formData.get("desc")
+            };
+            console.log(data);
+            this.setState({
+                results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+                "zip":"900000", "state":"CA"
+            }, { "id":2, "headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+            "zip":"900000", "state":"CA"
+        }]
+            });
+            /*await axios({
+                method: 'get',
+                url: API_BASE_URL + '/property/search',
+                params: data,
+                config: { headers: { 'Content-Type': 'multipart/form-data' } },
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+                .then((response) => {
+                    if (response.status >= 500) {
+                        throw new Error("Bad response from server");
+                    }
+                    return response.data;
+                })
+                .then((responseData) => {
+                    console.log("responseData", responseData);
+                    if (responseData.dataFound === false) {
+                        swal("No results found for given entry. Please try with different values.");
+                    } else {
+                        var results = responseData;
+                        console.log(results);
+                        this.setState({
+                            results : results
+                        });
+                    }
+                }).catch(function (err) {
+                    console.log(err)
+                });*/
+        }
 
     }
     render() {
@@ -54,7 +99,7 @@ class SearchProperty extends Component {
 
                                 <div className="col-12">
                                     <div className="border-bottom row" style={{ marginBottom: "3%", marginTop: "2%" }}>
-                                        <h3>Search For Properties</h3>
+                                        <h3>Search For Property</h3>
                                     </div>
                                     <form onSubmit={this.handleSearch} method="post">
                                         <div className="row">
@@ -96,8 +141,8 @@ class SearchProperty extends Component {
                                             </div>
                                             <div className="form-group row">
                                                 <label htmlFor="internet" className="col-form-label" style={{ marginLeft: "1.5em" }}>Internet Avialibilty:</label>
-                                                <label> <input type="radio" name="sharingType" value="yes" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Yes</label>&nbsp;&nbsp;
-                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="no" style={{ marginTop: "0.8em" }} />&nbsp;No</label>
+                                                <label> <input type="radio" name="internet" value="yes" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Yes</label>&nbsp;&nbsp;
+                                                    &nbsp;&nbsp;<label> <input type="radio" name="internet" value="no" style={{ marginTop: "0.8em" }} />&nbsp;No</label>
 
                                             </div>
                                             <div className="form-group row">
@@ -127,6 +172,12 @@ class SearchProperty extends Component {
                                         </div>
                                     </form>
                                     <br></br>
+                                    {this.state.results.length > 0 &&
+                                        <Redirect to={{
+                                            pathname: '/property/result',
+                                            state: { results: this.state.results }
+                                        }} />
+                                    }
                                 </div>
                             </div>
                         </div>
