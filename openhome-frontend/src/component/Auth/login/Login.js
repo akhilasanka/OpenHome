@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import '../../Styles/Login.css';
-import { GOOGLE_AUTH_URL, FACEBOOK_AUTH_URL, GITHUB_AUTH_URL, ACCESS_TOKEN } from '../../constants';
+import { GOOGLE_AUTH_URL, FACEBOOK_AUTH_URL, ACCESS_TOKEN, API_BASE_URL } from '../../constants';
 import { login } from '../../util/APIUtils';
 import { Link, Redirect } from 'react-router-dom'
 import fbLogo from '../../img/fb-logo.png';
 import googleLogo from '../../img/google-logo.png';
 import Alert from 'react-s-alert';
+import swal from 'sweetalert';
+import axios from 'axios';
 
 class Login extends Component {
     componentDidMount() {
@@ -92,10 +94,26 @@ class LoginForm extends Component {
         login(loginRequest)
         .then(response => {
             localStorage.setItem(ACCESS_TOKEN, response.accessToken);
+            axios({
+                method: 'get',
+                url: API_BASE_URL+"/user/me",
+                headers: {"Authorization" : `Bearer ${response.accessToken}`}
+            })
+            .then(response => {
+                if(response.data) {
+                    console.log(response.data);
+                    localStorage.setItem("id", response.data.id);
+                    localStorage.setItem("role", response.data.role);
+                }
+              }).catch(error => {
+                console.log(error);
+              }); 
             Alert.success("You're successfully logged in!");
-            this.props.history.push("/");
+            this.props.history.push("/home");
         }).catch(error => {
-            Alert.error((error && error.message) || 'Oops! Something went wrong. Please try again!');
+            var err = (error && error.message) || 'Something went wrong';
+            swal("Oops!",  err+'! Please try again', "error");
+            //Alert.error((error && error.message) || 'Oops! Something went wrong. Please try again!');
         });
     }
     

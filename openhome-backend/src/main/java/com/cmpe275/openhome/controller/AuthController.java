@@ -69,6 +69,14 @@ public class AuthController {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        String email = signUpRequest.getEmail();
+        if(email.substring(email.indexOf("@")).equals("@sjsu.edu")){
+            user.setRole("host");
+        }
+        else{
+            user.setRole("guest");
+        }
+
         User result = userRepository.save(user);
 
         URI location = ServletUriComponentsBuilder
