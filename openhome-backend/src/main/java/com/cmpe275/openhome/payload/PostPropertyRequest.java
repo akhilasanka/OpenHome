@@ -2,6 +2,7 @@ package com.cmpe275.openhome.payload;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 public class PostPropertyRequest {
     @NotBlank
@@ -9,8 +10,6 @@ public class PostPropertyRequest {
 
     @NotBlank
     String streetAddress;
-
-    String unitNumber;
 
     @NotBlank
     String city;
@@ -53,14 +52,13 @@ public class PostPropertyRequest {
 
     String parkingCost;
 
-    @NotBlank
+    @NotEmpty
     String[] photos;
 
     @NotBlank
     String alwaysAvailable;
 
-    @NotBlank
-    String weeklyAvailability;
+    String[] weeklyAvailability;
 
     String weekdayRentPrice;
 
@@ -80,14 +78,6 @@ public class PostPropertyRequest {
 
     public void setStreetAddress(String streetAddress) {
         this.streetAddress = streetAddress;
-    }
-
-    public String getUnitNumber() {
-        return unitNumber;
-    }
-
-    public void setUnitNumber(String unitNumber) {
-        this.unitNumber = unitNumber;
     }
 
     public String getCity() {
@@ -218,11 +208,11 @@ public class PostPropertyRequest {
         this.photos = photos;
     }
 
-    public String getWeeklyAvailability() {
+    public String[] getWeeklyAvailability() {
         return weeklyAvailability;
     }
 
-    public void setWeeklyAvailability(String weeklyAvailability) {
+    public void setWeeklyAvailability(String[] weeklyAvailability) {
         this.weeklyAvailability = weeklyAvailability;
     }
 
