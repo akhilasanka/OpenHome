@@ -9,10 +9,8 @@ class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            results: []
         }
-    }
-
-    componentWillMount() {
     }
 
     handleSearch = async (event) => {
@@ -20,10 +18,10 @@ class SearchProperty extends Component {
         const formData = new FormData(event.target);
         let validInput = true;
         var token = localStorage.getItem("accessToken");
-        
+
         var to = formData.get("to");
         var from = formData.get("from");
-        
+
         var priceMin = formData.get("priceFrom");
         var priceMax = formData.get("priceTo");
 
@@ -44,18 +42,27 @@ class SearchProperty extends Component {
             }
         }
 
-        if(validInput == true){
-            var data = { "city": formData.get("city"), "zip": formData.get("zipcode"), 
-            "to": to, "from": from, "sharingType": formData.get("sharingType"),
-            "propertyType": formData.get("propertyType"), "internet": formData.get("internet"),
-           "minPrice": parseInt(priceMin), "maxPrice":parseInt(priceMax), "desc": formData.get("desc")};
-           console.log(data);
-            await axios({
+        if (validInput == true) {
+            var data = {
+                "city": formData.get("city"), "zip": formData.get("zipcode"),
+                "to": to, "from": from, "sharingType": formData.get("sharingType"),
+                "propertyType": formData.get("propertyType"), "internet": formData.get("internet"),
+                "minPrice": parseInt(priceMin), "maxPrice": parseInt(priceMax), "desc": formData.get("desc")
+            };
+            console.log(data);
+            this.setState({
+                results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+                "zip":"900000", "state":"CA"
+            }, { "id":2, "headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+            "zip":"900000", "state":"CA"
+        }]
+            });
+            /*await axios({
                 method: 'get',
-                url:  API_BASE_URL+'/property/search',     
+                url: API_BASE_URL + '/property/search',
                 params: data,
                 config: { headers: { 'Content-Type': 'multipart/form-data' } },
-                headers: {"Authorization" : `Bearer ${token}`}
+                headers: { "Authorization": `Bearer ${token}` }
             })
                 .then((response) => {
                     if (response.status >= 500) {
@@ -65,16 +72,19 @@ class SearchProperty extends Component {
                 })
                 .then((responseData) => {
                     console.log("responseData", responseData);
-                    if(responseData.dataFound === false){
+                    if (responseData.dataFound === false) {
                         swal("No results found for given entry. Please try with different values.");
-                    }else{
+                    } else {
                         var results = responseData;
                         console.log(results);
+                        this.setState({
+                            results : results
+                        });
                     }
                 }).catch(function (err) {
                     console.log(err)
-                }); 
-            }
+                });*/
+        }
 
     }
     render() {
@@ -162,6 +172,12 @@ class SearchProperty extends Component {
                                         </div>
                                     </form>
                                     <br></br>
+                                    {this.state.results.length > 0 &&
+                                        <Redirect to={{
+                                            pathname: '/property/result',
+                                            state: { results: this.state.results }
+                                        }} />
+                                    }
                                 </div>
                             </div>
                         </div>

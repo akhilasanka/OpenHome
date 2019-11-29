@@ -11,6 +11,7 @@ import Alert from 'react-s-alert';
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import SearchProperty from './Search/SearchProperty';
+import SearchResult from './Search/SearchResult';
 
 class Main extends Component {
     render() {
@@ -22,6 +23,7 @@ class Main extends Component {
                 <Route exact path="/home" component={Home} />
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/search" component={SearchProperty} />
+                <Route exact path="/property/result" component={SearchResult}/>
             </div>
         )
         }
