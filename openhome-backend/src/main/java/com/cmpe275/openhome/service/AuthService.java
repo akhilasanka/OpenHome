@@ -1,8 +1,8 @@
 package com.cmpe275.openhome.service;
 
 import com.cmpe275.openhome.model.User;
+import com.cmpe275.openhome.notification.EmailNotification;
 import com.cmpe275.openhome.repository.UserRepository;
-import com.cmpe275.openhome.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,13 @@ import java.util.UUID;
 public class AuthService {
 
     @Autowired
-    private EmailSender emailSender;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    EmailNotification emailNotification;
 
 
     public User signupUser(User user) throws Exception {
@@ -55,10 +55,7 @@ public class AuthService {
             String text = String.format("Hi %s, \n\nPlease confirm your registration for OpenHome by clicking the link below. \n  %s  \n\n\n Thank you, \n Team OpenHome",
                    user.getName(), baseURL + verifyURL);
 
-            new Thread(() -> {
-                System.out.println("Sending mail to " + email );
-                emailSender.sendEmail(email, subject , text);
-            }).start();
+            emailNotification.sendEmail(email, subject, text);
 
             return result;
 

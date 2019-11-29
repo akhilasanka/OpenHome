@@ -1,6 +1,7 @@
 package com.cmpe275.openhome.repository;
 
 import com.cmpe275.openhome.model.PaymentMethod;
+import com.cmpe275.openhome.model.Reservation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Long> {
-    @Query("SELECT pm FROM PaymentMethod pm, reservation r WHERE r.guest_id=pm.user_id AND r.id=:rid")
-    PaymentMethod getPayByReservationId(@Param("rid") Integer rid);
+    @Query("SELECT pm FROM PaymentMethod pm, Reservation r WHERE r.guest.id=pm.userId AND r.id=:rid")
+    PaymentMethod getPayByReservationId(@Param("rid") Long rid);
 }

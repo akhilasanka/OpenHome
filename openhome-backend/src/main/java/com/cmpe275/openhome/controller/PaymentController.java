@@ -66,11 +66,11 @@ public class PaymentController {
     public ResponseEntity<?> insertSampleTransaction(@CurrentUser UserPrincipal userPrincipal) {
         try {
             // host is charged a penalty
-            payProcessingUtil.recordPayment(1, ChargeType.HOSTPENALTY, 10.0);
+            payProcessingUtil.recordPayment(1L, ChargeType.HOSTPENALTY, 10.0);
             // guest is charged a penalty
-            payProcessingUtil.recordPayment(2, ChargeType.GUESTPENALTY, 100.0);
+            payProcessingUtil.recordPayment(2L, ChargeType.GUESTPENALTY, 100.0);
             // guest checks in & is charged
-            payProcessingUtil.recordPayment(3, ChargeType.GUESTCHECKIN, 500.0);
+            payProcessingUtil.recordPayment(3L, ChargeType.GUESTCHECKIN, 500.0);
             return ResponseEntity.ok(null);
         } catch (PayTransactionException e) {
             return ResponseEntity.status(500).body(null);

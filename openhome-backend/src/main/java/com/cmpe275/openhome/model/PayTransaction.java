@@ -19,7 +19,7 @@ public class PayTransaction {
     private Integer transactionId;
 
     @Column(nullable=false)
-    private Integer reservationId;
+    private Long reservationId;
 
     @Column(nullable=false)
     private ChargeType chargeType;
@@ -42,11 +42,11 @@ public class PayTransaction {
         this.transactionId = transactionId;
     }
 
-    public Integer getReservationId() {
+    public Long getReservationId() {
         return reservationId;
     }
 
-    public void setReservationId(Integer reservationId) {
+    public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
     }
 

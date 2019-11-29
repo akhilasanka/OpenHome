@@ -9,7 +9,6 @@ import com.cmpe275.openhome.repository.PaymentMethodRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -24,7 +23,7 @@ public class PayProcessingUtil {
     @Autowired
     PayTransactionRepository payTransactionRepository;
 
-    public void recordPayment(int reservationId, ChargeType chargeType, double amount)
+    public void recordPayment(long reservationId, ChargeType chargeType, double amount)
             throws PayTransactionException {
         PayTransaction transaction = new PayTransaction();
         transaction.setReservationId(reservationId);
