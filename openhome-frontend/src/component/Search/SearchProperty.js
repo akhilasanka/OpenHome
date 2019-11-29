@@ -53,7 +53,7 @@ class SearchProperty extends Component {
             this.setState({
                 results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
                 "zip":"900000", "state":"CA"
-            }, { "id":2, "headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+            }, { "id":2, "headline": "House by the ocean2", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
             "zip":"900000", "state":"CA"
         }]
             });
