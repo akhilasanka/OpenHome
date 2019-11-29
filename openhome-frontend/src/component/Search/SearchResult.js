@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
 import '../Styles/SearchResult.css';
-
+import ReactPaginate from 'react-paginate';
 
 class SearchResult extends Component {
     //call the constructor method
@@ -12,16 +12,40 @@ class SearchResult extends Component {
         console.log(this.props);
         //maintain the state required for this component
         this.state = {
-            results : this.props.location.state.results
+            results : this.props.location.state.results,
+            
+            //for pagination
+            paginated_results:[],
+            results_per_page: 1,
+            num_pages:0,
         }
+        //for pagination
+        this.handlePageClick = this.handlePageClick.bind(this);
     }
+
+     //for pagination
+     handlePageClick(data){
+        console.log(data.selected)
+        let page_number = data.selected;
+        let offset = Math.ceil(page_number * this.state.results_per_page)
+        this.setState({
+            paginated_results : this.state.results.slice(offset, offset +this.state.results_per_page)
+        })
+        }
 
     componentDidMount() {
         console.log(this.state.results);
+        // for pagination
+        const all_results = this.state.results;
+        const pages = Math.ceil(all_results.length/this.state.results_per_page)
+        this.setState({
+            num_pages:pages,
+            paginated_results: all_results.slice(0,this.state.results_per_page),
+        });
     }
 
     render() {
-        let resultsDiv = this.state.results.map(record => {
+        let resultsDiv = this.state.paginated_results.map(record => {
             var link = "/property/"+record.id;
             return(
                 <div class="card bg-light text-dark">
@@ -66,6 +90,21 @@ class SearchResult extends Component {
                     {resultsDiv}
                     </div>
                     </div>
+                    <div className="row">
+                            <ReactPaginate
+                            previousLabel={'Previous'}
+                            nextLabel={'Next'}
+                            breakLabel={'...'}
+                            breakClassName={'break-me'}
+                            pageCount={this.state.num_pages}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={5}
+                            onPageChange={this.handlePageClick}
+                            containerClassName={'pagination'}
+                            subContainerClassName={'pages pagination'}
+                            activeClassName={'active'}
+                            />
+                        </div>
                 </div>
             </div>
             

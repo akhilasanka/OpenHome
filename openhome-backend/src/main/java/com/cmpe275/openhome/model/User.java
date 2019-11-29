@@ -36,6 +36,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
+    @Column(nullable = false)
+    private String authcode;
+
     private String providerId;
 
     public Long getId() {
@@ -104,5 +107,13 @@ public class User {
 
     public void setProviderId(String providerId) {
         this.providerId = providerId;
+    }
+
+    public String getAuthcode() {
+        return authcode;
+    }
+
+    public void setAuthcode(String authcode) {
+        this.authcode = authcode;
     }
 }
