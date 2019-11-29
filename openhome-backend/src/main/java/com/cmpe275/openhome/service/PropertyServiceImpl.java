@@ -3,6 +3,7 @@ package com.cmpe275.openhome.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cmpe275.openhome.entity.PropertyDetails;
 import org.springframework.stereotype.Service;
 
 import com.cmpe275.openhome.entity.Property;
@@ -11,6 +12,7 @@ import com.cmpe275.openhome.entity.Property;
 public class PropertyServiceImpl implements PropertyService {
 	
 	private static List<Property> myHardcodedPropertyList = new ArrayList<Property>();
+	private static PropertyDetails myHardcodedPropertyDetails = new PropertyDetails();
 
 	  static {
 		  Property property1 = new Property();
@@ -33,10 +35,18 @@ public class PropertyServiceImpl implements PropertyService {
 		  myHardcodedPropertyList.add(property2);
 		  myHardcodedPropertyList.add(property3);
 		  myHardcodedPropertyList.add(property4);
+
+		  myHardcodedPropertyDetails.setMyId(1L);
+		  myHardcodedPropertyDetails.setOwnerId(1L);
 	  }
 
 	public List<Property> getHardcodedPropertyList() {
 		// method for testing
 		return myHardcodedPropertyList;
+	}
+
+	@Override
+	public PropertyDetails getHardcodedPropertyDetails() {
+		return null;
 	}
 }
