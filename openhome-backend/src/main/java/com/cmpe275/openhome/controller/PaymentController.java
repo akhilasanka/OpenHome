@@ -27,6 +27,7 @@ import javax.validation.Valid;
 public class PaymentController {
     @Autowired
     PaymentMethodRepository paymentMethodRepository;
+
     @PostMapping("/addpaymethod")
     public ResponseEntity<?> addPayMethod(@Valid @RequestBody AddPayRequest request) {
         if(request == null || !request.validate()) {
