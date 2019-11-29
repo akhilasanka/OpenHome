@@ -6,7 +6,7 @@ import java.util.List;
 import com.cmpe275.openhome.entity.PropertyDetails;
 import org.springframework.stereotype.Service;
 
-import com.cmpe275.openhome.entity.Property;
+import com.cmpe275.openhome.model.Property;
 
 @Service
 public class PropertyServiceImpl implements PropertyService {
@@ -17,19 +17,19 @@ public class PropertyServiceImpl implements PropertyService {
 	  static {
 		  Property property1 = new Property();
 		  property1.setId(1L);
-		  property1.setOwner("foo");
+		  property1.setHeadline("foo");
 		  
 		  Property property2 = new Property();
 		  property2.setId(2L);
-		  property2.setOwner("foo");
+		  property2.setHeadline("foo");
 
 		  Property property3 = new Property();
 		  property3.setId(3L);
-		  property3.setOwner("foo");
+		  property3.setHeadline("foo");
 
 		  Property property4 = new Property();
 		  property4.setId(4L);
-		  property4.setOwner("foo");
+		  property4.setHeadline("foo");
 		  
 		  myHardcodedPropertyList.add(property1);
 		  myHardcodedPropertyList.add(property2);
@@ -47,6 +47,11 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Override
 	public PropertyDetails getHardcodedPropertyDetails() {
+		return null;
+	}
+
+	@Override
+	public Property hostProperty(Property property) {
 		return null;
 	}
 }
