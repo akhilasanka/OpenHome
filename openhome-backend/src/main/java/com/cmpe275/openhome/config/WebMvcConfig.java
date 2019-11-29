@@ -1,5 +1,8 @@
 package com.cmpe275.openhome.config;
 
+import com.cmpe275.openhome.util.PayProcessingUtil;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -17,5 +20,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(MAX_AGE_SECS);
+    }
+
+    @Bean
+    public PayProcessingUtil payProcessingUtil() {
+        return new PayProcessingUtil();
     }
 }

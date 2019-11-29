@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Long> {
-    @Query("SELECT pm FROM payment_method pm, reservation r WHERE r.guest_id=pm.user_id AND r.id=:rid")
-    Optional<PaymentMethod> getPayByReservationId(@Param("rid") Long rid);
+    @Query("SELECT pm FROM PaymentMethod pm, reservation r WHERE r.guest_id=pm.user_id AND r.id=:rid")
+    PaymentMethod getPayByReservationId(@Param("rid") Integer rid);
 }
