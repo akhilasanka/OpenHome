@@ -16,7 +16,6 @@ public class EmailNotification {
 
     public void sendEmail(String email, final String subject, final String body) {
         try {
-
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress("openhomecmpe275@gmail.com"));
             message.setRecipients(
