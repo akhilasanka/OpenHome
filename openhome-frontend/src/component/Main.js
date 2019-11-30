@@ -16,6 +16,7 @@ import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
 import ReservationCreate from './Reservation/ReservationCreate'
 import TimeManagement from './System/TimeManagement'
+import VerifyAuthCode from './Auth/signup/VerifyAuthCode';
 
 class Main extends Component {
     render() {
@@ -32,6 +33,7 @@ class Main extends Component {
                 <Route exact path="/addpayment" component={AddPayMethod} />
                 <Route exact path="/reservation/create" component={ReservationCreate} />
                 <Route exact path="/system/timeManagement" component={TimeManagement} />
+                <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
             </div>
         )
         }
