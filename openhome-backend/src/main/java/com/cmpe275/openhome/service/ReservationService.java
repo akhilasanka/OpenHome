@@ -1,5 +1,9 @@
 package com.cmpe275.openhome.service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,8 @@ import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.ReservationStatusEnum;
 import com.cmpe275.openhome.repository.ReservationRepository;
 import com.cmpe275.openhome.repository.UserRepository;
+import com.cmpe275.openhome.util.DateUtils;
+import com.cmpe275.openhome.util.SystemDateTime;
 
 @Component
 public class ReservationService {
@@ -28,13 +34,33 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));
     }
     
-    @Transactional
-    public Reservation createReservation(Reservation reservation) {
-    	// ToDo: validate before creating
+    @Transactional(rollbackOn=Exception.class)
+    public Reservation createReservation(Reservation reservation) throws Exception {
     	// check reservation date range (must be between 1 to 14 consecutive days)
-    	// check reservation date rage (must be within 365 days from today)
+    	LocalDate startDate = DateUtils.convertDateToLocalDate(reservation.getStartDate());
+    	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());
+    	long daysBetween = startDate.until(endDate, ChronoUnit.DAYS);
+    	if (daysBetween < 1|| daysBetween > 14 ) {
+    		throw new Exception("Reservation Date Range must be between 1 and 14 days");
+    	}
+    	
+    	// check reservation date range (must be within 365 days from today)
+    	LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate().plusDays(365);
+    	boolean isAfter365Days = endDate.isAfter(currentDate);
+    	if (isAfter365Days) {
+    		throw new Exception("Reservation Dates must be within 365 days from the current date");
+    	}
+    	
     	// check properties are not double booked
-    	// throw Exception for any of the above and reservation is not created
+    	List<Reservation> bookedReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+    			reservation.getProperty().getId(),
+    			DateUtils.convertLocalDateToDate(startDate), 
+    			DateUtils.convertLocalDateToDate(endDate.plusDays(1))
+    	);
+    	
+    	if (!bookedReservations.isEmpty()) {
+    		throw new Exception("Reservations are already booked within the specified Date Range");
+    	}
     	
     	reservation.setStatus(ReservationStatusEnum.pendingCheckIn);
     	Reservation createdReservation = reservationRepository.save(reservation);
