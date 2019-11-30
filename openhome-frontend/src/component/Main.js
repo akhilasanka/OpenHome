@@ -15,6 +15,7 @@ import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
 import ReservationCreate from './Reservation/ReservationCreate'
+import TimeManagement from './System/TimeManagement'
 
 class Main extends Component {
     render() {
@@ -30,6 +31,7 @@ class Main extends Component {
                 <Route exact path="/property/host" exact component={HostProperty} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
                 <Route exact path="/reservation/create" component={ReservationCreate} />
+                <Route exact path="/system/timeManagement" component={TimeManagement} />
             </div>
         )
         }
