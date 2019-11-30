@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import { createReservation } from '../util/APIUtils';
 import swal from 'sweetalert';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
 
 class ReservationCreate extends Component {
     render() {
@@ -15,12 +18,11 @@ class ReservationCreate extends Component {
         }
 
         return (
-            <div className="container">
-                <div className="content">
-                <h1 className="title">Create Reservation</h1>
-                  <div className='col-6'>
+            <div className="card">
+                <div className="container">
+                    <div className="content">
                     <ReservationCreateForm {...this.props} />
-                  </div>
+                    </div>
                 </div>
             </div>
         );
@@ -31,8 +33,6 @@ class ReservationCreateForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            startDate: '',
-            endDate: ''
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -57,6 +57,7 @@ class ReservationCreateForm extends Component {
         var token = localStorage.getItem("accessToken");
 
         const createReservationRequest = Object.assign({}, this.state);
+        console.log(createReservationRequest);
         var startDate = new Date(createReservationRequest["startDate"]);
         var endDate = new Date(createReservationRequest["endDate"]);
 
@@ -80,20 +81,29 @@ class ReservationCreateForm extends Component {
         return (
             <form onSubmit={this.handleSubmit} method="post">
                 <div className="form-group row">
-                    <label htmlFor="startDate" className="col-sm-4 col-form-label">Start Date:*</label>
-                    <div className="col-sm-8">
-                        <input name="startDate" type="date" className="form-control" onChange={this.handleInputChange}  required />
+                    <label htmlFor="startDate" className="col-12 col-form-label">Dates</label>
+                    <div className="col-12">
+                      <DateRangePicker
+                        startDate={this.state.startDate} // momentPropTypes.momentObj or null,
+                        startDateId="startDate" // PropTypes.string.isRequired,
+                        endDate={this.state.endDate} // momentPropTypes.momentObj or null,
+                        endDateId="endDate" // PropTypes.string.isRequired,
+                        onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                        focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                        onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+                        small={true}
+                      />
                     </div>
                 </div>
                 <div className="form-group row">
-                    <label htmlFor="endDate" className="col-sm-3 col-form-label">End Date:*</label>
-                    <div className="col-sm-9">
-                        <input name="endDate" type="date" className="form-control" onChange={this.handleInputChange} required />
+                    <div className="col-12 col-form-label">
+                        Total:
+                    </div>
+                    <div className="col-12">
+                        <div id="total">Select a date range!</div>
                     </div>
                 </div>
-                <div className="form-group row">
-                  <button type="submit" className="btn btn-primary align-center">Reserve</button>
-                </div>
+                <button type="submit" className="btn btn-primary align-center">Reserve</button>
             </form>
         );
     }
