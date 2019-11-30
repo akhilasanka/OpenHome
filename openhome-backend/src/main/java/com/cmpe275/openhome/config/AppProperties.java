@@ -13,6 +13,7 @@ public class AppProperties {
     public static class Auth {
         private String tokenSecret;
         private long tokenExpirationMsec;
+        private String clientURL;
 
         public String getTokenSecret() {
             return tokenSecret;
@@ -29,6 +30,10 @@ public class AppProperties {
         public void setTokenExpirationMsec(long tokenExpirationMsec) {
             this.tokenExpirationMsec = tokenExpirationMsec;
         }
+
+        public String getClientURL() {return clientURL; }
+
+        public void setClientURL(String url){ this.clientURL = url; }
     }
 
     public static final class OAuth2 {
