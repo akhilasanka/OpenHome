@@ -24,13 +24,11 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ToDo: make this reference the property model
-    // @ManyToOne(optional=true, fetch=FetchType.EAGER)
-    // @JoinColumn(name="PROPERTY_ID")
-    // private Property myProperty;
-  
-    // ToDo: make these mandatory
-    @ManyToOne(optional=true, fetch=FetchType.EAGER)
+    @ManyToOne(optional=false, fetch=FetchType.EAGER)
+    @JoinColumn(name="PROPERTY_ID")
+    private Property property;
+
+    @ManyToOne(optional=false, fetch=FetchType.EAGER)
     @JoinColumn(name="GUEST_ID")
     private User guest;
     
@@ -61,13 +59,13 @@ public class Reservation {
 		this.id = id;
 	}
 
-	//public Property getProperty() {
-	//	return myProperty;
-	//}
+	public Property getProperty() {
+		return property;
+	}
 
-	//public void setProperty(Property property) {
-	//	myProperty = property;
-	//}
+	public void setProperty(Property property) {
+		this.property = property;
+	}
 
 	public User getGuest() {
 		return guest;
