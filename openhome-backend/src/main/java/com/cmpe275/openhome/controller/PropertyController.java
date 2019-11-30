@@ -47,7 +47,7 @@ public class PropertyController {
 
     Property result = null;
     try {
-      Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest);
+      Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, Long.parseLong(hostId));
       result = myPropertyService.hostProperty(property);
     } catch (Exception e) {
       //send a failure status code like 500
