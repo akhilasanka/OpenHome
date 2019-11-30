@@ -26,7 +26,7 @@ public class Reservation {
     
     @ManyToOne(optional=false, fetch=FetchType.EAGER)
     @JoinColumn(name="PROPERTY_ID")
-    private Property myProperty;
+    private Property property;
 
     @ManyToOne(optional=false, fetch=FetchType.EAGER)
     @JoinColumn(name="GUEST_ID")
@@ -60,11 +60,11 @@ public class Reservation {
 	}
 
 	public Property getProperty() {
-		return myProperty;
+		return property;
 	}
 
 	public void setProperty(Property property) {
-		myProperty = property;
+		this.property = property;
 	}
 
 	public User getGuest() {
