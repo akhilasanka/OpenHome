@@ -1,16 +1,20 @@
 package com.cmpe275.openhome.service;
 
+import com.cmpe275.openhome.entity.PropertyDetails;
+import com.cmpe275.openhome.model.Property;
+import com.cmpe275.openhome.repository.PropertyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cmpe275.openhome.entity.PropertyDetails;
-import org.springframework.stereotype.Service;
-
-import com.cmpe275.openhome.model.Property;
-
 @Service
 public class PropertyServiceImpl implements PropertyService {
-	
+
+	@Autowired
+	private PropertyRepository propertyRepository;
+
 	private static List<Property> myHardcodedPropertyList = new ArrayList<Property>();
 	private static PropertyDetails myHardcodedPropertyDetails = new PropertyDetails();
 
@@ -18,7 +22,7 @@ public class PropertyServiceImpl implements PropertyService {
 		  Property property1 = new Property();
 		  property1.setId(1L);
 		  property1.setHeadline("foo");
-		  
+
 		  Property property2 = new Property();
 		  property2.setId(2L);
 		  property2.setHeadline("foo");
@@ -30,7 +34,7 @@ public class PropertyServiceImpl implements PropertyService {
 		  Property property4 = new Property();
 		  property4.setId(4L);
 		  property4.setHeadline("foo");
-		  
+
 		  myHardcodedPropertyList.add(property1);
 		  myHardcodedPropertyList.add(property2);
 		  myHardcodedPropertyList.add(property3);
@@ -39,6 +43,7 @@ public class PropertyServiceImpl implements PropertyService {
 		  myHardcodedPropertyDetails.setMyId(1L);
 		  myHardcodedPropertyDetails.setOwnerId(1L);
 	  }
+
 
 	public List<Property> getHardcodedPropertyList() {
 		// method for testing
@@ -52,6 +57,7 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Override
 	public Property hostProperty(Property property) {
-		return null;
+		Property savedProperty = propertyRepository.save(property);
+		return savedProperty;
 	}
 }
