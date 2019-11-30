@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import '../Styles/HostProperty.css'
 import { Redirect } from 'react-router';
-import PropertyDataService from '../../service/PropertyDataService';
 import {ACCESS_TOKEN, API_BASE_URL} from "../constants";
 import axios from "axios";
 import Alert from "react-s-alert";
@@ -27,12 +26,12 @@ class HostProperty extends Component {
             propertyType: "",
             bedrooms: "",
             sqft: "",
-            privateBathShowerAvailable: "",
-            privateBathroomAvailable: "",
+            privateBathShowerAvailable: "Yes",
+            privateBathroomAvailable: "Yes",
             photos: [],
             freeWifi: "",
             parkingAvailable: "",
-            parkingFree: "",
+            parkingFree: "Yes",
             parkingCost: "",
             alwaysAvailable: "",
             weeklyAvailability: [],
@@ -223,14 +222,6 @@ class HostProperty extends Component {
 
             console.log(data);
 
-            const headers = new Headers({
-                'Content-Type': 'application/json',
-            })
-
-            if(localStorage.getItem(ACCESS_TOKEN)) {
-                headers.append('Authorization', 'Bearer ' + localStorage.getItem(ACCESS_TOKEN))
-            }
-
             axios(
                 {
                     method:'post',
@@ -241,13 +232,12 @@ class HostProperty extends Component {
             ).then((response)=>{
                 console.log(response)
                 Alert.success("Hosted property!");
-                this.props.history.push("/home");
+                // this.props.history.push("/home");
             })
                 .catch(Alert.error("Failed to add property"))
 
         }
     };
-
 
     render() {
 
@@ -443,7 +433,7 @@ class HostProperty extends Component {
                                             <input type="text" name="zipCode" id="zipCode" className="form-control form-control-lg" placeholder="Zip Code" onChange={this.handleInputChange} />
                                         </div>
                                         <div className="form-group">
-                                            <input type="text" name="propertyContact" id="propertyContact" className="form-control form-control-lg" placeholder="Property Contact" onChange={this.handleInputChange} />
+                                            <input type="number" name="propertyContact" id="propertyContact" className="form-control form-control-lg" placeholder="Property Contact" onChange={this.handleInputChange} />
                                         </div>
                                         <div className="form-group location-form-btn flt-right">
                                             <button className="btn btn-primary btn-lg" onClick={this.handleDetailsClick}>Next</button>
@@ -517,7 +507,6 @@ class HostProperty extends Component {
                                         <div className="form-group details-form-btn flt-right">
                                             <button className="btn btn-primary btn-lg" onClick={this.handlePhotosClick}>Next</button>
                                         </div>
-
                                     </div>
 
                                     <div className={this.state.photosActive ? "photos-form show-form" : "photos-form"}>
