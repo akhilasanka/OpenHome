@@ -46,6 +46,7 @@ class Main extends Component {
                     <Route exact path="/home" component={Home} />
                     <Route exact path="/addpayment" component={Login} />
                     <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}/>
+                    <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
                     <Alert stack={{limit: 3}}
                       timeout = {3000}
                       position='top-right' effect='slide' offset={65} />
