@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
-import { createReservation } from '../util/APIUtils';
+import { createReservation, getCurrentSystemTime } from '../util/APIUtils';
 import swal from 'sweetalert';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
@@ -34,7 +34,6 @@ class ReservationCreateForm extends Component {
         super(props);
         this.state = {
         }
-
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -51,13 +50,11 @@ class ReservationCreateForm extends Component {
 
     handleSubmit = async (event) => {
         event.preventDefault();
-
-        console.log(event.target);
+        
         let validInput = true;
         var token = localStorage.getItem("accessToken");
 
         const createReservationRequest = Object.assign({}, this.state);
-        console.log(createReservationRequest);
         var startDate = new Date(createReservationRequest["startDate"]);
         var endDate = new Date(createReservationRequest["endDate"]);
 
