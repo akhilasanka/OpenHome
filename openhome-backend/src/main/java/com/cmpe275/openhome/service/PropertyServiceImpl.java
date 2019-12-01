@@ -1,6 +1,7 @@
 package com.cmpe275.openhome.service;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
+import com.cmpe275.openhome.exception.ResourceNotFoundException;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.payload.SearchProperty;
 import com.cmpe275.openhome.payload.SearchRequest;
@@ -57,11 +58,6 @@ public class PropertyServiceImpl implements PropertyService {
 	}
 
 	@Override
-	public PropertyDetails getHardcodedPropertyDetails() {
-		return null;
-	}
-
-	@Override
 	public Property hostProperty(Property property) {
 		Property savedProperty = propertyRepository.save(property);
 		return savedProperty;
@@ -82,5 +78,11 @@ public class PropertyServiceImpl implements PropertyService {
 			searchProperties.add(sp);
 	  	}
 	  	return searchProperties;
+	}
+
+	@Override
+	public Property getProperty(String propertyId) {
+		return propertyRepository.findById(Long.parseLong(propertyId))
+				.orElseThrow(() -> new ResourceNotFoundException("Property", "id", propertyId));
 	}
 }
