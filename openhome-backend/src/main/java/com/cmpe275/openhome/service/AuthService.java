@@ -52,7 +52,6 @@ public class AuthService {
             User result = userRepository.save(user);
 
             String baseURL = appProperties.getAuth().getClientURL();
-           // System.out.println("Frontend URL is " + baseURL);
 
             String verifyURL = "/registration-confirmation/?token=" + authcode.toString();
             String subject = String.format("OpenHome - Your account verification required");
