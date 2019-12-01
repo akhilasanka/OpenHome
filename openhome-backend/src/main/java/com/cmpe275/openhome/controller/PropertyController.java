@@ -3,8 +3,8 @@ package com.cmpe275.openhome.controller;
 import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
-import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.PostPropertyRequest;
+import com.cmpe275.openhome.payload.PostPropertyResponse;
 import com.cmpe275.openhome.payload.SearchPropertyResponse;
 import com.cmpe275.openhome.payload.SearchRequest;
 import com.cmpe275.openhome.repository.UserRepository;
@@ -69,7 +69,8 @@ public class PropertyController {
             .buildAndExpand(result.getId()).toUri();
 
     return ResponseEntity.created(location)
-            .body(new ApiResponse(true, "Property registered successfully@"));
+            .body(new PostPropertyResponse(true, result.getId(),
+                    "Property registered successfully@"));
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
@@ -92,10 +93,10 @@ public class PropertyController {
     return propertyService.deleteProperty(property, isApproved);
   }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-  @GetMapping("/hosts/{hostId}/property/{propertyId}")
-  public PropertyDetails getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String hostId, @PathVariable String propertyId) {
-    return propertyService.getHardcodedPropertyDetails(); // TODO: proper impl!
+  @CrossOrigin(origins = "http://localhost:3000")
+  @GetMapping("/property/{propertyId}")
+  public Property getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String propertyId) {
+    return propertyService.getProperty(propertyId);
   }
 
   @CrossOrigin(origins = "http://localhost:3000")

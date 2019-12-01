@@ -11,8 +11,12 @@ import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.service.ReservationService;
+import com.cmpe275.openhome.util.PayProcessingUtil;
+import com.cmpe275.openhome.util.DateUtils;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -37,6 +41,9 @@ public class ReservationController {
     @Autowired
     private PropertyRepository propertyRepository; // for testing
     
+    @Autowired
+    PayProcessingUtil payProcessingUtil;
+    
     @PostMapping("/reservation/create")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> testCreate(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationCreateRequest createRequest) {
@@ -45,13 +52,33 @@ public class ReservationController {
     	
     	List<Property> properties = propertyRepository.findAll();
     	
+    	// set StartDate to 3PM
+    	LocalDateTime startDateTime = DateUtils.convertDateToLocalDateTime(createRequest.getStartDate());
+    	startDateTime = startDateTime.withHour(15).withMinute(0).withSecond(0).withNano(0);
+    	Date startDate = DateUtils.convertLocalDateTimeToDate(startDateTime);
+    	
+    	// set EndDate to 11AM
+    	LocalDateTime endDateTime = DateUtils.convertDateToLocalDateTime(createRequest.getEndDate());
+    	startDateTime = endDateTime.withHour(11).withMinute(0).withSecond(0).withNano(0);
+    	Date endDate = DateUtils.convertLocalDateTimeToDate(startDateTime);
+    	
     	Reservation reservation = new Reservation();
     	reservation.setProperty(properties.get(0));
     	reservation.setGuest(guest);
     	reservation.setWeekdayPrice(1.0);
-    	reservation.setWeekendPrice(1.0);
-    	reservation.setStartDate(createRequest.getStartDate());
-    	reservation.setEndDate(createRequest.getEndDate());
+    	reservation.setWeekendPrice(2.5);
+    	reservation.setDailyParkingPrice(0.0);
+    	reservation.setStartDate(startDate);
+    	reservation.setEndDate(endDate);
+    	Double totalPrice = payProcessingUtil.calculateTotalPrice(
+    			DateUtils.convertDateToLocalDate(reservation.getStartDate()), 
+    			DateUtils.convertDateToLocalDate(reservation.getEndDate()), 
+				reservation.getWeekdayPrice(), 
+				reservation.getWeekendPrice(), 
+				reservation.getDailyParkingPrice()
+		);
+    	
+    	reservation.setTotalPrice(totalPrice);
     	
     	try {
         	reservationService.createReservation(reservation);    		

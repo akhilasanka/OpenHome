@@ -4,7 +4,6 @@ import com.cmpe275.openhome.model.PayTransaction;
 import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.BillingSummaryResponse;
-import com.cmpe275.openhome.payload.PayMethodResponse;
 import com.cmpe275.openhome.payload.ReservationStatsResponse;
 import com.cmpe275.openhome.repository.PayTransactionRepository;
 import com.cmpe275.openhome.repository.ReservationRepository;
@@ -96,9 +95,9 @@ public class StatsController {
         return billingSummaryResponse;
         /*
          * Sample JSON response:
-         * { "valid_months": [], "valid_properties":{"id":"name"}, line_items:[
+         * { all_months: [], "valid_properties":{"id":"name"}, line_items:[
          *           {
-         *              "transaction_month":January,
+         *              "transaction_month":Jan '19,
          *              "transaction_id":1,
          *              "reservation_id":1,
          *              "property_id":1,

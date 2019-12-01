@@ -1,26 +1,39 @@
 package com.cmpe275.openhome.payload;
 
-import com.cmpe275.openhome.model.ChargeType;
 import com.cmpe275.openhome.model.PayTransaction;
+import com.cmpe275.openhome.util.DateUtils;
+import com.cmpe275.openhome.util.SystemDateTime;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class BillingSummaryResponse {
     private boolean success = false;
     private Map<Long, String> validProperties = new HashMap<>();
-    private Set<String> validMonths = new HashSet<>();
+    private List<String> allMonths = null;
     private List<LineItem> lineItems = new ArrayList<>();
 
     public void addLineItem(LineItem lineItem) {
+        if(lineItem == null)
+            return;
         lineItems.add(lineItem);
-        validMonths.add(lineItem.transactionMonth);
         validProperties.put(lineItem.propertyId, lineItem.propertyName);
+    }
+
+    public List<String> getAllMonths() {
+        if(allMonths == null) {
+            allMonths = new ArrayList<>();
+            final LocalDate curLocalDate = SystemDateTime.getCurSystemTime().toLocalDate();
+            for (int i = 11; i >=0; i--) {
+                final LocalDate loopLocalDate = curLocalDate.minusMonths(i);
+                allMonths.add(DateUtils.formatMonthForDisplay(loopLocalDate));
+            }
+        }
+        return allMonths;
     }
 
     public void setSuccess(boolean success) {
@@ -35,18 +48,11 @@ public class BillingSummaryResponse {
         return validProperties;
     }
 
-    public Set<String> getValidMonths() {
-        return validMonths;
-    }
-
     public List<LineItem> getLineItems() {
         return lineItems;
     }
 
     public static class LineItem {
-        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM yyyy");
-        private static final SimpleDateFormat T_DATE_FORMAT = new SimpleDateFormat("dd MMM yy");
-        private static final SimpleDateFormat MONTH_NAME = new SimpleDateFormat("MMMM");
         private String transactionMonth;
         private Long transactionId;
         private Long reservationId;
@@ -61,38 +67,40 @@ public class BillingSummaryResponse {
 
         public static LineItem parseLineItemFromPayTransaction(PayTransaction payTransaction,
                                                                boolean isGuest) {
+            final LocalDate curLocalDate = SystemDateTime.getCurSystemTime().toLocalDate();
+            final LocalDate transactionLocalDate = DateUtils.convertDateToLocalDate(payTransaction.getTransactionDate());
+            final long monthsBetween = ChronoUnit.MONTHS.between(transactionLocalDate, curLocalDate);
+            if(monthsBetween <0 || monthsBetween >= 12) {
+                return null;
+            }
+
             final LineItem li = new LineItem();
             li.transactionId = payTransaction.getTransactionId();
             li.reservationId = payTransaction.getReservation().getId();
             li.propertyId = payTransaction.getReservation().getProperty().getId();
             li.propertyName = payTransaction.getReservation().getProperty().getPropertyName();
-            li.startDate = DATE_FORMAT.format(payTransaction.getReservation().getStartDate());
-            li.endDate = DATE_FORMAT.format(payTransaction.getReservation().getEndDate());
-            li.chargedDate = T_DATE_FORMAT.format(payTransaction.getTransactionDate());
-            li.transactionMonth = MONTH_NAME.format(payTransaction.getTransactionDate());
+            li.startDate = DateUtils.formatForDisplay(payTransaction.getReservation().getStartDate());
+            li.endDate = DateUtils.formatForDisplay(payTransaction.getReservation().getEndDate());
+            li.chargedDate = DateUtils.formatForDisplay(payTransaction.getTransactionDate());
+            li.transactionMonth = DateUtils.formatMonthForDisplay(payTransaction.getTransactionDate());
             li.card = payTransaction.getCardUsed();
-            if(isGuest) {
-                if(payTransaction.getChargeType() == ChargeType.GUESTCHECKIN) {
-                    li.amount = -1.0* payTransaction.getAmount();
-                    li.type = "Check-in";
-                } else if(payTransaction.getChargeType() == ChargeType.GUESTPENALTY) {
-                    li.amount = -1.0* payTransaction.getAmount();
-                    li.type = "Change/Cancel Penalty";
-                } else {
-                    li.amount = payTransaction.getAmount();
-                    li.type = "Host Change/Cancel credit";
-                }
-            } else {
-                if(payTransaction.getChargeType() == ChargeType.GUESTCHECKIN) {
-                    li.amount = payTransaction.getAmount();
-                    li.type = "Guest Check-in";
-                } else if(payTransaction.getChargeType() == ChargeType.GUESTPENALTY) {
-                    li.amount = payTransaction.getAmount();
-                    li.type = "Guest Change/Cancel Credit";
-                } else {
-                    li.amount = -1.0 * payTransaction.getAmount();
-                    li.type = "Change/Cancel Penalty";
-                }
+            switch (payTransaction.getChargeType()) {
+                case GUESTPENALTY:
+                    li.amount = isGuest ? -1.0* payTransaction.getAmount() : payTransaction.getAmount();
+                    li.type = isGuest ? "Change/Cancel Penalty" : "Guest Change/Cancel Credit";
+                    break;
+                case GUESTCHECKIN:
+                    li.amount = isGuest ? -1.0* payTransaction.getAmount() : payTransaction.getAmount();
+                    li.type = isGuest ? "Check-in charge" : "Guest Check-in credit";
+                    break;
+                case GUESTREFUND:
+                    li.amount = isGuest ? payTransaction.getAmount() : -1.0 * payTransaction.getAmount();
+                    li.type = isGuest ? "Refund credit" : "Guest Refund";
+                    break;
+                case HOSTPENALTY:
+                    li.amount = isGuest ? payTransaction.getAmount() : -1.0 * payTransaction.getAmount();
+                    li.type = isGuest ? "Host Change/Cancel credit" : "Change/Cancel Penalty";
+                    break;
             }
             return li;
         }
