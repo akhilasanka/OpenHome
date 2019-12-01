@@ -33,6 +33,10 @@ public class DateUtils {
 	public static Date convertLocalDateToDate(LocalDate dateToConvert) {
 	    return java.sql.Date.valueOf(dateToConvert);
 	}
+
+	public static Date convertLocalDateTimeToDate(LocalDateTime dateToConvert) {
+		return Date.from( dateToConvert.atZone( ZoneId.systemDefault()).toInstant());
+	}
 	
 	public static LocalDateTime convertDateToLocalDateTime(Date dateToConvert) {
 	    return dateToConvert.toInstant()
