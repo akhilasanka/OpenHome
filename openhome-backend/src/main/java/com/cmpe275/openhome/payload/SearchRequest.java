@@ -92,6 +92,10 @@ public class SearchRequest {
         this.desc = desc;
     }
 
+    public String getZip() {return zip; }
+
+    public void setZip(String zip) {this.zip = zip; }
+
     private String city;
 
     @JsonFormat(pattern="yyyy-MM-dd")
@@ -102,7 +106,9 @@ public class SearchRequest {
 
     private String sharingType;
 
-    public SearchRequest(String city, Date from, Date to, String sharingType, String propertyType, String internet, double minPrice, double maxPrice, String desc) {
+    private String zip;
+
+    public SearchRequest(String city, String zip, Date from, Date to, String sharingType, String propertyType, String internet, double minPrice, double maxPrice, String desc) {
         this.city = city;
         this.from = from;
         this.to = to;
@@ -112,6 +118,7 @@ public class SearchRequest {
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
         this.desc = desc;
+        this.zip = zip;
     }
 
     private String propertyType;

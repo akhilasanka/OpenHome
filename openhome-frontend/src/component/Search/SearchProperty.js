@@ -125,8 +125,8 @@ class SearchProperty extends Component {
                                             </div>
                                             <div className="form-group row">
                                                 <label htmlFor="sharingType" className="col-form-label" style={{ marginLeft: "1.5em" }}>Sharing Type:</label>
-                                                <label> <input type="radio" name="sharingType" value="entirePlace" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Entire Place</label>&nbsp;&nbsp;
-                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="room" style={{ marginTop: "0.8em" }} />&nbsp;A Room</label>
+                                                <label> <input type="radio" name="sharingType" value="Entire Place" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Entire Place</label>&nbsp;&nbsp;
+                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="Private Room" style={{ marginTop: "0.8em" }} />&nbsp;A Room</label>
 
                                             </div>
                                             <div className="form-group row">
