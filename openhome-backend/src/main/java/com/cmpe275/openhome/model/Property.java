@@ -262,4 +262,18 @@ public class Property {
     public void setPhotosArrayJson(String photosArrayJson) {
         this.photosArrayJson = photosArrayJson;
     }
+
+    @Override
+    public String toString() {
+        return "SearchRequest{" +
+                "city='" + addressCity + '\'' +
+
+                ", sharingType='" + sharingType + '\'' +
+                ", propertyType='" + propertyType + '\'' +
+                ", internet='" + wifiAvailability + '\'' +
+                ", minPrice=" + weekdayPrice +
+                ", maxPrice=" + weekendPrice +
+                ", zipCode='" + addressZipcode + '\'' +
+                '}';
+    }
 }
