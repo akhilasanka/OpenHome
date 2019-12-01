@@ -50,17 +50,17 @@ class SearchProperty extends Component {
                 "minPrice": parseInt(priceMin), "maxPrice": parseInt(priceMax), "desc": formData.get("desc")
             };
             console.log(data);
-            this.setState({
+            /*this.setState({
                 results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
                 "zip":"900000", "state":"CA"
             }, { "id":2, "headline": "House by the ocean2", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
             "zip":"900000", "state":"CA"
         }]
-            });
-            /*await axios({
-                method: 'get',
+            });*/
+            await axios({
+                method: 'post',
                 url: API_BASE_URL + '/property/search',
-                params: data,
+                data: data,
                 config: { headers: { 'Content-Type': 'multipart/form-data' } },
                 headers: { "Authorization": `Bearer ${token}` }
             })
@@ -78,12 +78,12 @@ class SearchProperty extends Component {
                         var results = responseData;
                         console.log(results);
                         this.setState({
-                            results : results
+                            results : results.properties
                         });
                     }
                 }).catch(function (err) {
                     console.log(err)
-                });*/
+                });
         }
 
     }
