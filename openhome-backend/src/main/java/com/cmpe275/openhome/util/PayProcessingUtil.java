@@ -6,6 +6,7 @@ import com.cmpe275.openhome.model.PayTransaction;
 import com.cmpe275.openhome.model.PaymentMethod;
 import com.cmpe275.openhome.repository.PayTransactionRepository;
 import com.cmpe275.openhome.repository.PaymentMethodRepository;
+import com.cmpe275.openhome.repository.ReservationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,10 +24,14 @@ public class PayProcessingUtil {
     @Autowired
     PayTransactionRepository payTransactionRepository;
 
-    public void recordPayment(long reservationId, ChargeType chargeType, double amount)
+    @Autowired
+    ReservationRepository reservationRepository;
+
+    public Integer recordPayment(long reservationId, ChargeType chargeType, double amount)
             throws PayTransactionException {
+
         PayTransaction transaction = new PayTransaction();
-        transaction.setReservationId(reservationId);
+        transaction.setReservation(reservationRepository.findReservationById(reservationId));
         transaction.setChargeType(chargeType);
         transaction.setAmount(amount);
         transaction.setTransactionDate(Date.from( SystemDateTime.getCurSystemTime()
@@ -42,6 +47,6 @@ public class PayProcessingUtil {
             transaction.setCardUsed(paymentMethod.getCardEnding());
         }
 
-        payTransactionRepository.save(transaction);
+        return payTransactionRepository.save(transaction).getTransactionId();
     }
 }

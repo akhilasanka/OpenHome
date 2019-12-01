@@ -2,7 +2,12 @@ package com.cmpe275.openhome.controller;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
-import com.cmpe275.openhome.payload.*;
+import com.cmpe275.openhome.model.User;
+import com.cmpe275.openhome.payload.ApiResponse;
+import com.cmpe275.openhome.payload.PostPropertyRequest;
+import com.cmpe275.openhome.payload.SearchPropertyResponse;
+import com.cmpe275.openhome.payload.SearchRequest;
+import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.service.PropertyService;
@@ -23,9 +28,12 @@ import java.util.List;
 @RestController
 public class PropertyController {
 
+
+  @Autowired
+  private UserRepository userRepository;
   @Autowired
   private PropertyService propertyService;
-  
+
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/hosts/{hostName}/properties")
   public List<Property> getAllProperties(@PathVariable String hostName) {
@@ -47,7 +55,8 @@ public class PropertyController {
 
     Property result = null;
     try {
-      Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, Long.parseLong(hostId));
+      User owner = userRepository.getOne(Long.parseLong(hostId));
+      Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
       result = propertyService.hostProperty(property);
     } catch (Exception e) {
       //send a failure status code like 500
