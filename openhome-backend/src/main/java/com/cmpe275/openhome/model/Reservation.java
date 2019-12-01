@@ -48,8 +48,12 @@ public class Reservation {
     private ReservationStatusEnum status;
     
     @NotNull
-    @Column(name="PRICE")
-    private Double dailyPrice;
+    @Column(name = "WEEKDAY_PRICE")
+    private double weekdayPrice;
+
+    @NotNull
+    @Column(name = "WEEKEND_PRICE")
+    private double weekendPrice;
 
 	public Long getId() {
 		return id;
@@ -99,11 +103,20 @@ public class Reservation {
 		this.status = status;
 	}
 
-	public Double getDailyPrice() {
-		return dailyPrice;
+	public double getWeekdayPrice() {
+		return weekdayPrice;
 	}
 
-	public void setDailyPrice(Double dailyPrice) {
-		this.dailyPrice = dailyPrice;
-	} 
+	public void setWeekdayPrice(double weekdayPrice) {
+		this.weekdayPrice = weekdayPrice;
+	}
+
+	public double getWeekendPrice() {
+		return weekendPrice;
+	}
+
+	public void setWeekendPrice(double weekendPrice) {
+		this.weekendPrice = weekendPrice;
+	}
+
 }
