@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import sun.tools.tree.BooleanExpression;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -73,18 +74,34 @@ public class PropertyController {
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
+  @PostMapping("/hosts/{hostId}/property/{propertyId}/edit")
+  @PreAuthorize("hasRole('USER')")
+  public Boolean editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+    User owner = userRepository.getOne(Long.parseLong(hostId));
+    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
+    property.setId(propertyId);
+    return propertyService.editProperty(property, isApproved);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
+  @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
+  @PreAuthorize("hasRole('USER')")
+  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+    User owner = userRepository.getOne(Long.parseLong(hostId));
+    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
+    property.setId(propertyId);
+    return propertyService.deleteProperty(property, isApproved);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/property/{propertyId}")
   public Property getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String propertyId) {
-      return propertyService.getProperty(propertyId);
+    return propertyService.getProperty(propertyId);
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
-    List properties = new ArrayList();
-
-   // System.out.println(searchRequest);
-
     return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
 
