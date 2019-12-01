@@ -55,6 +55,10 @@ public class Reservation {
     @Column(name = "WEEKEND_PRICE")
     private Double weekendPrice;
     
+    @NotNull
+    @Column(name = "DAILY_PARKING_PRICE")
+    private Double dailyParkingPrice;
+
 	@Column(name = "PRICE")
     private Double totalPrice; // calculated based on the weekday and weekend price
 
@@ -120,6 +124,14 @@ public class Reservation {
 
 	public void setWeekendPrice(Double weekendPrice) {
 		this.weekendPrice = weekendPrice;
+	}
+	
+	public Double getDailyParkingPrice() {
+		return dailyParkingPrice;
+	}
+
+	public void setDailyParkingPrice(Double dailyParkingPrice) {
+		this.dailyParkingPrice = dailyParkingPrice;
 	}
 	
 	public Double getTotalPrice() {
