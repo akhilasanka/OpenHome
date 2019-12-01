@@ -38,8 +38,9 @@ public class SystemDateTimeController {
     	SystemDateTime.addToOffset(addRequest.getTimeOffset());
     	
 		try {
-    		reservationService.checkPendingReservations();
-    		reservationService.checkCheckedInReservations();		
+    		reservationService.checkPendingHostCancelationReservations();
+			reservationService.checkPendingReservations();
+    		reservationService.checkCheckedInReservations();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

@@ -72,4 +72,21 @@ public class OpenhomeApplication extends SpringBootServletInitializer {
     		}
     	}
     }
+    
+    @Scheduled(cron="0 * * * * *")
+    public void scheduleHostCancelReservationProcess() {
+    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
+    	
+    	// schedule 'checkPendingReservations' at 3pm
+    	LocalDateTime threePm = currentDateTime.withHour(15).withMinute(0).withSecond(0);
+    	long diff = Math.abs(ChronoUnit.SECONDS.between(currentDateTime, threePm));
+    	if (diff < 30) {
+    		try {
+        		reservationService.checkPendingHostCancelationReservations();    			
+    		}
+    		catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
+    }
 }
