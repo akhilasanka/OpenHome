@@ -9,9 +9,10 @@ import com.cmpe275.openhome.payload.SearchRequest;
 
 public interface PropertyService {
 	List<Property> getHardcodedPropertyList();
-	PropertyDetails getHardcodedPropertyDetails();
 
 	Property hostProperty(Property property);
 
 	List<SearchProperty> searchProperties(SearchRequest searchRequest);
+
+	Property getProperty(String propertyId);
 }
