@@ -166,7 +166,9 @@ public class PropertyServiceImpl implements PropertyService {
 			}
 		});
 
-		propertyRepository.delete(property);
+		property.setIsDeleted(true);
+
+		propertyRepository.save(property);
 		return true;
 	}
 
