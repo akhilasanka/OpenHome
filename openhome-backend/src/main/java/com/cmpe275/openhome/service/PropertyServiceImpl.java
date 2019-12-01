@@ -36,9 +36,6 @@ public class PropertyServiceImpl implements PropertyService {
 	@Autowired
 	private ReservationService reservationService;
 
-	@Autowired
-	PayProcessingUtil payProcessingUtil;
-
 	private static List<Property> myHardcodedPropertyList = new ArrayList<Property>();
 	private static PropertyDetails myHardcodedPropertyDetails = new PropertyDetails();
 
@@ -104,17 +101,16 @@ public class PropertyServiceImpl implements PropertyService {
 		List<Reservation> cancelledWithoutPenalty = new ArrayList<>();
 
 
-		if (sevenDayReservations.size()>0 && isApprovedForPayingFine) {
+		if (sevenDayReservations.size() > 0 && isApprovedForPayingFine) {
 			for (Reservation r : sevenDayReservations) {
-				payProcessingUtil.recordPayment(r.getId(), ChargeType.HOSTPENALTY, 0.15 * r.getTotalPrice());
 				cancelledWithPenalty.add(r);
 				reservationService.hostCancelReservation(r);
 			}
-		} else if (sevenDayReservations.size()>0 && !isApprovedForPayingFine) {
+		} else if (sevenDayReservations.size() > 0 && !isApprovedForPayingFine) {
 			return false;
 		}
 
-		allReservations.forEach( r -> {
+		allReservations.forEach(r -> {
 			if (!sevenDayReservations.contains(r.getId())) {
 				cancelledWithoutPenalty.add(r);
 				reservationService.hostCancelReservation(r);
@@ -149,17 +145,16 @@ public class PropertyServiceImpl implements PropertyService {
 		List<Reservation> cancelledWithoutPenalty = new ArrayList<>();
 
 
-		if (sevenDayReservations.size()>0 && isApprovedForPayingFine) {
+		if (sevenDayReservations.size() > 0 && isApprovedForPayingFine) {
 			for (Reservation r : sevenDayReservations) {
-				payProcessingUtil.recordPayment(r.getId(), ChargeType.HOSTPENALTY, 0.15 * r.getTotalPrice());
 				cancelledWithPenalty.add(r);
 				reservationService.hostCancelReservation(r);
 			}
-		} else if (sevenDayReservations.size()>0 && !isApprovedForPayingFine) {
+		} else if (sevenDayReservations.size() > 0 && !isApprovedForPayingFine) {
 			return false;
 		}
 
-		allReservations.forEach( r -> {
+		allReservations.forEach(r -> {
 			if (!sevenDayReservations.contains(r.getId())) {
 				cancelledWithoutPenalty.add(r);
 				reservationService.hostCancelReservation(r);
