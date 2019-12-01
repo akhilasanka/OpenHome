@@ -3,10 +3,12 @@ package com.cmpe275.openhome.controller;
 import com.cmpe275.openhome.exception.PayTransactionException;
 import com.cmpe275.openhome.model.ChargeType;
 import com.cmpe275.openhome.model.PaymentMethod;
+import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.AddPayRequest;
 import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.PayMethodResponse;
 import com.cmpe275.openhome.repository.PaymentMethodRepository;
+import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.util.PayProcessingUtil;
@@ -28,6 +30,10 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/pay")
 public class PaymentController {
+
+    @Autowired
+    UserRepository userRepository;
+
     @Autowired
     PaymentMethodRepository paymentMethodRepository;
 
@@ -39,7 +45,8 @@ public class PaymentController {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Unparsable request"));
         }
         final PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.parseAddPayRequest(request);
+        final User user = userRepository.findById(request.getUserid()).orElse(null);
+        paymentMethod.parseAddPayRequest(request, user);
         final PaymentMethod result = paymentMethodRepository.save(paymentMethod);
         if(result == null) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Failed to save your payment method"));
@@ -61,6 +68,7 @@ public class PaymentController {
             return new PayMethodResponse(payMethod);
     }
 
+    // todo For testing only. Remove it later?
     @GetMapping("/insertsampletransaction")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> insertSampleTransaction(@CurrentUser UserPrincipal userPrincipal) {

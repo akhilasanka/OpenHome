@@ -2,8 +2,10 @@ package com.cmpe275.openhome.controller;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
+import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.PostPropertyRequest;
+import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.service.PropertyService;
@@ -25,6 +27,9 @@ public class PropertyController {
 
   @Autowired
   private PropertyService myPropertyService;
+
+  @Autowired
+  private UserRepository userRepository;
   
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/hosts/{hostName}/properties")
@@ -47,7 +52,8 @@ public class PropertyController {
 
     Property result = null;
     try {
-      Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, Long.parseLong(hostId));
+      User owner = userRepository.findById(Long.parseLong(hostId)).orElse(null);
+      Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
       result = myPropertyService.hostProperty(property);
     } catch (Exception e) {
       //send a failure status code like 500
