@@ -2,8 +2,7 @@ package com.cmpe275.openhome.controller;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
-import com.cmpe275.openhome.payload.ApiResponse;
-import com.cmpe275.openhome.payload.PostPropertyRequest;
+import com.cmpe275.openhome.payload.*;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.service.PropertyService;
@@ -18,18 +17,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class PropertyController {
 
   @Autowired
-  private PropertyService myPropertyService;
+  private PropertyService propertyService;
   
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/hosts/{hostName}/properties")
   public List<Property> getAllProperties(@PathVariable String hostName) {
-	 return myPropertyService.getHardcodedPropertyList(); // TODO: proper impl!
+	 return propertyService.getHardcodedPropertyList(); // TODO: proper impl!
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
@@ -48,7 +48,7 @@ public class PropertyController {
     Property result = null;
     try {
       Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, Long.parseLong(hostId));
-      result = myPropertyService.hostProperty(property);
+      result = propertyService.hostProperty(property);
     } catch (Exception e) {
       //send a failure status code like 500
       e.printStackTrace();
@@ -65,7 +65,17 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/hosts/{hostId}/property/{propertyId}")
   public PropertyDetails getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String hostId, @PathVariable String propertyId) {
-    return myPropertyService.getHardcodedPropertyDetails(); // TODO: proper impl!
+    return propertyService.getHardcodedPropertyDetails(); // TODO: proper impl!
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
+  @PostMapping("/property/search")
+  public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
+    List properties = new ArrayList();
+
+    System.out.println(searchRequest);
+
+    return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
 
 }

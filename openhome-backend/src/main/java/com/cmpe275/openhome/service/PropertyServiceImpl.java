@@ -2,7 +2,10 @@ package com.cmpe275.openhome.service;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
+import com.cmpe275.openhome.payload.SearchProperty;
+import com.cmpe275.openhome.payload.SearchRequest;
 import com.cmpe275.openhome.repository.PropertyRepository;
+import com.cmpe275.openhome.repository.PropertyRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,9 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Autowired
 	private PropertyRepository propertyRepository;
+
+	@Autowired
+	private PropertyRepositoryCustom propertyRepositoryCustom;
 
 	private static List<Property> myHardcodedPropertyList = new ArrayList<Property>();
 	private static PropertyDetails myHardcodedPropertyDetails = new PropertyDetails();
@@ -59,5 +65,22 @@ public class PropertyServiceImpl implements PropertyService {
 	public Property hostProperty(Property property) {
 		Property savedProperty = propertyRepository.save(property);
 		return savedProperty;
+	}
+
+	@Override
+	public List<SearchProperty> searchProperties(SearchRequest searchRequest) {
+	  	List<Property> properties =  propertyRepositoryCustom.findProperties(searchRequest);
+	  	List<SearchProperty> searchProperties = new ArrayList<>();
+	  	for (Property p : properties) {
+	  		String imagesString = p.getPhotosArrayJson();
+	  		String[] images = imagesString.split(",");
+	  		String imageUrl = "";
+	  		if (images.length>0) {
+	  			imageUrl = images[0].replace("[", "").replace("\"","").replace("]", "");
+			}
+			SearchProperty sp = new SearchProperty(imageUrl,p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressCity(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
+			searchProperties.add(sp);
+	  	}
+	  	return searchProperties;
 	}
 }

@@ -51,7 +51,7 @@ class SearchResult extends Component {
                 <div class="card bg-light text-dark">
                 <div class="row">
                     <div class="col-3">
-                        <img class="card-img" src={record.imageurl} alt="Card image" />
+                        <img class="card-img" src={record.imageUrl} alt="Card image" />
                     </div>
                     <div className="col">
                         <div class="card-body">
@@ -67,8 +67,8 @@ class SearchResult extends Component {
                             </div>
                                 </div>
                                 <div className="col" style={{marginLeft:"10em"}}>
-                                <label className="row">Weekday Price($): {record.weekdayprice}</label>
-                                <label className="row">Weekend Price($): {record.weekendprice}</label>
+                                <label className="row">Weekday Price($): {record.weekdayPrice}</label>
+                                <label className="row">Weekend Price($): {record.weekendPrice}</label>
                                 </div>
                             </div>
                             
@@ -80,7 +80,7 @@ class SearchResult extends Component {
         });
 
         return (
-            <div>
+            <div style={{background:"white"}}>
                 <div className="container">
                 <div className="row justify-content-center align-items-center" style={{ height: '75vh' }}>
                 <div className="col-12">
