@@ -27,7 +27,7 @@ public class PropertyRepositoryCustomImpl implements PropertyRepositoryCustom{
         CriteriaQuery<Property> query = queryObj.select(from).
         where(cb.equal(from.get("addressCity"), searchRequest.getCity()));
 
-        System.out.println(query.toString());
+        //System.out.println(query.toString());
 
         return entityManager.createQuery(query)
                 .getResultList();
