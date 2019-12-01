@@ -1,11 +1,14 @@
 package com.cmpe275.openhome.aop;
 
+import com.cmpe275.openhome.model.PayTransaction;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.notification.EmailNotification;
 import com.cmpe275.openhome.payload.AddPayRequest;
+import com.cmpe275.openhome.payload.PostPropertyResponse;
 import com.cmpe275.openhome.repository.PropertyRepository;
 import com.cmpe275.openhome.repository.UserRepository;
+import com.cmpe275.openhome.util.DateUtils;
 
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import org.aspectj.lang.JoinPoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @Configuration
@@ -46,25 +51,61 @@ public class NotificationAOP {
     }
 
     @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.postProperty(..))",
-            returning = "property")
-    public void postPropertyNotification(JoinPoint joinPoint, Property property) {
-        // todo waiting on postProperty to return some data.
+            returning = "re")
+    public void postPropertyNotification(JoinPoint joinPoint, ResponseEntity re) {
         System.out.println("Sending email to host after property is setup");
-        // email -> hostemail
-        // Subject -> New property posted
-        // text -> Thank you for posting a new property to OpenHome.
+        PostPropertyResponse ppr = (PostPropertyResponse) re.getBody();
+        if(ppr != null) {
+            Long propId = ppr.getPropertyId();
+            Property p = propertyRepository.findById(propId).orElse(null);
+            if (p != null) {
+                final String email = p.getOwner().getEmail();
+                final String subject = "New property posted";
+                final String text = "Thank you for posting a new property at " + String.format("%s, %s, %s",
+                        p.getAddressStreet(), p.getAddressCity(), p.getAddressState());
+                emailNotification.sendEmail(email, subject, text);
+            }
+        }
     }
 
     @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.util.PayProcessingUtil.recordPayment(..))",
-            returning = "transactionId")
-    public void payTransactionNotification(JoinPoint joinPoint, int transactionId) {
-        //todo waiting on property Model to be setup.
+            returning = "transaction")
+    public void payTransactionNotification(JoinPoint joinPoint, PayTransaction transaction) {
         System.out.println("Sending email after payment was charged");
-        // Guest email, host email, charge-type, amount, propertyname, reservation dates.
-        // email -> guest email & host email
-        // Subject -> Payment notification
-        // Text -> You were Charged/credited $X.XX for ("" | cancellation/change penalty against)
-        //          reservation of <property name> on dates <reservation-dates>
+        final String guestEmail = transaction.getReservation().getGuest().getEmail();
+        final String hostEmail = transaction.getReservation().getProperty().getOwner().getEmail();
+        final String subject = "payment notification";
+        final String textTemplate = "You were %s " +
+                String.format("$%.2f on %s for ", transaction.getAmount(),
+                        DateUtils.formatForDisplay(transaction.getTransactionDate()))
+                + "%s" + String.format("reservation of %s on dates %s to %s",
+                    transaction.getReservation().getProperty().getPropertyName(),
+                    DateUtils.formatForDisplay(transaction.getReservation().getStartDate()),
+                    DateUtils.formatForDisplay(transaction.getReservation().getEndDate()));
+        final String charged = "Charged", credited = "Credited",
+                cancel = "cancellation/change penalty on ", checkin = "checkin on ", refund = "refund on";
+        String guestText = "";
+        String hostText = "";
+        switch (transaction.getChargeType()) {
+            case GUESTPENALTY:
+                guestText = String.format(textTemplate, charged, cancel);
+                hostText = String.format(textTemplate, credited, cancel);
+                break;
+            case GUESTCHECKIN:
+                guestText = String.format(textTemplate, charged, checkin);
+                hostText = String.format(textTemplate, credited, checkin);
+                break;
+            case HOSTPENALTY:
+                guestText = String.format(textTemplate, credited, cancel);
+                hostText = String.format(textTemplate, charged, cancel);
+                break;
+            case GUESTREFUND:
+                guestText = String.format(textTemplate, credited, refund);
+                hostText = String.format(textTemplate, charged, refund);
+                break;
+        }
+        emailNotification.sendEmail(guestEmail, subject, guestText);
+        emailNotification.sendEmail(hostEmail, subject, hostText);
     }
 
     @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.AuthController.verify(..))", returning = "re")
