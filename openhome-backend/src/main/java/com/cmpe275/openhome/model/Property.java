@@ -76,6 +76,17 @@ public class Property {
     @Column(name = "photos")
     private String photosArrayJson;
 
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean Isdeleted) {
+        isDeleted = Isdeleted;
+    }
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     public Long getId() {
         return id;
     }
