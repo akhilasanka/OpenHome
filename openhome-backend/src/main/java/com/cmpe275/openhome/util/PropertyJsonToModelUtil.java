@@ -1,8 +1,13 @@
 package com.cmpe275.openhome.util;
 
 import com.cmpe275.openhome.model.Property;
+import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.PostPropertyRequest;
+import com.cmpe275.openhome.repository.UserRepository;
+
 import com.google.gson.Gson;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +16,7 @@ import java.util.Map;
  * Utility class to process payments charged to guests or penalty charged to hosts.
  */
 public class PropertyJsonToModelUtil {
+
     private static final Gson JSON_CONVERTER = new Gson();
     private static final String ALWAYS_AVAILABLE_DAYS = "SUMTUWTHFSA";
     private static final Map<String, String> FULL_DAY_TO_COMPRESS_MAP = new HashMap<String, String>();
@@ -24,12 +30,12 @@ public class PropertyJsonToModelUtil {
         FULL_DAY_TO_COMPRESS_MAP.put("sunday","SU");
     }
 
-    public static Property getProperty(PostPropertyRequest postPropertyRequest, Long hostId) {
+    public static Property getProperty(PostPropertyRequest postPropertyRequest, User owner) {
         String availableDaysCompressedString = getAvailableDaysConpressedString(postPropertyRequest.getAlwaysAvailable(),
                 postPropertyRequest.getWeeklyAvailability());
 
         Property property = new Property();
-        property.setOwnerId(hostId);
+        property.setOwner(owner);
         property.setAddressStreet(postPropertyRequest.getStreetAddress());
         property.setAddressCity(postPropertyRequest.getCity());
         property.setAddressState(postPropertyRequest.getState());

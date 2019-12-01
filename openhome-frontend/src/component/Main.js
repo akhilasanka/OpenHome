@@ -16,6 +16,8 @@ import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
 import ReservationCreate from './Reservation/ReservationCreate'
 import TimeManagement from './System/TimeManagement'
+import VerifyAuthCode from './Auth/signup/VerifyAuthCode';
+import EditProperty from './Properties/EditProperty';
 
 class Main extends Component {
     render() {
@@ -29,9 +31,11 @@ class Main extends Component {
                 <Route exact path="/search" component={SearchProperty} />
                 <Route exact path="/property/result" component={SearchResult}/>
                 <Route exact path="/property/host" exact component={HostProperty} />
+                <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
                 <Route exact path="/reservation/create" component={ReservationCreate} />
                 <Route exact path="/system/timeManagement" component={TimeManagement} />
+                <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
             </div>
         )
         }
@@ -44,6 +48,7 @@ class Main extends Component {
                     <Route exact path="/home" component={Home} />
                     <Route exact path="/addpayment" component={Login} />
                     <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}/>
+                    <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
                     <Alert stack={{limit: 3}}
                       timeout = {3000}
                       position='top-right' effect='slide' offset={65} />
