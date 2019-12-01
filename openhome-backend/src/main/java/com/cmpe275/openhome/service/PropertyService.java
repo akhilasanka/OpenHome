@@ -12,6 +12,10 @@ public interface PropertyService {
 
 	Property hostProperty(Property property);
 
+	Boolean editProperty(Property property, Boolean isApprovedForPayingFine) throws Exception;
+
+	Boolean deleteProperty(Property property, Boolean isApprovedForPayingFine) throws Exception;
+
 	List<SearchProperty> searchProperties(SearchRequest searchRequest);
 
 	Property getProperty(String propertyId);

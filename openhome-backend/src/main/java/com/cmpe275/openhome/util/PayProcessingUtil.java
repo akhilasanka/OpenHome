@@ -10,6 +10,8 @@ import com.cmpe275.openhome.repository.ReservationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -27,7 +29,7 @@ public class PayProcessingUtil {
     @Autowired
     ReservationRepository reservationRepository;
 
-    public Long recordPayment(long reservationId, ChargeType chargeType, double amount)
+    public PayTransaction recordPayment(long reservationId, ChargeType chargeType, double amount)
             throws PayTransactionException {
 
         PayTransaction transaction = new PayTransaction();
@@ -47,6 +49,26 @@ public class PayProcessingUtil {
             transaction.setCardUsed(paymentMethod.getCardEnding());
         }
 
-        return payTransactionRepository.save(transaction).getTransactionId();
+        return payTransactionRepository.save(transaction);
+    }
+    
+    public Double calculateTotalPrice(LocalDate startDate, LocalDate endDate, Double weekdayPrice, Double weekendPrice, Double dailyParkingPrice) {
+    	Double totalPrice = new Double(0);
+    	
+    	for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+    		DayOfWeek dow = date.getDayOfWeek();
+    		boolean isWeekend = dow.equals(DayOfWeek.SATURDAY) || dow.equals(DayOfWeek.SUNDAY);
+    		
+    		if (isWeekend) {
+    			totalPrice += weekendPrice;
+    		}
+    		else {
+    			totalPrice += weekdayPrice;
+    		}
+    		
+    		totalPrice += dailyParkingPrice;	
+    	}
+    	
+    	return totalPrice;
     }
 }
