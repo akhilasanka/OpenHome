@@ -1,10 +1,6 @@
 package com.cmpe275.openhome.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "property")
@@ -82,6 +78,11 @@ public class Property {
 
     public Long getId() {
         return id;
+    }
+
+    public String getPropertyName() {
+        return String.format("%s (%s) at %s,%s,%s", getPropertyType(), getSharingType(),
+                getAddressStreet(), getAddressCity(), getAddressState());
     }
 
     public void setId(Long id) {
