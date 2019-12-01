@@ -37,22 +37,28 @@ public class StatsController {
     @GetMapping("/getreservations")
     @PreAuthorize("hasRole('USER')")
     public ReservationStatsResponse getReservations(@CurrentUser UserPrincipal userPrincipal) {
+        final User currentUser = userRepository.findById(userPrincipal.getId()).orElse(null);
         final ReservationStatsResponse reservationStatsResponse = new ReservationStatsResponse();
-        List<Reservation> reservations = reservationRepository.findByVerifiedGuestId(userPrincipal.getId());
-        Date curTime = Date.from( SystemDateTime.getCurSystemTime().atZone( ZoneId.systemDefault()).toInstant());
-        for(final Reservation r: reservations) {
-            ReservationStatsResponse.ReservationItem ri = ReservationStatsResponse.ReservationItem.newItemFromReservation(r);
-            if(curTime.before(r.getStartDate())) {
-                // cur time is before startdate, so future reservation
-                reservationStatsResponse.setFuture(ri);
-            } else if (curTime.after(r.getEndDate())) {
-                // curTime is after end date, so reservation is in the past
-                reservationStatsResponse.setPast(ri);
-            } else {
-                reservationStatsResponse.setCurrent(ri);
+        if(currentUser != null && currentUser.getEmailVerified()) {
+            final boolean isGuest = "guest".equals(currentUser.getRole());
+            List<Reservation> reservations = isGuest ?
+                    reservationRepository.findByVerifiedGuestId(userPrincipal.getId()) :
+                    reservationRepository.findByVerifiedHostId(userPrincipal.getId());
+            Date curTime = Date.from( SystemDateTime.getCurSystemTime().atZone( ZoneId.systemDefault()).toInstant());
+            for(final Reservation r: reservations) {
+                ReservationStatsResponse.ReservationItem ri = ReservationStatsResponse.ReservationItem.newItemFromReservation(r);
+                if(curTime.before(r.getStartDate())) {
+                    // cur time is before startdate, so future reservation
+                    reservationStatsResponse.setFuture(ri);
+                } else if (curTime.after(r.getEndDate())) {
+                    // curTime is after end date, so reservation is in the past
+                    reservationStatsResponse.setPast(ri);
+                } else {
+                    reservationStatsResponse.setCurrent(ri);
+                }
             }
+            reservationStatsResponse.setSuccess(true);
         }
-        reservationStatsResponse.setSuccess(true);
         return reservationStatsResponse;
         /*
           Sample JSON response:
