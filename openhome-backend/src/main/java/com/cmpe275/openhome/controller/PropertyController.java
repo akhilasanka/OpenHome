@@ -73,7 +73,7 @@ public class PropertyController {
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
     List properties = new ArrayList();
 
-    System.out.println(searchRequest);
+   // System.out.println(searchRequest);
 
     return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
