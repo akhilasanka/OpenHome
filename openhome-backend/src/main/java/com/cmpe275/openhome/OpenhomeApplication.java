@@ -44,10 +44,15 @@ public class OpenhomeApplication extends SpringBootServletInitializer {
     	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
     	
     	// schedule 'checkPendingReservations' at 3am
-    	LocalDateTime threeAM = currentDateTime.withHour(3);
+    	LocalDateTime threeAM = currentDateTime.withHour(3).withMinute(0).withSecond(0);
     	long diff = Math.abs(ChronoUnit.SECONDS.between(currentDateTime, threeAM));
     	if (diff < 30) {
-    		reservationService.checkPendingReservations();
+    		try {
+        		reservationService.checkPendingReservations();    			
+    		}
+    		catch (Exception e) {
+    			e.printStackTrace();
+    		}
     	}
     }
     
@@ -55,11 +60,16 @@ public class OpenhomeApplication extends SpringBootServletInitializer {
     public void scheduleCheckedInReservationProcess() {
     	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
     	
-    	// schedule 'checkPendingReservations' at 3am
-    	LocalDateTime elevenAM = currentDateTime.withHour(11);
+    	// schedule 'checkPendingReservations' at 11am
+    	LocalDateTime elevenAM = currentDateTime.withHour(11).withMinute(0).withSecond(0);
     	long diff = Math.abs(ChronoUnit.SECONDS.between(currentDateTime, elevenAM));
     	if (diff < 30) {
-    		reservationService.checkCheckedInReservations();
+    		try {
+        		reservationService.checkCheckedInReservations();    			
+    		}
+    		catch (Exception e) {
+    			e.printStackTrace();
+    		}
     	}
     }
 }
