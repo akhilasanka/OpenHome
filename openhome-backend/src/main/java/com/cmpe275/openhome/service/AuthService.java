@@ -1,5 +1,6 @@
 package com.cmpe275.openhome.service;
 
+import com.cmpe275.openhome.config.AppProperties;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.notification.EmailNotification;
 import com.cmpe275.openhome.repository.UserRepository;
@@ -21,6 +22,9 @@ public class AuthService {
 
     @Autowired
     EmailNotification emailNotification;
+
+    @Autowired
+    private AppProperties appProperties;
 
 
     public User signupUser(User user) throws Exception {
@@ -47,8 +51,8 @@ public class AuthService {
 
             User result = userRepository.save(user);
 
-            String baseURL = "http://localhost:8080";
-            System.out.println("Frontend URL is " + baseURL);
+            String baseURL = appProperties.getAuth().getClientURL();
+           // System.out.println("Frontend URL is " + baseURL);
 
             String verifyURL = "/registration-confirmation/?token=" + authcode.toString();
             String subject = String.format("OpenHome - Your account verification required");

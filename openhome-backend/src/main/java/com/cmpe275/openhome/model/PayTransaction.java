@@ -4,9 +4,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,10 +19,11 @@ import javax.persistence.TemporalType;
 public class PayTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer transactionId;
+    private Long transactionId;
 
-    @Column(nullable=false)
-    private Long reservationId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "RESERVATION_ID")
+    private Reservation reservation;
 
     @Column(nullable=false)
     private ChargeType chargeType;
@@ -34,20 +38,20 @@ public class PayTransaction {
     @Column(nullable=false)
     private String cardUsed;
 
-    public Integer getTransactionId() {
+    public Long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId) {
+    public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
     }
 
-    public Long getReservationId() {
-        return reservationId;
+    public Reservation getReservation() {
+        return reservation;
     }
 
-    public void setReservationId(Long reservationId) {
-        this.reservationId = reservationId;
+    public void setReservation(Reservation reservationId) {
+        this.reservation = reservationId;
     }
 
     public ChargeType getChargeType() {

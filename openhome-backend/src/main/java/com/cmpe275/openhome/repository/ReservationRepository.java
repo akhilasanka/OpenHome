@@ -11,6 +11,12 @@ import com.cmpe275.openhome.model.User;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+	@Query(value = "SELECT r FROM Reservation r WHERE r.guest.id=:userId AND r.guest.emailVerified=true")
+	List<Reservation> findByVerifiedGuestId(Long userId);
+
+	@Query(value = "SELECT r FROM Reservation r WHERE r.property.owner.id=:userId AND r.property.owner.emailVerified=true")
+	List<Reservation> findByVerifiedHostId(Long userId);
+
 	List<Reservation> findByGuest(User guest);
 	
 	Reservation findReservationById(Long id);

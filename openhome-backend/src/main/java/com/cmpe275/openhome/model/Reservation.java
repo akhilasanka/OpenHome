@@ -48,8 +48,19 @@ public class Reservation {
     private ReservationStatusEnum status;
     
     @NotNull
-    @Column(name="PRICE")
-    private Double dailyPrice;
+    @Column(name = "WEEKDAY_PRICE")
+    private Double weekdayPrice;
+
+    @NotNull
+    @Column(name = "WEEKEND_PRICE")
+    private Double weekendPrice;
+    
+    @NotNull
+    @Column(name = "DAILY_PARKING_PRICE")
+    private Double dailyParkingPrice;
+
+	@Column(name = "PRICE")
+    private Double totalPrice; // calculated based on the weekday and weekend price
 
 	public Long getId() {
 		return id;
@@ -98,12 +109,36 @@ public class Reservation {
 	public void setStatus(ReservationStatusEnum status) {
 		this.status = status;
 	}
-
-	public Double getDailyPrice() {
-		return dailyPrice;
+	
+	public void setWeekdayPrice(Double weekdayPrice) {
+		this.weekdayPrice = weekdayPrice;
+	}
+	
+	public double getWeekdayPrice() {
+		return weekdayPrice;
+	}
+	
+    public Double getWeekendPrice() {
+		return weekendPrice;
 	}
 
-	public void setDailyPrice(Double dailyPrice) {
-		this.dailyPrice = dailyPrice;
-	} 
+	public void setWeekendPrice(Double weekendPrice) {
+		this.weekendPrice = weekendPrice;
+	}
+	
+	public Double getDailyParkingPrice() {
+		return dailyParkingPrice;
+	}
+
+	public void setDailyParkingPrice(Double dailyParkingPrice) {
+		this.dailyParkingPrice = dailyParkingPrice;
+	}
+	
+	public Double getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(Double totalPrice) {
+		this.totalPrice = totalPrice;
+	}
 }
