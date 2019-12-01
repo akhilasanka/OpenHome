@@ -100,7 +100,7 @@ class ReservationCreateForm extends Component {
                         <div id="total">Select a date range!</div>
                     </div>
                 </div>
-                <button type="submit" className="btn btn-primary align-center">Reserve</button>
+                <button type="submit" className="btn btn-primary align-center mb-3">Reserve</button>
             </form>
         );
     }

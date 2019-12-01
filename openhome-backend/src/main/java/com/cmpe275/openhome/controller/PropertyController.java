@@ -1,6 +1,5 @@
 package com.cmpe275.openhome.controller;
 
-import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.PostPropertyRequest;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import sun.tools.tree.BooleanExpression;
 
 import javax.validation.Valid;
 import java.net.URI;
