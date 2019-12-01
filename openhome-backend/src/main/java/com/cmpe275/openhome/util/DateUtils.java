@@ -41,8 +41,4 @@ public class DateUtils {
 	public static LocalDateTime convertDateToLocalDateTime(Date dateToConvert) {
 	    return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 	}
-	
-	public static Date convertLocalDateTimeToDate(LocalDateTime dateToConvert) {
-	    return Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
-	}
 }
