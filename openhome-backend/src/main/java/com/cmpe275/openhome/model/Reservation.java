@@ -55,7 +55,7 @@ public class Reservation {
     @Column(name = "WEEKEND_PRICE")
     private Double weekendPrice;
     
-	@Column(name = "TOTAL_PRICE")
+	@Column(name = "PRICE")
     private Double totalPrice; // calculated based on the weekday and weekend price
 
 	public Long getId() {
