@@ -56,13 +56,13 @@ public class PropertyJsonToModelUtil {
         property.setHasPrivateShower(postPropertyRequest.getPrivateBathShowerAvailable());
 
         if(!postPropertyRequest.getParkingCost().isEmpty()) {
-            property.setDailyParkingFee(Long.parseLong(postPropertyRequest.getParkingCost()));
+            property.setDailyParkingFee(Double.parseDouble(postPropertyRequest.getParkingCost()));
         }
         if(!postPropertyRequest.getWeekdayRentPrice().isEmpty()) {
-            property.setWeekdayPrice(Long.parseLong(postPropertyRequest.getWeekdayRentPrice()));
+            property.setWeekdayPrice(Double.parseDouble(postPropertyRequest.getWeekdayRentPrice()));
         }
         if(!postPropertyRequest.getWeekendRentPrice().isEmpty()) {
-            property.setWeekendPrice(Long.parseLong(postPropertyRequest.getWeekendRentPrice()));
+            property.setWeekendPrice(Double.parseDouble(postPropertyRequest.getWeekendRentPrice()));
         }
         return property;
     }
