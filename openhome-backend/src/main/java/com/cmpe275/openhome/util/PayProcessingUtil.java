@@ -10,6 +10,8 @@ import com.cmpe275.openhome.repository.ReservationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -48,5 +50,25 @@ public class PayProcessingUtil {
         }
 
         return payTransactionRepository.save(transaction).getTransactionId();
+    }
+    
+    public Double calculateTotalPrice(LocalDate startDate, LocalDate endDate, Double weekdayPrice, Double weekendPrice, Double dailyParkingPrice) {
+    	Double totalPrice = new Double(0);
+    	
+    	for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+    		DayOfWeek dow = date.getDayOfWeek();
+    		boolean isWeekend = dow.equals(DayOfWeek.SATURDAY) || dow.equals(DayOfWeek.SUNDAY);
+    		
+    		if (isWeekend) {
+    			totalPrice += weekendPrice;
+    		}
+    		else {
+    			totalPrice += weekdayPrice;
+    		}
+    		
+    		totalPrice += dailyParkingPrice;	
+    	}
+    	
+    	return totalPrice;
     }
 }
