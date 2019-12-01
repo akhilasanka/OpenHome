@@ -49,11 +49,14 @@ public class Reservation {
     
     @NotNull
     @Column(name = "WEEKDAY_PRICE")
-    private double weekdayPrice;
+    private Double weekdayPrice;
 
     @NotNull
     @Column(name = "WEEKEND_PRICE")
-    private double weekendPrice;
+    private Double weekendPrice;
+    
+	@Column(name = "PRICE")
+    private Double totalPrice; // calculated based on the weekday and weekend price
 
 	public Long getId() {
 		return id;
@@ -102,21 +105,28 @@ public class Reservation {
 	public void setStatus(ReservationStatusEnum status) {
 		this.status = status;
 	}
-
+	
+	public void setWeekdayPrice(Double weekdayPrice) {
+		this.weekdayPrice = weekdayPrice;
+	}
+	
 	public double getWeekdayPrice() {
 		return weekdayPrice;
 	}
-
-	public void setWeekdayPrice(double weekdayPrice) {
-		this.weekdayPrice = weekdayPrice;
-	}
-
-	public double getWeekendPrice() {
+	
+    public Double getWeekendPrice() {
 		return weekendPrice;
 	}
 
-	public void setWeekendPrice(double weekendPrice) {
+	public void setWeekendPrice(Double weekendPrice) {
 		this.weekendPrice = weekendPrice;
 	}
+	
+	public Double getTotalPrice() {
+		return totalPrice;
+	}
 
+	public void setTotalPrice(Double totalPrice) {
+		this.totalPrice = totalPrice;
+	}
 }
