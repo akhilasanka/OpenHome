@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +18,15 @@ import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.SystemDateTimeAddRequest;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
+import com.cmpe275.openhome.service.ReservationService;
 import com.cmpe275.openhome.util.SystemDateTime;
 
 @RestController
 public class SystemDateTimeController {
+	
+    @Autowired
+    private ReservationService reservationService;
+    
     @GetMapping("/system/time")
     public LocalDateTime getSystemTime() {
     	return SystemDateTime.getCurSystemTime();
@@ -30,6 +36,14 @@ public class SystemDateTimeController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> addToSysemTime(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody SystemDateTimeAddRequest addRequest) {
     	SystemDateTime.addToOffset(addRequest.getTimeOffset());
+    	
+		try {
+    		reservationService.checkPendingReservations();
+    		reservationService.checkCheckedInReservations();		
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
     	
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/system/addTime")
