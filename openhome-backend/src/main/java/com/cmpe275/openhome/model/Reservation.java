@@ -61,6 +61,10 @@ public class Reservation {
 
 	@Column(name = "PRICE")
     private Double totalPrice; // calculated based on the weekday and weekend price
+	
+	@Column(name = "HOST_CANCELATION_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date hostCancelationDate; // the date that the host cancelation was initiated from
 
 	public Long getId() {
 		return id;
@@ -140,5 +144,13 @@ public class Reservation {
 
 	public void setTotalPrice(Double totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+
+	public Date getHostCancelationDate() {
+		return hostCancelationDate;
+	}
+
+	public void setHostCancelationDate(Date hostCancelationDate) {
+		this.hostCancelationDate = hostCancelationDate;
 	}
 }
