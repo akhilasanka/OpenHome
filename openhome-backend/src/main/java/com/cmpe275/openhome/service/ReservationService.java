@@ -1,6 +1,7 @@
 package com.cmpe275.openhome.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -73,21 +74,41 @@ public class ReservationService {
     	reservationRepository.save(reservation);
     }
     
-    @Transactional
-    public void checkInReservation(Reservation reservation) {
-    	// ToDo: validate before check-in
+    @Transactional(rollbackOn=Exception.class)
+    public void checkInReservation(Reservation reservation) throws Exception {
     	// check if "current" time is between 3pm of Start Date and Next Day
-    	// throw Exception if the above is not true
+    	LocalDateTime startDate = DateUtils.convertDateToLocalDateTime(reservation.getStartDate());
+
+    	LocalDateTime validRangeStart = startDate.withHour(15);
+    	LocalDateTime validRangeEnd = startDate.plusDays(1).withHour(3);
     	
+    	LocalDateTime currentSystemTime = SystemDateTime.getCurSystemTime();
+    	if (currentSystemTime.isBefore(validRangeStart) || currentSystemTime.isAfter(validRangeEnd)) {
+    		throw new Exception("Check Ins can only be made during between 3pm of the Start Date and 3am of the next day");
+    	}
+    	
+    	// ToDo: charge the guest!
     	reservation.setStatus(ReservationStatusEnum.checkedIn);
     	updateReservation(reservation);
     }
     
     @Transactional
     public void checkOutReservation(Reservation reservation) {
-    	// ToDo: validate before check-out
     	// check if guest checked out with days remaining
-    	// if so current day is charged fully and the other days are treated as cancelations 
+    	// if so current day is charged fully and the other days are treated as cancelations    	
+    	LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
+    	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());
+
+    	if (!currentDate.equals(endDate)) {
+        	long daysBetween = currentDate.until(endDate, ChronoUnit.DAYS);
+        	if (daysBetween == 1) {
+        		// ToDo: charge 30% penalty for next day
+        	}
+        	else if (daysBetween > 1) {
+        		// ToDo: charge 30% penalty for next day and day after that 
+        	}
+    	}
+    	
     	reservation.setStatus(ReservationStatusEnum.checkedOut);
     	updateReservation(reservation);
     }
@@ -95,10 +116,30 @@ public class ReservationService {
     @Transactional
     public void guestCancelReservation(Reservation reservation) {	
     	// ToDo: Decipher Cancellation logic
+    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
+    	LocalDateTime startDateTime = DateUtils.convertDateToLocalDateTime(reservation.getStartDate());
+    	LocalDateTime endDateTime = DateUtils.convertDateToLocalDateTime(reservation.getEndDate());
 
     	// if current time is before (Start Date - 1) @ 3PM charge nothing
-    	// if current time is between (Start Date - 1) @ 3PM and Start Date 3PM charge 30% of Start Date
-    	// if current time is after Start Date @ 3PM charge 30% for Start Date and Start Date + 1 if there are multiple days
+    	// if cancelled with more than 24 hours ahead of start date
+    	long hoursBetweenCurrentTimeAndStartTime = currentDateTime.until(startDateTime.withHour(15), ChronoUnit.HOURS); 
+    	long minutesBetweenCurrentTimeAndStartTime = currentDateTime.until(startDateTime.withHour(15), ChronoUnit.MINUTES);    	
+    	if (hoursBetweenCurrentTimeAndStartTime > 24) {
+    		// no cancellation fee
+    	}
+    	else if (minutesBetweenCurrentTimeAndStartTime > 0){
+        	// if current time is between (Start Date - 1) @ 3PM and Start Date 3PM charge 30% of Start Date
+    	}
+    	else {
+        	// if current time is after Start Date @ 3PM charge 30% for Start Date and Start Date + 1 if there are multiple days
+        	long daysBetween = startDateTime.toLocalDate().until(endDateTime.toLocalDate(), ChronoUnit.DAYS);
+        	if (daysBetween == 1) {
+        		// ToDo: charge 30% penalty for first day
+        	}
+        	else if (daysBetween > 1) {
+        		// ToDo: charge 30% penalty for first day and day after that 
+        	}
+    	}
     	
     	reservation.setStatus(ReservationStatusEnum.cancelled);
     	updateReservation(reservation);
@@ -120,17 +161,18 @@ public class ReservationService {
     	// trigger payment service charges
     	// charge 30% of reservation price for start date
     	// charge 30% of reservation price for start date + 1 if the reservation ends on start date + 2 days
-
-    	// ToDo: implementation + background job caller
+    	// ToDo: implementation
+    	System.out.println("I AM ALIVE!!!!!");
     }
     
     @Transactional 
-    void checkCheckedInReservations() {
+    public void checkCheckedInReservations() {
     	// this will be a triggered by a background job at 11am 
     	// checks 'checkedIn' reservations where the End Date is the current day
     	
     	// set the reservation statuses to checkedOut
     	
     	// ToDo: implementation + background job caller
+    	System.out.println("I AM ALIVE TOO!!!!!");
     }
 }

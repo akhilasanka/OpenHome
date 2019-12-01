@@ -48,7 +48,8 @@ public class ReservationController {
     	Reservation reservation = new Reservation();
     	reservation.setProperty(properties.get(0));
     	reservation.setGuest(guest);
-    	reservation.setDailyPrice(1.0);
+    	reservation.setWeekdayPrice(1.0);
+    	reservation.setWeekendPrice(1.0);
     	reservation.setStartDate(createRequest.getStartDate());
     	reservation.setEndDate(createRequest.getEndDate());
     	
