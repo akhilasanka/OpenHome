@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.User;
 
@@ -23,13 +24,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	
 	@Query(value = "SELECT r from Reservation r where property.id =:propertyId AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsForPropertyBetweenDates(long propertyId, Date startDate, Date endDate);
-	
+
 	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND startDate < :currentDate")
 	List<Reservation> findAllPendingReservationsThatShouldBeCancelled(Date currentDate);
-	
+
 	@Query(value = "SELECT r from Reservation r where r.status='checkedIn' AND endDate < :currentDate")
 	List<Reservation> findAllCheckedInReservationsThatShouldBeCheckedOut(Date currentDate);
 	
 	@Query(value = "SELECT r from Reservation r where r.status='pendingHostCancelation'")
 	List<Reservation> findAllReservationsThatShouldBeCanceled();
+
+	List<Reservation> findAllByProperty(Property property);
 }

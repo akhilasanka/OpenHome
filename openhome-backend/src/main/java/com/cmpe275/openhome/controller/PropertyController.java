@@ -3,8 +3,8 @@ package com.cmpe275.openhome.controller;
 import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
-import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.PostPropertyRequest;
+import com.cmpe275.openhome.payload.PostPropertyResponse;
 import com.cmpe275.openhome.payload.SearchPropertyResponse;
 import com.cmpe275.openhome.payload.SearchRequest;
 import com.cmpe275.openhome.repository.UserRepository;
@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import sun.tools.tree.BooleanExpression;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -68,22 +69,39 @@ public class PropertyController {
             .buildAndExpand(result.getId()).toUri();
 
     return ResponseEntity.created(location)
-            .body(new ApiResponse(true, "Property registered successfully@"));
+            .body(new PostPropertyResponse(true, result.getId(),
+                    "Property registered successfully@"));
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
-  @GetMapping("/hosts/{hostId}/property/{propertyId}")
-  public PropertyDetails getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String hostId, @PathVariable String propertyId) {
-    return propertyService.getHardcodedPropertyDetails(); // TODO: proper impl!
+  @PostMapping("/hosts/{hostId}/property/{propertyId}/edit")
+  @PreAuthorize("hasRole('USER')")
+  public Boolean editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+    User owner = userRepository.getOne(Long.parseLong(hostId));
+    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
+    property.setId(propertyId);
+    return propertyService.editProperty(property, isApproved);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
+  @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
+  @PreAuthorize("hasRole('USER')")
+  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+    User owner = userRepository.getOne(Long.parseLong(hostId));
+    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
+    property.setId(propertyId);
+    return propertyService.deleteProperty(property, isApproved);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
+  @GetMapping("/property/{propertyId}")
+  public Property getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String propertyId) {
+    return propertyService.getProperty(propertyId);
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
-    List properties = new ArrayList();
-
-   // System.out.println(searchRequest);
-
     return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
 

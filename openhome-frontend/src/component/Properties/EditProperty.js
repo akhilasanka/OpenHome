@@ -28,7 +28,7 @@ class EditProperty extends Component {
             sqft: "",
             privateBathShowerAvailable: "Yes",
             privateBathroomAvailable: "Yes",
-            photos: ["http://img1.png","http://img2.jpg"],
+            photos: [],
             freeWifi: "",
             parkingAvailable: "",
             parkingFree: "Yes",
@@ -74,7 +74,7 @@ class EditProperty extends Component {
             streetAddress: "Default streetAddress",
             city: "Default city",
             state: "Default Sate",
-            zipCode: "Default Zipcode",
+            zipCode: 95667,
             headline: "Default Headline",
             description: "Default Description",
             sharingType: "Private Room",
@@ -83,7 +83,7 @@ class EditProperty extends Component {
             sqft: 200,
             privateBathShowerAvailable: "Yes",
             privateBathroomAvailable: "Yes",
-            photos: [],
+            photos: ["http://img1.png","http://img2.jpg"],
             freeWifi: "Yes",
             parkingAvailable: "Yes",
             parkingFree: "Yes",
@@ -177,7 +177,7 @@ class EditProperty extends Component {
     };
 
     handlePricingClick = () => {
-        const validator = this.state.photos.length < 1 ? false: true;
+        const validator = this.state.photos.filter(Boolean).length == 0;
 
         if (validator) {
             this.setState({
@@ -254,7 +254,6 @@ class EditProperty extends Component {
             e.preventDefault();
 
             const data = {
-                propertyID: this.state.propertyID,
                 propertyContact: this.state.propertyContact,
                 streetAddress: this.state.streetAddress,
                 city: this.state.city,
@@ -284,7 +283,8 @@ class EditProperty extends Component {
             axios(
                 {
                     method:'post',
-                    url:API_BASE_URL + '/hosts/'+ localStorage.id + '/property/edit',
+                    url:API_BASE_URL + '/hosts/'+ localStorage.id + '/property/' + this.state.propertyID +'/edit',
+                    params: {"isApproved": true},
                     data:data,
                     headers: {"Authorization" : "Bearer "+localStorage.getItem(ACCESS_TOKEN)}
                 }

@@ -9,9 +9,14 @@ import com.cmpe275.openhome.payload.SearchRequest;
 
 public interface PropertyService {
 	List<Property> getHardcodedPropertyList();
-	PropertyDetails getHardcodedPropertyDetails();
 
 	Property hostProperty(Property property);
 
+	Boolean editProperty(Property property, Boolean isApprovedForPayingFine) throws Exception;
+
+	Boolean deleteProperty(Property property, Boolean isApprovedForPayingFine) throws Exception;
+
 	List<SearchProperty> searchProperties(SearchRequest searchRequest);
+
+	Property getProperty(String propertyId);
 }
