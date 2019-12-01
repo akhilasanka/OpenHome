@@ -1,10 +1,6 @@
 package com.cmpe275.openhome.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "property")
@@ -13,8 +9,9 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @Column(name = "address_street")
     private String addressStreet;
@@ -83,16 +80,21 @@ public class Property {
         return id;
     }
 
+    public String getPropertyName() {
+        return String.format("%s (%s) at %s,%s,%s", getPropertyType(), getSharingType(),
+                getAddressStreet(), getAddressCity(), getAddressState());
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public String getAddressStreet() {
