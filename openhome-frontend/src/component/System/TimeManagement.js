@@ -110,7 +110,7 @@ class TimeManagementForm extends Component {
             <form onSubmit={this.handleSubmit} method="post">
                 <label htmlFor="startDate" className="col-12 col-form-label">Add Time to the Current System Time</label>
                 <div className="col-12">
-                  <select className="form-control col-sm-6" name="timeOffset" onChange={this.handleInputChange} value={"1"}>
+                  <select className="form-control col-sm-6" name="timeOffset" onChange={this.handleInputChange} value={this.state.timeOffset} >
                       <option value="1">1 Hour</option>
                       <option value="2">2 Hours</option>
                       <option value="4">4 Hours</option>
