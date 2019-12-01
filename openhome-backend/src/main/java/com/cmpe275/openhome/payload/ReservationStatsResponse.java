@@ -11,6 +11,12 @@ import java.util.Map;
 
 public class ReservationStatsResponse {
     private boolean success = false;
+
+    public Map<Long, String> getValidProperties() {
+        return validProperties;
+    }
+
+    private Map<Long, String> validProperties = new HashMap<>();
     private List<ReservationItem> past = new ArrayList<>();
     private List<ReservationItem> current = new ArrayList<>();
     private List<ReservationItem> future = new ArrayList<>();
@@ -20,6 +26,7 @@ public class ReservationStatsResponse {
     }
 
     public void setPast(ReservationItem pastItem) {
+        addValidProperty(pastItem);
         this.past.add(pastItem);
     }
 
@@ -28,6 +35,7 @@ public class ReservationStatsResponse {
     }
 
     public void setCurrent(ReservationItem currentItem) {
+        addValidProperty(currentItem);
         this.current.add(currentItem);
     }
 
@@ -35,7 +43,11 @@ public class ReservationStatsResponse {
         return future;
     }
 
+    private void addValidProperty(ReservationItem ri) {
+        validProperties.put(ri.PropertyId, ri.propertyName);
+    }
     public void setFuture(ReservationItem futureItem) {
+        addValidProperty(futureItem);
         this.future.add(futureItem);
     }
 

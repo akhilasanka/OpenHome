@@ -27,7 +27,7 @@ public class PayProcessingUtil {
     @Autowired
     ReservationRepository reservationRepository;
 
-    public Integer recordPayment(long reservationId, ChargeType chargeType, double amount)
+    public Long recordPayment(long reservationId, ChargeType chargeType, double amount)
             throws PayTransactionException {
 
         PayTransaction transaction = new PayTransaction();

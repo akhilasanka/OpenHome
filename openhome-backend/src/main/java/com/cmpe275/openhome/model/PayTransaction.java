@@ -19,7 +19,7 @@ import javax.persistence.TemporalType;
 public class PayTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer transactionId;
+    private Long transactionId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "RESERVATION_ID")
@@ -38,11 +38,11 @@ public class PayTransaction {
     @Column(nullable=false)
     private String cardUsed;
 
-    public Integer getTransactionId() {
+    public Long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId) {
+    public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
     }
 
