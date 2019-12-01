@@ -27,7 +27,7 @@ public class PayProcessingUtil {
     @Autowired
     ReservationRepository reservationRepository;
 
-    public Long recordPayment(long reservationId, ChargeType chargeType, double amount)
+    public PayTransaction recordPayment(long reservationId, ChargeType chargeType, double amount)
             throws PayTransactionException {
 
         PayTransaction transaction = new PayTransaction();
@@ -47,6 +47,6 @@ public class PayProcessingUtil {
             transaction.setCardUsed(paymentMethod.getCardEnding());
         }
 
-        return payTransactionRepository.save(transaction).getTransactionId();
+        return payTransactionRepository.save(transaction);
     }
 }
