@@ -4,14 +4,24 @@ import com.cmpe275.openhome.payload.AddPayRequest;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "payment_method")
 public class PaymentMethod {
     @Id
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name="USER_ID")
+    private User user;
 
     @Column(nullable=false)
     private String cardNumber;
@@ -28,8 +38,8 @@ public class PaymentMethod {
     @Column(nullable = false)
     private String cvv;
 
-    public void parseAddPayRequest(final AddPayRequest payRequest){
-        this.setUserId(payRequest.getUserid());
+    public void parseAddPayRequest(final AddPayRequest payRequest, User user){
+        this.setUser(user);
         this.setCardNumber(payRequest.getCardNumber());
         this.setCardEnding(payRequest.getCardNumber().substring(12,16));
         this.setExpiryMonth(payRequest.getExpiryMonth());
@@ -37,12 +47,13 @@ public class PaymentMethod {
         this.setCvv(payRequest.getCvv());
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getUser() {
+        return user.getId();
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+
+        this.user = user;
     }
 
     public String getCardNumber() {
