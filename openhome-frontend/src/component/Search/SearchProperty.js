@@ -72,15 +72,14 @@ class SearchProperty extends Component {
                 })
                 .then((responseData) => {
                     console.log("responseData", responseData);
-                    if (responseData.dataFound === false) {
-                        swal("No results found for given entry. Please try with different values.");
-                    } else {
                         var results = responseData;
                         console.log(results);
                         this.setState({
                             results : results.properties
                         });
-                    }
+                        if(results.properties.length==0){
+                            swal("Unable to find properties with given values. Please refine search criteria!");
+                        }
                 }).catch(function (err) {
                     console.log(err)
                 });
