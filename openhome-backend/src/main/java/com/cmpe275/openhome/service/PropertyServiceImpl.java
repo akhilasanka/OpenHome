@@ -193,7 +193,7 @@ public class PropertyServiceImpl implements PropertyService {
 	  		if (images.length>0) {
 	  			imageUrl = images[0].replace("[", "").replace("\"","").replace("]", "");
 			}
-			SearchProperty sp = new SearchProperty(imageUrl,p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressCity(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
+			SearchProperty sp = new SearchProperty(imageUrl,p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressState(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
 			searchProperties.add(sp);
 	  	}
 	  	return searchProperties;

@@ -45,7 +45,7 @@ class SearchProperty extends Component {
                 validInput = false;
             }
             else {
-                let curTime = this.state.curTime;
+               /* let curTime = this.state.curTime;
                 let curDate = curTime.substr(0,curTime.indexOf(','));
                 
                 console.log("From Date"+from);
@@ -59,12 +59,12 @@ class SearchProperty extends Component {
                     swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
                     validInput = false;
                 }
-                else{
+                else{*/
                     if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
                         swal("Oops!", "Please make sure Max price is greater Min price.", "error");
                         validInput = false;
                     }
-                }
+                //}
             }
         }
 
