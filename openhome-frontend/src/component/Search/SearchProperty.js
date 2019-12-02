@@ -4,13 +4,23 @@ import { Redirect } from 'react-router';
 import swal from 'sweetalert';
 import '../Styles/Search.css';
 import { API_BASE_URL } from '../constants';
+import { getCurrentSystemTime } from '../util/APIUtils';
 
 class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            results: []
+            results: [],
+            curTime: null
         }
+    }
+
+    componentDidMount = () => {
+        getCurrentSystemTime().then(response => {
+            this.setState({
+              curTime : response.toLocaleString()
+            })
+          });
     }
 
     handleSearch = async (event) => {
@@ -35,9 +45,25 @@ class SearchProperty extends Component {
                 validInput = false;
             }
             else {
-                if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
-                    swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                let curTime = this.state.curTime;
+                let curDate = curTime.substr(0,curTime.indexOf(','));
+                
+                console.log("From Date"+from);
+                var curFormmatedDate = curDate.split("/").reverse();
+                var tmp = curFormmatedDate[2];
+                curFormmatedDate[2] = curFormmatedDate[1];
+                curFormmatedDate[1] = tmp;
+                curFormmatedDate = curFormmatedDate.join("-");
+                console.log("Current formatted Date:"+curFormmatedDate);
+                if(from < curFormmatedDate || to < curFormmatedDate){
+                    swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
                     validInput = false;
+                }
+                else{
+                    if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
+                        swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                        validInput = false;
+                    }
                 }
             }
         }
@@ -87,7 +113,7 @@ class SearchProperty extends Component {
 
     }
     render() {
-
+        console.log(this.state.curTime);
         return (
             <div>
                 <div className='rowC backgroundImg' style={{ display: "flex", flexDirection: "row" }}>
