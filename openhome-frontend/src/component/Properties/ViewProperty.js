@@ -372,7 +372,7 @@ class PropertyDisplay extends Component {
                                 {weekendRentPrice}
                             </div>
                             <div>
-                                <ReservationCreate/>
+                                <ReservationCreate propertyId={this.props.match.params.id}/>
                                 <hr/>
                                 <div className="center-content">
                                     <label htmlFor="ownername">Property Owner: </label>
