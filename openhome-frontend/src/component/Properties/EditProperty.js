@@ -4,6 +4,7 @@ import { Redirect } from 'react-router';
 import { ACCESS_TOKEN, API_BASE_URL } from "../constants";
 import axios from "axios";
 import Alert from "react-s-alert";
+import swal from 'sweetalert';
 
 class EditProperty extends Component {
 
@@ -155,8 +156,8 @@ class EditProperty extends Component {
                     parkingCost: result.dailyParkingFee,
                     alwaysAvailable: count == 7 ? "Yes" : "No",
                     weeklyAvailability: [],
-                    weekdayRentPrice: 100,
-                    weekendRentPrice: 120,
+                    weekdayRentPrice: result.weekdayPrice,
+                    weekendRentPrice: result.weekendPrice,
                     weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
                     weekends: ['Saturday', 'Sunday'],
                     locationError: false,
@@ -322,6 +323,7 @@ class EditProperty extends Component {
             e.preventDefault();
 
             const data = {
+                isDeleted: false,
                 propertyContact: this.state.propertyContact,
                 streetAddress: this.state.streetAddress,
                 city: this.state.city,
@@ -357,11 +359,33 @@ class EditProperty extends Component {
                     headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                 }
             ).then((response) => {
-                console.log(response)
-                Alert.success("Hosted property!");
+                console.log(response);
+                swal({
+                    title: "Caution",
+                    text: "Changes will affect reservations already made. 15% of reservation amount will be charged as PENALITY. Are you sure you want to proceed?",
+                    icon: "warning",
+                    buttons: [
+                      'No, cancel it!',
+                      'Yes, I am sure!'
+                    ],
+                    dangerMode: true,
+                  }).then(function(isConfirm) {
+                    if (isConfirm) {
+                      swal({
+                        title: 'OK',
+                        text: 'Updated with penality charged!',
+                        icon: 'success'
+                      }).then(function() {
+                        //form.submit(); // <--- submit form programmatically
+                      });
+                    } else {
+                      swal("Cancelled", "No changes have been made :)", "success");
+                    }
+                  })
+                //Alert.success("Hosted property!");
                 // this.props.history.push("/home");
             })
-                .catch(Alert.error("Failed to add property"))
+                .catch(Alert.error("Failed to update property"))
         }
     };
 
@@ -529,22 +553,22 @@ class EditProperty extends Component {
         }
 
         let weekdayRentPrice = "";
-        if (this.state.alwaysAvailable === 'Yes'
-            || this.state.weeklyAvailability.some(item => this.state.weekdays.includes(item))) {
+        //if (this.state.alwaysAvailable === 'Yes'
+           // || this.state.weeklyAvailability.some(item => this.state.weekdays.includes(item))) {
             weekdayRentPrice = <div className="form-group">
                 <label htmlFor="alwaysAvailable" className="col-sm-3">Weekday Rent Price</label>
                 <input type="number" name="weekdayRentPrice" id="weekdayRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} defaultValue={this.state.weekdayRentPrice} />
             </div>
-        }
+        //}
 
         let weekendRentPrice = "";
-        if (this.state.alwaysAvailable === 'Yes'
-            || this.state.weeklyAvailability.some(item => this.state.weekends.includes(item))) {
+        //if (this.state.alwaysAvailable === 'Yes'
+          //  || this.state.weeklyAvailability.some(item => this.state.weekends.includes(item))) {
             weekendRentPrice = <div className="form-group">
                 <label htmlFor="alwaysAvailable" className="col-sm-3">Weekend Rent Price</label>
                 <input type="number" name="weekendRentPrice" id="weekendRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} defaultValue={this.state.weekendRentPrice} />
             </div>
-        }
+        //}
 
         return (
             <div>
