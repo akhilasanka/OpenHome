@@ -90,7 +90,10 @@ public class PropertyRepositoryCustomImpl implements PropertyRepositoryCustom {
         }
 
         predicates.add(cb.equal(propertyTable.get("isDeleted"), false));
-        predicates.add(cb.not(propertyTable.get("id").in(property_ids)));
+        if(property_ids.size()>0){
+            predicates.add(cb.not(propertyTable.get("id").in(property_ids)));
+        }
+
 
         System.out.println(cb.toString());
 
