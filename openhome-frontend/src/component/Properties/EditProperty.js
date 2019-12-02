@@ -60,9 +60,29 @@ class EditProperty extends Component {
     }
 
 
-    componentDidMount() {
+    async componentDidMount() {
         var propertyID = this.props.match.params.propertyID;
         console.log(propertyID);
+        var token = localStorage.getItem("accessToken");
+        await axios({
+            method: 'get',
+            url: API_BASE_URL + '/property/' +propertyID,
+            config: { headers: { 'Content-Type': 'multipart/form-data' } },
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+            .then((response) => {
+                if (response.status >= 500) {
+                    throw new Error("Bad response from server");
+                }
+                return response;
+            })
+            .then((responseData) => {
+                    var results = responseData;
+                    console.log(results);
+            }).catch(function (err) {
+                console.log(err)
+            });
+
         //need to make it dynamic
         this.setState({
             propertyID: propertyID,
