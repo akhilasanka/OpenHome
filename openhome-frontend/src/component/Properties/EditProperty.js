@@ -349,7 +349,7 @@ class EditProperty extends Component {
             };
 
             console.log(data);
-
+            var propertyID = this.state.propertyID;
             axios(
                 {
                     method: 'post',
@@ -359,30 +359,45 @@ class EditProperty extends Component {
                     headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                 }
             ).then((response) => {
+                console.log("*******************");
                 console.log(response);
-                swal({
-                    title: "Caution",
-                    text: "Changes will affect reservations already made. 15% of reservation amount will be charged as PENALITY. Are you sure you want to proceed?",
-                    icon: "warning",
-                    buttons: [
-                      'No, cancel it!',
-                      'Yes, I am sure!'
-                    ],
-                    dangerMode: true,
-                  }).then(function(isConfirm) {
-                    if (isConfirm) {
-                      swal({
-                        title: 'OK',
-                        text: 'Updated with penality charged!',
-                        icon: 'success'
-                      }).then(function() {
-                        //form.submit(); // <--- submit form programmatically
-                      });
-                    } else {
-                      swal("Cancelled", "No changes have been made :)", "success");
-                    }
-                  })
-                //Alert.success("Hosted property!");
+                if(response.data==false){
+                    swal({
+                        title: "Caution",
+                        text: "Changes will affect reservations already made. 15% of reservation amount will be charged as PENALITY. Are you sure you want to proceed?",
+                        icon: "warning",
+                        buttons: [
+                          'No, cancel it!',
+                          'Yes, I am sure!'
+                        ],
+                        dangerMode: true,
+                      }).then(function(isConfirm) {
+                        if (isConfirm) {
+                            axios(
+                                {
+                                    method: 'post',
+                                    url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/edit',
+                                    params: { "isPenalityApproved": true },
+                                    data: data,
+                                    headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
+                                }
+                            ).then((response) => {
+                               if(response.data==true){
+                                swal({
+                                    title: 'OK',
+                                    text: 'Updated with penality charged!',
+                                    icon: 'success'
+                                  });
+                               }
+                            });
+                        } else {
+                          swal("Cancelled", "No changes have been made :)", "success");
+                        }
+                      })
+                }
+                else{
+                    swal("Sucessfully edited property!");
+                }
                 // this.props.history.push("/home");
             })
                 .catch(Alert.error("Failed to update property"))

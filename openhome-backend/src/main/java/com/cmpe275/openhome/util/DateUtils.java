@@ -8,9 +8,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateUtils {
-	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd MMM ''yy");
-	private static final SimpleDateFormat SIMPLE_MONTH_NAME = new SimpleDateFormat("MMM ''yy");
-	private static final DateTimeFormatter MONTH_NAME = DateTimeFormatter.ofPattern("MMM ''yy");
+	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd MMM `yy");
+	private static final SimpleDateFormat SIMPLE_MONTH_NAME = new SimpleDateFormat("MMM `yy");
+	private static final DateTimeFormatter MONTH_NAME = DateTimeFormatter.ofPattern("MMM `yy");
 
 	public static String formatForDisplay(Date date) {
 		return SIMPLE_DATE_FORMAT.format(date);
