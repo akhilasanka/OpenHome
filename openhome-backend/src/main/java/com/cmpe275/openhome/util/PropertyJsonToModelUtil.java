@@ -54,6 +54,7 @@ public class PropertyJsonToModelUtil {
         property.setPhotosArrayJson(JSON_CONVERTER.toJson(postPropertyRequest.getPhotos()));
         property.setHasPrivateBathroom(postPropertyRequest.getPrivateBathroomAvailable());
         property.setHasPrivateShower(postPropertyRequest.getPrivateBathShowerAvailable());
+        property.setIsDeleted(postPropertyRequest.getIsDeleted());
 
         if(!postPropertyRequest.getParkingCost().isEmpty()) {
             property.setDailyParkingFee(Double.parseDouble(postPropertyRequest.getParkingCost()));

@@ -287,6 +287,10 @@ public class ReservationService {
         	updateReservation(reservation);
     	}
     }
+
+	public List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate) {
+		return reservationRepository.findAllReservationsBetweenDates(startDate, endDate);
+	}
     
     @Transactional
     public void checkPendingReservations() throws Exception {
@@ -402,5 +406,7 @@ public class ReservationService {
     		
         	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.HOSTPENALTY, penalty);
     	}
+
+
     }
 }

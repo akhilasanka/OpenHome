@@ -64,6 +64,16 @@ public class PostPropertyRequest {
 
     String weekendRentPrice;
 
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    Boolean isDeleted;
+
     public String getPropertyContact() {
         return propertyContact;
     }

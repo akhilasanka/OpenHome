@@ -5,9 +5,10 @@ import com.cmpe275.openhome.payload.SearchRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface PropertyRepositoryCustom {
 
-    List<Property> findProperties(SearchRequest searchRequest);
+    List<Property> findPropertiesBySearchCriteria(SearchRequest searchRequest, Set<Long> property_ids);
 }

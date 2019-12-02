@@ -4,13 +4,23 @@ import { Redirect } from 'react-router';
 import swal from 'sweetalert';
 import '../Styles/Search.css';
 import { API_BASE_URL } from '../constants';
+import { getCurrentSystemTime } from '../util/APIUtils';
 
 class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            results: []
+            results: [],
+            curTime: null
         }
+    }
+
+    componentDidMount = () => {
+        getCurrentSystemTime().then(response => {
+            this.setState({
+              curTime : response.toLocaleString()
+            })
+          });
     }
 
     handleSearch = async (event) => {
@@ -35,9 +45,25 @@ class SearchProperty extends Component {
                 validInput = false;
             }
             else {
-                if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
-                    swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                let curTime = this.state.curTime;
+                let curDate = curTime.substr(0,curTime.indexOf(','));
+                
+                console.log("From Date"+from);
+                var curFormmatedDate = curDate.split("/").reverse();
+                var tmp = curFormmatedDate[2];
+                curFormmatedDate[2] = curFormmatedDate[1];
+                curFormmatedDate[1] = tmp;
+                curFormmatedDate = curFormmatedDate.join("-");
+                console.log("Current formatted Date:"+curFormmatedDate);
+                if(from < curFormmatedDate || to < curFormmatedDate){
+                    swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
                     validInput = false;
+                }
+                else{
+                    if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
+                        swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                        validInput = false;
+                    }
                 }
             }
         }
@@ -72,15 +98,14 @@ class SearchProperty extends Component {
                 })
                 .then((responseData) => {
                     console.log("responseData", responseData);
-                    if (responseData.dataFound === false) {
-                        swal("No results found for given entry. Please try with different values.");
-                    } else {
                         var results = responseData;
                         console.log(results);
                         this.setState({
                             results : results.properties
                         });
-                    }
+                        if(results.properties.length==0){
+                            swal("Unable to find properties with given values. Please refine search criteria!");
+                        }
                 }).catch(function (err) {
                     console.log(err)
                 });
@@ -88,7 +113,7 @@ class SearchProperty extends Component {
 
     }
     render() {
-
+        console.log(this.state.curTime);
         return (
             <div>
                 <div className='rowC backgroundImg' style={{ display: "flex", flexDirection: "row" }}>
@@ -125,8 +150,8 @@ class SearchProperty extends Component {
                                             </div>
                                             <div className="form-group row">
                                                 <label htmlFor="sharingType" className="col-form-label" style={{ marginLeft: "1.5em" }}>Sharing Type:</label>
-                                                <label> <input type="radio" name="sharingType" value="entirePlace" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Entire Place</label>&nbsp;&nbsp;
-                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="room" style={{ marginTop: "0.8em" }} />&nbsp;A Room</label>
+                                                <label> <input type="radio" name="sharingType" value="Entire Place" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Entire Place</label>&nbsp;&nbsp;
+                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="Private Room" style={{ marginTop: "0.8em" }} />&nbsp;A Room</label>
 
                                             </div>
                                             <div className="form-group row">

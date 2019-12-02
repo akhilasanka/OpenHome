@@ -74,21 +74,21 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/edit")
   @PreAuthorize("hasRole('USER')")
-  public Boolean editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+  public Boolean editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
     User owner = userRepository.getOne(Long.parseLong(hostId));
     Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
     property.setId(propertyId);
-    return propertyService.editProperty(property, isApproved);
+    return propertyService.editProperty(property, isPenalityApproved);
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
   @PreAuthorize("hasRole('USER')")
-  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
     User owner = userRepository.getOne(Long.parseLong(hostId));
     Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
     property.setId(propertyId);
-    return propertyService.deleteProperty(property, isApproved);
+    return propertyService.deleteProperty(property, isPenalityApproved);
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
