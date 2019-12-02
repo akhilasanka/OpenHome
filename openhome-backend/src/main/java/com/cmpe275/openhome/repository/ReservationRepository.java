@@ -12,6 +12,8 @@ import com.cmpe275.openhome.model.User;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+
 	@Query(value = "SELECT r FROM Reservation r WHERE r.guest.id=:userId AND r.guest.emailVerified=true")
 	List<Reservation> findByVerifiedGuestId(Long userId);
 
@@ -24,6 +26,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	
 	@Query(value = "SELECT r from Reservation r where property.id =:propertyId AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsForPropertyBetweenDates(long propertyId, Date startDate, Date endDate);
+
+	@Query(value = "SELECT r from Reservation r where (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
+	List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate);
 
 	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND startDate < :currentDate")
 	List<Reservation> findAllPendingReservationsThatShouldBeCancelled(Date currentDate);

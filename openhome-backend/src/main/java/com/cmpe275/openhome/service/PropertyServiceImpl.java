@@ -1,7 +1,6 @@
 package com.cmpe275.openhome.service;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
-import com.cmpe275.openhome.model.ChargeType;
 import com.cmpe275.openhome.exception.ResourceNotFoundException;
 
 import com.cmpe275.openhome.model.Property;
@@ -12,7 +11,6 @@ import com.cmpe275.openhome.repository.PropertyRepository;
 import com.cmpe275.openhome.repository.PropertyRepositoryCustom;
 import com.cmpe275.openhome.repository.ReservationRepository;
 import com.cmpe275.openhome.util.DateUtils;
-import com.cmpe275.openhome.util.PayProcessingUtil;
 import com.cmpe275.openhome.util.SystemDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PropertyServiceImpl implements PropertyService {
@@ -179,7 +179,12 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Override
 	public List<SearchProperty> searchProperties(SearchRequest searchRequest) {
-	  	List<Property> properties =  propertyRepositoryCustom.findProperties(searchRequest);
+
+	  	List<Reservation> reservationsInDateSelected = reservationService.findAllReservationsBetweenDates(searchRequest.getFrom(), searchRequest.getTo());
+		Set<Long> property_ids = reservationsInDateSelected.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
+
+	  	List<Property> properties =  propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, property_ids);
+
 	  	List<SearchProperty> searchProperties = new ArrayList<>();
 	  	for (Property p : properties) {
 	  		String imagesString = p.getPhotosArrayJson();
