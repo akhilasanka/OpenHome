@@ -2,6 +2,9 @@ package com.cmpe275.openhome.repository;
 
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -35,4 +38,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	List<Reservation> findAllReservationsThatShouldBeCanceled();
 
 	List<Reservation> findAllByProperty(Property property);
+	
+	@Query( value = "SELECT r from Reservation r where r.guest = :guest",
+		    countQuery = "SELECT count(*) from Reservation r where r.guest = :guest"
+		    )
+	Page<Reservation> findByGuest(User guest, Pageable pageable);
 }

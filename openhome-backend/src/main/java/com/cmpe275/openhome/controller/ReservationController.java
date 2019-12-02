@@ -6,7 +6,11 @@ import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.ReservationCreateRequest;
+import com.cmpe275.openhome.payload.ReservationListRequest;
+import com.cmpe275.openhome.payload.ReservationListResponse;
+import com.cmpe275.openhome.payload.ReservationListResponseEntity;
 import com.cmpe275.openhome.payload.ReservationPriceRequest;
+import com.cmpe275.openhome.repository.ReservationRepository;
 import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
@@ -18,10 +22,16 @@ import com.cmpe275.openhome.util.DateUtils;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +44,9 @@ public class ReservationController {
 
     @Autowired
     private ReservationService reservationService;
+    
+    @Autowired
+    private ReservationRepository reservationRepository;
     
     @Autowired
     private UserRepository userRepository;
@@ -118,4 +131,27 @@ public class ReservationController {
 		return totalPrice;
     }
     
+    @PostMapping("/reservation/list")
+    @PreAuthorize("hasRole('USER')")
+    public ReservationListResponse getReservationList(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationListRequest listRequest) {
+    	ReservationListResponse response = new ReservationListResponse();
+        final User currentUser = userRepository.findById(userPrincipal.getId()).orElse(null);
+
+        if (currentUser != null) {
+        	boolean isHost = currentUser.getRole().equals("host");
+        	Pageable pageable = PageRequest.of(listRequest.getCurrentPage(), listRequest.getElementsPerPage());
+        	
+        	Page<Reservation> page = reservationRepository.findByGuest(currentUser, pageable);
+        	
+        	List<ReservationListResponseEntity> responseList = new ArrayList<ReservationListResponseEntity>();
+        	List<Reservation> reservationList = page.toList();
+        	for (Reservation reservation : reservationList) {
+        		responseList.add(new ReservationListResponseEntity(reservation.getId(), reservation.getStartDate()));
+        	}
+        	response.setPageCount(page.getTotalPages());
+        	response.setReservations(responseList);
+        }    	
+    	return response;
+    }
+        
 }
