@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import '../Styles/HostProperty.css'
 import { Redirect } from 'react-router';
-import {ACCESS_TOKEN, API_BASE_URL} from "../constants";
+import { ACCESS_TOKEN, API_BASE_URL } from "../constants";
 import axios from "axios";
 import Alert from "react-s-alert";
 
@@ -61,12 +61,13 @@ class EditProperty extends Component {
 
 
     async componentDidMount() {
+        var result = null;
         var propertyID = this.props.match.params.propertyID;
         console.log(propertyID);
         var token = localStorage.getItem("accessToken");
         await axios({
             method: 'get',
-            url: API_BASE_URL + '/property/' +propertyID,
+            url: API_BASE_URL + '/property/' + propertyID,
             config: { headers: { 'Content-Type': 'multipart/form-data' } },
             headers: { "Authorization": `Bearer ${token}` }
         })
@@ -77,57 +78,104 @@ class EditProperty extends Component {
                 return response;
             })
             .then((responseData) => {
-                    var results = responseData;
-                    console.log(results);
+                result = responseData.data;
+                console.log(result);
+
+                //for calculating availability days
+                let adString = result.availableDays;
+                var count = 0;
+                let monSelected = false;
+                let tueSelected = false
+                let wedSelected = false;
+                let thuSelected = false;
+                let friSelected = false;
+                let satSelected = false;
+                let sunSelected = false;
+                if (adString && adString !== "") {
+                    if (adString.startsWith("M")) {
+                        monSelected = true;
+                        adString = adString.substr(1);
+                        count++;
+                    }
+                    if (adString.startsWith("TU")) {
+                        tueSelected = true;
+                        adString = adString.substr(2);
+                        count++;
+                    }
+                    if (adString.startsWith("W")) {
+                        wedSelected = true;
+                        adString = adString.substr(1);
+                        count++;
+                    }
+                    if (adString.startsWith("TH")) {
+                        thuSelected = true;
+                        adString = adString.substr(2);
+                        count++;
+                    }
+                    if (adString.startsWith("F")) {
+                        friSelected = true;
+                        adString = adString.substr(1);
+                        count++;
+                    }
+                    if (adString.startsWith("SA")) {
+                        satSelected = true;
+                        adString = adString.substr(2);
+                        count++;
+                    }
+                    if (adString.startsWith("SU")) {
+                        sunSelected = true;
+                        adString = adString.substr(2);
+                        count++;
+                    }
+                }
+
+                this.setState({
+                    propertyID: propertyID,
+                    locationActive: true,
+                    detailsActive: false,
+                    photosActive: false,
+                    pricingActive: false,
+                    propertyContact: result.phoneNumber,
+                    streetAddress: result.addressStreet,
+                    city: result.addressCity,
+                    state: result.addressState,
+                    zipCode: result.addressZipcode,
+                    headline: result.headline,
+                    description: result.description,
+                    sharingType: result.sharingType,
+                    propertyType: result.propertyType,
+                    bedrooms: result.numBedroom,
+                    sqft: result.squareFootage,
+                    privateBathShowerAvailable: result.hasPrivateShower,
+                    privateBathroomAvailable: result.hasPrivateBathroom,
+                    photos: JSON.parse(result.photosArrayJson),
+                    freeWifi: result.wifiAvailability,
+                    parkingAvailable: result.parkingAvailability,
+                    parkingFree: result.dailyParkingFee == 0 ? "Yes" : "No",
+                    parkingCost: result.dailyParkingFee,
+                    alwaysAvailable: count == 7 ? "Yes" : "No",
+                    weeklyAvailability: [],
+                    weekdayRentPrice: 100,
+                    weekendRentPrice: 120,
+                    weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                    weekends: ['Saturday', 'Sunday'],
+                    locationError: false,
+                    detailsError: false,
+                    photosError: false,
+                    pricingError: false,
+                    propertyInsertComplete: false,
+                    errorRedirect: false,
+                    monSelected: monSelected,
+                    tueSelected: tueSelected,
+                    wedSelected: wedSelected,
+                    thuSelected: thuSelected,
+                    friSelected: friSelected,
+                    satSelected: satSelected,
+                    sunSelected: sunSelected,
+                });
             }).catch(function (err) {
                 console.log(err)
             });
-
-        //need to make it dynamic
-        this.setState({
-            propertyID: propertyID,
-            locationActive: true,
-            detailsActive: false,
-            photosActive: false,
-            pricingActive: false,
-            propertyContact: 12345,
-            streetAddress: "Default streetAddress",
-            city: "Default city",
-            state: "Default Sate",
-            zipCode: 95667,
-            headline: "Default Headline",
-            description: "Default Description",
-            sharingType: "Private Room",
-            propertyType: "House",
-            bedrooms: "2",
-            sqft: 200,
-            privateBathShowerAvailable: "Yes",
-            privateBathroomAvailable: "Yes",
-            photos: ["http://img1.png","http://img2.jpg"],
-            freeWifi: "Yes",
-            parkingAvailable: "Yes",
-            parkingFree: "Yes",
-            parkingCost: 5,
-            alwaysAvailable: "No",
-            weeklyAvailability: [],
-            weekdayRentPrice: 100,
-            weekendRentPrice: 120,
-            weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            weekends: ['Saturday', 'Sunday'],
-            locationError: false,
-            detailsError: false,
-            photosError: false,
-            pricingError: false,
-            propertyInsertComplete: false,
-            errorRedirect: false,
-            monSelected: true,
-            tueSelected: false,
-            wedSelected: false,
-            thuSelected: true,
-            friSelected: false,
-            satSelected: false,
-            sunSelected: false,
-        });
     }
 
     handleLocationClick = () => {
@@ -224,20 +272,20 @@ class EditProperty extends Component {
         const name = target.name;
         var value = target.value;
 
-        if(name.startsWith('photo')) {
-            var index = parseInt(name.substr(name.length - 1))-1;
+        if (name.startsWith('photo')) {
+            var index = parseInt(name.substr(name.length - 1)) - 1;
             var photoArr = this.state.photos;
-            if(value === "")
+            if (value === "")
                 photoArr[index] = undefined;
             else
                 photoArr[index] = value;
 
-            this.setState( {
-                photos : photoArr
+            this.setState({
+                photos: photoArr
             }, console.log(this.state.photos));
         }
 
-        if(name === 'weeklyAvailability') {
+        if (name === 'weeklyAvailability') {
             var options = target.options;
             value = [];
             for (var i = 0, l = options.length; i < l; i++) {
@@ -302,13 +350,13 @@ class EditProperty extends Component {
 
             axios(
                 {
-                    method:'post',
-                    url:API_BASE_URL + '/hosts/'+ localStorage.id + '/property/' + this.state.propertyID +'/edit',
-                    params: {"isApproved": true},
-                    data:data,
-                    headers: {"Authorization" : "Bearer "+localStorage.getItem(ACCESS_TOKEN)}
+                    method: 'post',
+                    url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + this.state.propertyID + '/edit',
+                    params: { "isApproved": true },
+                    data: data,
+                    headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                 }
-            ).then((response)=>{
+            ).then((response) => {
                 console.log(response)
                 Alert.success("Hosted property!");
                 // this.props.history.push("/home");
@@ -329,7 +377,7 @@ class EditProperty extends Component {
             redirectVar = <Redirect to="/error" />
         }
 
-        if(this.state.propertyInsertComplete){
+        if (this.state.propertyInsertComplete) {
             redirectVar = <Redirect to="/" />
         }
 
@@ -374,18 +422,18 @@ class EditProperty extends Component {
         }
 
         let photos = this.state.photos.map(function (thumbnail, index) {
-            if(thumbnail !== undefined && thumbnail !== '')
-            return (
-                <img src={thumbnail} className="img-thumbnail" alt="thumbnail" width="304" height="236" key={index}></img>
-            )
+            if (thumbnail !== undefined && thumbnail !== '')
+                return (
+                    <img src={thumbnail} className="img-thumbnail" alt="thumbnail" width="304" height="236" key={index}></img>
+                )
         });
         console.log('PhotoThumbnail inside return: ', this.state.photos);
 
         let bathRooms = ""
-        if(this.state.sharingType === 'Private Room') {
+        if (this.state.sharingType === 'Private Room') {
             bathRooms = <div className="form-group">
-                <label htmlFor="privateBathroomAvailable"  className="col-sm-3">Private Bathroom avaiable?</label>
-                <select className="form-control"  name="privateBathroomAvailable" id="privateBathroomAvailable" onChange={this.handleInputChange} value={this.state.privateBathroomAvailable}>
+                <label htmlFor="privateBathroomAvailable" className="col-sm-3">Private Bathroom avaiable?</label>
+                <select className="form-control" name="privateBathroomAvailable" id="privateBathroomAvailable" onChange={this.handleInputChange} value={this.state.privateBathroomAvailable}>
                     <option value="" selected disabled hidden>-- Please Select --</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -394,12 +442,12 @@ class EditProperty extends Component {
         }
 
         let privateBathShower = ""
-        if(this.state.privateBathroomAvailable === 'No') {
+        if (this.state.privateBathroomAvailable === 'No') {
             privateBathShower = <div className="form-group">
                 <label htmlFor="privateBathShowerAvailable" className="col-sm-3">Private Bath/Shower avaiable?</label>
                 <select className="form-control" name="privateBathShowerAvailable" id="privateBathShowerAvailable"
-                        onChange={this.handleInputChange}>
-                    <option value="" selected disabled hidden>-- Please Select --</option>
+                    onChange={this.handleInputChange} value={this.state.privateBathShowerAvailable}>
+                    <option value="" disabled hidden>-- Please Select --</option>
                     <option>Yes</option>
                     <option>No</option>
                 </select>
@@ -408,8 +456,8 @@ class EditProperty extends Component {
 
         let parkingAvailable =
             <div className="form-group">
-                <label htmlFor="parkingAvailable"  className="col-sm-3">Parking Available?</label>
-                <select className="form-control"  name="parkingAvailable" id="parkingAvailable" onChange={this.handleInputChange} value={this.state.parkingAvailable}>
+                <label htmlFor="parkingAvailable" className="col-sm-3">Parking Available?</label>
+                <select className="form-control" name="parkingAvailable" id="parkingAvailable" onChange={this.handleInputChange} value={this.state.parkingAvailable}>
                     <option value="" selected disabled hidden>-- Please Select --</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -417,10 +465,10 @@ class EditProperty extends Component {
             </div>;
 
         let parkingFree = "";
-        if(this.state.parkingAvailable === 'Yes') {
+        if (this.state.parkingAvailable === 'Yes') {
             parkingFree = <div className="form-group">
-                <label htmlFor="parkingFree"  className="col-sm-3">Free Parking?</label>
-                <select className="form-control"  name="parkingFree" id="parkingFree" onChange={this.handleInputChange} value={this.state.parkingFree}>
+                <label htmlFor="parkingFree" className="col-sm-3">Free Parking?</label>
+                <select className="form-control" name="parkingFree" id="parkingFree" onChange={this.handleInputChange} value={this.state.parkingFree}>
                     <option value="" selected disabled hidden>-- Please Select --</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -429,49 +477,49 @@ class EditProperty extends Component {
         }
 
         let parkingCost = "";
-        if(this.state.parkingFree === 'No') {
+        if (this.state.parkingFree === 'No') {
             parkingCost = <div className="form-group">
-                <label htmlFor="parkingCost"  className="col-sm-3">Daily Parking Fee</label>
-                <input type="number" name="parkingCost" id="parkingCost" className="form-control form-control-lg" placeholder="in USD" onChange={this.handleInputChange} value={this.state.parkingCost}/>
+                <label htmlFor="parkingCost" className="col-sm-3">Daily Parking Fee</label>
+                <input type="number" name="parkingCost" id="parkingCost" className="form-control form-control-lg" placeholder="in USD" onChange={this.handleInputChange} value={this.state.parkingCost} />
             </div>
         }
 
         let weeklyAvailability = "";
-        if(this.state.alwaysAvailable === 'No') {
+        if (this.state.alwaysAvailable === 'No') {
             weeklyAvailability = <div className="form-group">
                 <label htmlFor="weeklyAvailability">Select the days of the week that your property is available</label>
-                <select multiple className="form-control"  name="weeklyAvailability" id="weeklyAvailability" size="7" onChange={this.handleInputChange}>
-                    {this.state.monSelected ? 
+                <select multiple className="form-control" name="weeklyAvailability" id="weeklyAvailability" size="7" onChange={this.handleInputChange}>
+                    {this.state.monSelected ?
                         <option selected>Monday</option>
                         :
                         <option>Monday</option>
                     }
-                    {this.state.tueSelected ? 
+                    {this.state.tueSelected ?
                         <option selected>Tuesday</option>
                         :
                         <option>Tuesday</option>
                     }
-                    {this.state.wedSelected ? 
+                    {this.state.wedSelected ?
                         <option selected>Wednesday</option>
                         :
                         <option>Wednesday</option>
                     }
-                    {this.state.thuSelected ? 
+                    {this.state.thuSelected ?
                         <option selected>Thursday</option>
                         :
                         <option>Thursday</option>
                     }
-                    {this.state.friSelected ? 
+                    {this.state.friSelected ?
                         <option selected>Friday</option>
                         :
                         <option>Friday</option>
                     }
-                    {this.state.satSelected ? 
+                    {this.state.satSelected ?
                         <option selected>Saturday</option>
                         :
                         <option>Saturday</option>
                     }
-                    {this.state.sunSelected ? 
+                    {this.state.sunSelected ?
                         <option selected>Sunday</option>
                         :
                         <option>Sunday</option>
@@ -481,20 +529,20 @@ class EditProperty extends Component {
         }
 
         let weekdayRentPrice = "";
-        if(this.state.alwaysAvailable === 'Yes'
-        || this.state.weeklyAvailability.some(item => this.state.weekdays.includes(item)) ) {
+        if (this.state.alwaysAvailable === 'Yes'
+            || this.state.weeklyAvailability.some(item => this.state.weekdays.includes(item))) {
             weekdayRentPrice = <div className="form-group">
                 <label htmlFor="alwaysAvailable" className="col-sm-3">Weekday Rent Price</label>
-                <input type="number" name="weekdayRentPrice" id="weekdayRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} defaultValue={this.state.weekdayRentPrice}/>
+                <input type="number" name="weekdayRentPrice" id="weekdayRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} defaultValue={this.state.weekdayRentPrice} />
             </div>
         }
 
         let weekendRentPrice = "";
-        if(this.state.alwaysAvailable === 'Yes'
-        || this.state.weeklyAvailability.some(item => this.state.weekends.includes(item)) ) {
+        if (this.state.alwaysAvailable === 'Yes'
+            || this.state.weeklyAvailability.some(item => this.state.weekends.includes(item))) {
             weekendRentPrice = <div className="form-group">
                 <label htmlFor="alwaysAvailable" className="col-sm-3">Weekend Rent Price</label>
-                <input type="number" name="weekendRentPrice" id="weekendRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} defaultValue={this.state.weekendRentPrice}/>
+                <input type="number" name="weekendRentPrice" id="weekendRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} defaultValue={this.state.weekendRentPrice} />
             </div>
         }
 
@@ -531,16 +579,16 @@ class EditProperty extends Component {
                                             <input type="text" name="streetAddress" id="streetAddress" className="form-control form-control-lg" placeholder="Street Address" onChange={this.handleInputChange} defaultValue={this.state.streetAddress} />
                                         </div>
                                         <div className="form-group">
-                                            <input type="text" name="city" id="city" className="form-control form-control-lg" placeholder="City" onChange={this.handleInputChange} defaultValue={this.state.city}/>
+                                            <input type="text" name="city" id="city" className="form-control form-control-lg" placeholder="City" onChange={this.handleInputChange} defaultValue={this.state.city} />
                                         </div>
                                         <div className="form-group">
-                                            <input type="text" name="state" id="state" className="form-control form-control-lg" placeholder="State" onChange={this.handleInputChange} defaultValue={this.state.state}/>
+                                            <input type="text" name="state" id="state" className="form-control form-control-lg" placeholder="State" onChange={this.handleInputChange} defaultValue={this.state.state} />
                                         </div>
                                         <div className="form-group">
-                                            <input type="text" name="zipCode" id="zipCode" className="form-control form-control-lg" placeholder="Zip Code" onChange={this.handleInputChange} defaultValue={this.state.zipCode}/>
+                                            <input type="text" name="zipCode" id="zipCode" className="form-control form-control-lg" placeholder="Zip Code" onChange={this.handleInputChange} defaultValue={this.state.zipCode} />
                                         </div>
                                         <div className="form-group">
-                                            <input type="number" name="propertyContact" id="propertyContact" className="form-control form-control-lg" placeholder="Property Contact" onChange={this.handleInputChange} defaultValue={this.state.propertyContact}/>
+                                            <input type="number" name="propertyContact" id="propertyContact" className="form-control form-control-lg" placeholder="Property Contact" onChange={this.handleInputChange} defaultValue={this.state.propertyContact} />
                                         </div>
                                         <div className="form-group location-form-btn flt-right">
                                             <button className="btn btn-primary btn-lg" onClick={this.handleDetailsClick}>Next</button>
@@ -561,15 +609,15 @@ class EditProperty extends Component {
 
                                         <div className="form-group">
                                             <label htmlFor="headline" className="col-sm-3">Headline</label>
-                                            <input type="text" name="headline" id="headline" className="form-control form-control-lg" placeholder="Please give a descriptive headline" onChange={this.handleInputChange} defaultValue={this.state.headline}/>
+                                            <input type="text" name="headline" id="headline" className="form-control form-control-lg" placeholder="Please give a descriptive headline" onChange={this.handleInputChange} defaultValue={this.state.headline} />
                                         </div>
                                         <div className="form-group">
-                                            <label htmlFor="description"  className="col-sm-3">Description</label>
-                                            <textarea type="text" name="description" id="description" className="form-control form-control-lg" placeholder="Please give a detailed description" onChange={this.handleInputChange} defaultValue={this.state.description}/>
+                                            <label htmlFor="description" className="col-sm-3">Description</label>
+                                            <textarea type="text" name="description" id="description" className="form-control form-control-lg" placeholder="Please give a detailed description" onChange={this.handleInputChange} defaultValue={this.state.description} />
                                         </div>
                                         <div className="form-group">
-                                            <label htmlFor="propertyType"  className="col-sm-3">Property Type</label>
-                                            <select className="form-control"  name="propertyType" id="propertyTypeSelect" onChange={this.handleInputChange} value={this.state.propertyType}>
+                                            <label htmlFor="propertyType" className="col-sm-3">Property Type</label>
+                                            <select className="form-control" name="propertyType" id="propertyTypeSelect" onChange={this.handleInputChange} value={this.state.propertyType}>
                                                 <option value="" selected disabled hidden>-- Please Select --</option>
                                                 <option>House</option>
                                                 <option>Townhouse</option>
@@ -577,8 +625,8 @@ class EditProperty extends Component {
                                             </select>
                                         </div>
                                         <div className="form-group">
-                                            <label htmlFor="bedrooms"  className="col-sm-3">Bedrooms</label>
-                                            <select className="form-control"  name="bedrooms" id="bedrooms" onChange={this.handleInputChange} value={this.state.bedrooms}>
+                                            <label htmlFor="bedrooms" className="col-sm-3">Bedrooms</label>
+                                            <select className="form-control" name="bedrooms" id="bedrooms" onChange={this.handleInputChange} value={this.state.bedrooms}>
                                                 <option value="" selected disabled hidden>-- Please Select --</option>
                                                 <option>1</option>
                                                 <option>2</option>
@@ -587,8 +635,8 @@ class EditProperty extends Component {
                                             </select>
                                         </div>
                                         <div className="form-group">
-                                            <label htmlFor="sharingType"  className="col-sm-3">Sharing Type</label>
-                                            <select className="form-control"  name="sharingType" id="sharingType" onChange={this.handleInputChange} value={this.state.sharingType}>
+                                            <label htmlFor="sharingType" className="col-sm-3">Sharing Type</label>
+                                            <select className="form-control" name="sharingType" id="sharingType" onChange={this.handleInputChange} value={this.state.sharingType}>
                                                 <option value="" selected disabled hidden>-- Please Select --</option>
                                                 <option>Private Room</option>
                                                 <option>Entire Place</option>
@@ -597,12 +645,12 @@ class EditProperty extends Component {
                                         {bathRooms}
                                         {privateBathShower}
                                         <div className="form-group">
-                                            <label htmlFor="sqft"  className="col-sm-3">Square Footage</label>
-                                            <input type="number" name="sqft" id="sqft" className="form-control form-control-lg" placeholder="in sq.ft." onChange={this.handleInputChange} defaultValue={this.state.sqft}/>
+                                            <label htmlFor="sqft" className="col-sm-3">Square Footage</label>
+                                            <input type="number" name="sqft" id="sqft" className="form-control form-control-lg" placeholder="in sq.ft." onChange={this.handleInputChange} defaultValue={this.state.sqft} />
                                         </div>
                                         <div className="form-group">
-                                            <label htmlFor="freeWifi"  className="col-sm-3">Free Wifi?</label>
-                                            <select className="form-control"  name="freeWifi" id="freeWifi" onChange={this.handleInputChange} value={this.state.freeWifi}>
+                                            <label htmlFor="freeWifi" className="col-sm-3">Free Wifi?</label>
+                                            <select className="form-control" name="freeWifi" id="freeWifi" onChange={this.handleInputChange} value={this.state.freeWifi}>
                                                 <option value="" selected disabled hidden>-- Please Select --</option>
                                                 <option>Yes</option>
                                                 <option>No</option>
@@ -629,11 +677,11 @@ class EditProperty extends Component {
                                         </div>
                                         <div className="container photo-upload-btn-container">
                                             <div className="center-content">
-                                                <input type="text" name="photo1" id="photo1" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[0]!=null?this.state.photos[0]:''}/>
-                                                <input type="text" name="photo2" id="photo2" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[1]!=null?this.state.photos[1]:''}/>
-                                                <input type="text" name="photo3" id="photo3" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[2]!=null?this.state.photos[2]:''}/>
-                                                <input type="text" name="photo4" id="photo4" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[3]!=null?this.state.photos[3]:''}/>
-                                                <input type="text" name="photo5" id="photo5" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[4]!=null?this.state.photos[4]:''}/>
+                                                <input type="text" name="photo1" id="photo1" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[0] != null ? this.state.photos[0] : ''} />
+                                                <input type="text" name="photo2" id="photo2" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[1] != null ? this.state.photos[1] : ''} />
+                                                <input type="text" name="photo3" id="photo3" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[2] != null ? this.state.photos[2] : ''} />
+                                                <input type="text" name="photo4" id="photo4" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[3] != null ? this.state.photos[3] : ''} />
+                                                <input type="text" name="photo5" id="photo5" className="form-control form-control-lg" placeholder="Please paste a img URL here" onChange={this.handleInputChange} defaultValue={this.state.photos[4] != null ? this.state.photos[4] : ''} />
 
                                             </div>
                                         </div>
@@ -656,7 +704,7 @@ class EditProperty extends Component {
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="alwaysAvailable">Is your property available on all days of the week?</label>
-                                            <select className="form-control"  name="alwaysAvailable" id="alwaysAvailable" onChange={this.handleInputChange} value={this.state.alwaysAvailable}>
+                                            <select className="form-control" name="alwaysAvailable" id="alwaysAvailable" onChange={this.handleInputChange} value={this.state.alwaysAvailable}>
                                                 <option value="" selected disabled hidden>-- Please Select --</option>
                                                 <option>Yes</option>
                                                 <option>No</option>
