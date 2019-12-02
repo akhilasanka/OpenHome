@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
-import { createReservation, getCurrentSystemTime } from '../util/APIUtils';
+import { createReservation, getReservationPrice } from '../util/APIUtils';
 import swal from 'sweetalert';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
@@ -9,20 +9,10 @@ import 'react-dates/lib/css/_datepicker.css';
 
 class ReservationCreate extends Component {
     render() {
-        if(this.props.authenticated) {
-            return <Redirect
-                to={{
-                pathname: "/",
-                state: { from: this.props.location }
-            }}/>;
-        }
-
         return (
-            <div className="card">
-                <div className="container">
-                    <div className="content">
-                    <ReservationCreateForm {...this.props} />
-                    </div>
+            <div className="container">
+                <div className="content">
+                <ReservationCreateForm {...this.props}/>
                 </div>
             </div>
         );
@@ -34,26 +24,42 @@ class ReservationCreateForm extends Component {
         super(props);
         this.state = {
         }
-        this.handleInputChange = this.handleInputChange.bind(this);
+        this.state.totalPrice = "Select a date range!";
+        this.state.propertyId = props.propertyId;
+        if (this.state.propertyId == null){
+          this.state.propertyId = 4; // hard coded for now
+        }
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const inputName = target.name;
-        const inputValue = target.value;
+    handleInputChange({startDate, endDate}) {
+        this.setState({startDate, endDate});
+        if(!startDate || !endDate) return;
+        if(!startDate.isValid() || !endDate.isValid()) return;
 
-        this.setState({
-            [inputName] : inputValue
+        // calculate total cost of reservation
+        const getReservationPriceRequest = Object.assign({}, this.state);
+        var propertyId = this.state.propertyId;
+        var payload = {
+          startDate: startDate,
+          endDate: endDate,
+          propertyId: propertyId
+        }
+
+        getReservationPrice(payload)
+        .then(response => {
+          this.state.totalPrice = "$ " +  response;
+          this.forceUpdate()
+        }).catch(error => {
+            swal("Oops!", (error && error.message) || 'Oops! Something went wrong fetching the total price. Please try again!', "error");
         });
     }
 
     handleSubmit = async (event) => {
         event.preventDefault();
-        
         let validInput = true;
-        var token = localStorage.getItem("accessToken");
-
+        
         const createReservationRequest = Object.assign({}, this.state);
         var startDate = new Date(createReservationRequest["startDate"]);
         var endDate = new Date(createReservationRequest["endDate"]);
@@ -67,7 +73,7 @@ class ReservationCreateForm extends Component {
 
           createReservation(createReservationRequest)
           .then(response => {
-              swal("Success!", "You've successfully created the reservation!")
+            swal("Success!", "You've successfully created the reservation!")
           }).catch(error => {
               swal("Oops!", (error && error.message) || 'Oops! Something went wrong. Please try again!', "error");
           });
@@ -85,7 +91,7 @@ class ReservationCreateForm extends Component {
                         startDateId="startDate" // PropTypes.string.isRequired,
                         endDate={this.state.endDate} // momentPropTypes.momentObj or null,
                         endDateId="endDate" // PropTypes.string.isRequired,
-                        onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                        onDatesChange={this.handleInputChange} // PropTypes.func.isRequired,
                         focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
                         onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
                         small={true}
@@ -97,10 +103,10 @@ class ReservationCreateForm extends Component {
                         Total:
                     </div>
                     <div className="col-12">
-                        <div id="total">Select a date range!</div>
+                        <div id="total">{this.state.totalPrice}</div>
                     </div>
                 </div>
-                <button type="submit" className="btn btn-primary align-center mb-3">Reserve</button>
+                <button type="submit" className="btn btn-primary align-center">Reserve</button>
             </form>
         );
     }

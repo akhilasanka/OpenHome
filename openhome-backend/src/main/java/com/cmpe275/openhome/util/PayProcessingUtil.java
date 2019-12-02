@@ -55,6 +55,9 @@ public class PayProcessingUtil {
     public Double calculateTotalPrice(LocalDate startDate, LocalDate endDate, Double weekdayPrice, Double weekendPrice, Double dailyParkingPrice) {
     	Double totalPrice = new Double(0);
     	
+    	System.out.println(startDate);
+    	System.out.println(endDate);
+    	System.out.println(weekdayPrice);
     	for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
     		DayOfWeek dow = date.getDayOfWeek();
     		boolean isWeekend = dow.equals(DayOfWeek.SATURDAY) || dow.equals(DayOfWeek.SUNDAY);
@@ -68,6 +71,7 @@ public class PayProcessingUtil {
     		
     		totalPrice += dailyParkingPrice;	
     	}
+    	System.out.println(totalPrice);
     	
     	return totalPrice;
     }
