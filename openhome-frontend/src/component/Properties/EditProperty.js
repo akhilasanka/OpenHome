@@ -352,7 +352,7 @@ class EditProperty extends Component {
                 {
                     method: 'post',
                     url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + this.state.propertyID + '/edit',
-                    params: { "isApproved": true },
+                    params: { "isPenalityApproved": false },
                     data: data,
                     headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                 }
