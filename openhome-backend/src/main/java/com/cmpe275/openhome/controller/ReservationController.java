@@ -6,19 +6,19 @@ import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.ApiResponse;
 import com.cmpe275.openhome.payload.ReservationCreateRequest;
-import com.cmpe275.openhome.repository.PropertyRepository;
+import com.cmpe275.openhome.payload.ReservationPriceRequest;
 import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
+import com.cmpe275.openhome.service.PropertyService;
 import com.cmpe275.openhome.service.ReservationService;
 import com.cmpe275.openhome.util.PayProcessingUtil;
 import com.cmpe275.openhome.util.DateUtils;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class ReservationController {
     private UserRepository userRepository;
     
     @Autowired
-    private PropertyRepository propertyRepository; // for testing
+    private PropertyService propertyService; // for testing
     
     @Autowired
     PayProcessingUtil payProcessingUtil;
@@ -50,7 +50,7 @@ public class ReservationController {
     	User guest = userRepository.findById(userPrincipal.getId())
     			.orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
     	
-    	List<Property> properties = propertyRepository.findAll();
+    	Property property = propertyService.getProperty(createRequest.getPropertyId().toString());
     	
     	// set StartDate to 3PM
     	LocalDateTime startDateTime = DateUtils.convertDateToLocalDateTime(createRequest.getStartDate());
@@ -63,11 +63,11 @@ public class ReservationController {
     	Date endDate = DateUtils.convertLocalDateTimeToDate(startDateTime);
     	
     	Reservation reservation = new Reservation();
-    	reservation.setProperty(properties.get(0));
+    	reservation.setProperty(property);
     	reservation.setGuest(guest);
-    	reservation.setWeekdayPrice(1.0);
-    	reservation.setWeekendPrice(2.5);
-    	reservation.setDailyParkingPrice(0.0);
+    	reservation.setWeekdayPrice(property.getWeekdayPrice());
+    	reservation.setWeekendPrice(property.getWeekendPrice());
+    	reservation.setDailyParkingPrice(property.getDailyParkingFee());
     	reservation.setStartDate(startDate);
     	reservation.setEndDate(endDate);
     	Double totalPrice = payProcessingUtil.calculateTotalPrice(
@@ -93,6 +93,29 @@ public class ReservationController {
         
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "Reservation created successfully!"));
+    }
+    
+    @PostMapping("/reservation/priceRequest")
+    @PreAuthorize("hasRole('USER')")
+    public Double getReservationPrice(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationPriceRequest priceRequest) {
+    	Double totalPrice = new Double(0);
+		try {
+	    	Property property = propertyService.getProperty(priceRequest.getPropertyId().toString());
+	    	LocalDate startDate = DateUtils.convertDateToLocalDate(priceRequest.getStartDate());
+	    	LocalDate endDate = DateUtils.convertDateToLocalDate(priceRequest.getEndDate());
+	    	totalPrice = payProcessingUtil.calculateTotalPrice(
+	    			startDate, 
+	    			endDate, 
+	    			property.getWeekdayPrice(), 
+	    			property.getWeekendPrice(), 
+	    			property.getDailyParkingFee()
+			);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+		return totalPrice;
     }
     
 }

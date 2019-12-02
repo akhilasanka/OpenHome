@@ -113,7 +113,12 @@ public class PropertyServiceImpl implements PropertyService {
 		allReservations.forEach(r -> {
 			if (!sevenDayReservations.contains(r.getId())) {
 				cancelledWithoutPenalty.add(r);
-				reservationService.hostCancelReservation(r);
+				try {
+					reservationService.hostCancelReservation(r);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -157,7 +162,12 @@ public class PropertyServiceImpl implements PropertyService {
 		allReservations.forEach(r -> {
 			if (!sevenDayReservations.contains(r.getId())) {
 				cancelledWithoutPenalty.add(r);
-				reservationService.hostCancelReservation(r);
+				try {
+					reservationService.hostCancelReservation(r);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 

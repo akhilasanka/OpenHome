@@ -4,5 +4,6 @@ public enum ReservationStatusEnum {
 	pendingCheckIn,
 	checkedIn,
 	checkedOut,
-	cancelled
+	cancelled,
+	pendingHostCancelation
 }

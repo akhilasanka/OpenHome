@@ -3,6 +3,7 @@ package com.cmpe275.openhome.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -222,10 +223,68 @@ public class ReservationService {
     }
     
     @Transactional
-    public void hostCancelReservation(Reservation reservation) {	
-    	// ToDo: Decipher Cancellation logic
-    	reservation.setStatus(ReservationStatusEnum.cancelled);
-    	updateReservation(reservation);
+    public void hostCancelReservation(Reservation reservation) throws Exception {	
+    	/*
+    	 * A host can cancel any future reservation or the remaining days a reservation for guests who already checked in.
+		   If a cancelled day is within 7 days from now, host pays 15% penalty of the total fee for that day, including parking.
+           If a guest has checked in, then the earliest cancellation by the host that can take effect is the closest 3PM in the future. E.g, the guest checked in at 5pm, with 8 night to stay. The host initiates the cancellation at 10pm, then the cancellation will take effect at 3pm the next day, i.e., the guest can stay until 3pm the next day. The guest pays for one night, gets money back for the remaining 7 nights, and 15% compensation for 6 nights. 
+    	 */
+    	
+    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
+    	LocalDateTime currentDateTimePlus7Days = currentDateTime.plusDays(7);
+    	
+    	LocalDateTime startDateTime = DateUtils.convertDateToLocalDateTime(reservation.getStartDate());
+    	LocalDateTime endDateTime = DateUtils.convertDateToLocalDateTime(reservation.getEndDate());
+
+    	boolean guestHasCheckedIn = reservation.getStatus().equals(ReservationStatusEnum.pendingCheckIn);
+    	// guest has not checked in and cancellation can take place immediately
+    	if (!guestHasCheckedIn) {
+    		// set status to canceled
+        	reservation.setStatus(ReservationStatusEnum.cancelled);
+        	updateReservation(reservation);
+        	
+    		// refund guest entire amount
+        	Double totalRefund = payProcessingUtil.calculateTotalPrice(
+        			startDateTime.toLocalDate(),  // add one because current day is still charged fully
+        			endDateTime.toLocalDate(), 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+        	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+
+    		// if there are days within the 7 day range, host needs to pay 15% fee
+    		if (startDateTime.isBefore(currentDateTimePlus7Days)) {
+    			
+    			// determine if Reservation End Date is before 6 Day Period
+    			// pick the one that ends sooner
+    			LocalDate penaltyEndDate;
+    			if (currentDateTimePlus7Days.toLocalDate().isBefore(endDateTime.toLocalDate())) {
+    				penaltyEndDate = currentDateTimePlus7Days.toLocalDate();
+    			}
+    			else {
+    				penaltyEndDate = endDateTime.toLocalDate();
+    			}
+    			
+        		Double penalty = 0.15 * payProcessingUtil.calculateTotalPrice(
+        				startDateTime.toLocalDate(),
+        				penaltyEndDate, 
+        				reservation.getWeekdayPrice(), 
+        				reservation.getWeekendPrice(), 
+        				reservation.getDailyParkingPrice()
+        		);
+        		
+            	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.HOSTPENALTY, penalty);
+    		}
+    	}
+    	// guest has checked in and cancellation can take place the next day
+    	else {
+    		// set cancelation to current date + 1
+    		Date cancelationDate = DateUtils.convertLocalDateToDate(currentDateTime.toLocalDate().plusDays(1));
+    		reservation.setHostCancelationDate(cancelationDate);
+        	reservation.setStatus(ReservationStatusEnum.pendingHostCancelation);
+        	updateReservation(reservation);
+    	}
     }
     
     @Transactional
@@ -290,6 +349,57 @@ public class ReservationService {
         	// set the reservation statuses to cancelled
         	reservation.setStatus(ReservationStatusEnum.checkedOut);
         	updateReservation(reservation);
+    	}
+    }
+    
+    @Transactional 
+    public void checkPendingHostCancelationReservations() throws Exception {
+    	// this will be a triggered by a background job at 3pm 
+    	// checks 'pendingHostCancelation' that Host has initiated cancel request for 
+    	List<Reservation> pendingHostCancelationReservations = reservationRepository
+    			.findAllReservationsThatShouldBeCanceled();
+    	
+    	// set the reservation statuses to checkedOut
+    	for (Reservation reservation : pendingHostCancelationReservations) {
+        	// set the reservation statuses to cancelled
+        	reservation.setStatus(ReservationStatusEnum.cancelled);
+        	updateReservation(reservation);
+        	
+        	LocalDateTime cancelationDate = DateUtils.convertDateToLocalDateTime(reservation.getHostCancelationDate());
+        	LocalDateTime cancelationDateTimePlus6Days = cancelationDate.plusDays(6);
+
+        	LocalDateTime endDateTime = DateUtils.convertDateToLocalDateTime(reservation.getEndDate());
+        	
+        	// calculate refund to guest
+        	Double totalRefund = payProcessingUtil.calculateTotalPrice(
+        			cancelationDate.toLocalDate(),  // add one because current day is still charged fully
+        			endDateTime.toLocalDate(), 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+        	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+
+        	// calculate penalty for host
+			// determine if Reservation End Date is before 6 Day Period
+			// pick the one that ends sooner
+			LocalDate penaltyEndDate;
+			if (cancelationDateTimePlus6Days.toLocalDate().isBefore(endDateTime.toLocalDate())) {
+				penaltyEndDate = cancelationDateTimePlus6Days.toLocalDate();
+			}
+			else {
+				penaltyEndDate = endDateTime.toLocalDate();
+			}
+			
+    		Double penalty = 0.15 * payProcessingUtil.calculateTotalPrice(
+    				cancelationDate.toLocalDate(),
+    				penaltyEndDate, 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+    		
+        	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.HOSTPENALTY, penalty);
     	}
     }
 }
