@@ -1,15 +1,23 @@
 package com.cmpe275.openhome.service;
 
 import com.cmpe275.openhome.entity.PropertyDetails;
+import com.cmpe275.openhome.model.ChargeType;
 import com.cmpe275.openhome.exception.ResourceNotFoundException;
+
 import com.cmpe275.openhome.model.Property;
+import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.payload.SearchProperty;
 import com.cmpe275.openhome.payload.SearchRequest;
 import com.cmpe275.openhome.repository.PropertyRepository;
 import com.cmpe275.openhome.repository.PropertyRepositoryCustom;
+import com.cmpe275.openhome.repository.ReservationRepository;
+import com.cmpe275.openhome.util.DateUtils;
+import com.cmpe275.openhome.util.PayProcessingUtil;
+import com.cmpe275.openhome.util.SystemDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +29,12 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Autowired
 	private PropertyRepositoryCustom propertyRepositoryCustom;
+
+	@Autowired
+	private ReservationRepository reservationRepository;
+
+	@Autowired
+	private ReservationService reservationService;
 
 	private static List<Property> myHardcodedPropertyList = new ArrayList<Property>();
 	private static PropertyDetails myHardcodedPropertyDetails = new PropertyDetails();
@@ -61,6 +75,106 @@ public class PropertyServiceImpl implements PropertyService {
 	public Property hostProperty(Property property) {
 		Property savedProperty = propertyRepository.save(property);
 		return savedProperty;
+	}
+
+	@Override
+	public Boolean editProperty(Property property, Boolean isApprovedForPayingFine) throws Exception {
+
+		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
+		LocalDate sevenDaysFromNow = currentDate.plusDays(7);
+
+		List<Reservation> sevenDayReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+				property.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(sevenDaysFromNow)
+		);
+
+		LocalDate oneYearFromNow = currentDate.plusDays(365);
+
+		List<Reservation> allReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+				property.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(oneYearFromNow)
+		);
+
+		List<Reservation> cancelledWithPenalty = new ArrayList<>();
+		List<Reservation> cancelledWithoutPenalty = new ArrayList<>();
+
+
+		if (sevenDayReservations.size() > 0 && isApprovedForPayingFine) {
+			for (Reservation r : sevenDayReservations) {
+				cancelledWithPenalty.add(r);
+				reservationService.hostCancelReservation(r);
+			}
+		} else if (sevenDayReservations.size() > 0 && !isApprovedForPayingFine) {
+			return false;
+		}
+
+		allReservations.forEach(r -> {
+			if (!sevenDayReservations.contains(r.getId())) {
+				cancelledWithoutPenalty.add(r);
+				try {
+					reservationService.hostCancelReservation(r);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		Property savedProperty = propertyRepository.save(property);
+		return true;
+	}
+
+	@Override
+	public Boolean deleteProperty(Property property, Boolean isApprovedForPayingFine) throws Exception {
+
+		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
+		LocalDate sevenDaysFromNow = currentDate.plusDays(7);
+
+		List<Reservation> sevenDayReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+				property.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(sevenDaysFromNow)
+		);
+
+		LocalDate oneYearFromNow = currentDate.plusDays(365);
+
+		List<Reservation> allReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+				property.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(oneYearFromNow)
+		);
+
+		List<Reservation> cancelledWithPenalty = new ArrayList<>();
+		List<Reservation> cancelledWithoutPenalty = new ArrayList<>();
+
+
+		if (sevenDayReservations.size() > 0 && isApprovedForPayingFine) {
+			for (Reservation r : sevenDayReservations) {
+				cancelledWithPenalty.add(r);
+				reservationService.hostCancelReservation(r);
+			}
+		} else if (sevenDayReservations.size() > 0 && !isApprovedForPayingFine) {
+			return false;
+		}
+
+		allReservations.forEach(r -> {
+			if (!sevenDayReservations.contains(r.getId())) {
+				cancelledWithoutPenalty.add(r);
+				try {
+					reservationService.hostCancelReservation(r);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		property.setIsDeleted(true);
+
+		propertyRepository.save(property);
+		return true;
 	}
 
 	@Override

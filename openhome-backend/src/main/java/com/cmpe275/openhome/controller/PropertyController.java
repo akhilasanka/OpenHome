@@ -1,6 +1,5 @@
 package com.cmpe275.openhome.controller;
 
-import com.cmpe275.openhome.entity.PropertyDetails;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.PostPropertyRequest;
@@ -73,18 +72,34 @@ public class PropertyController {
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
+  @PostMapping("/hosts/{hostId}/property/{propertyId}/edit")
+  @PreAuthorize("hasRole('USER')")
+  public Boolean editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+    User owner = userRepository.getOne(Long.parseLong(hostId));
+    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
+    property.setId(propertyId);
+    return propertyService.editProperty(property, isApproved);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
+  @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
+  @PreAuthorize("hasRole('USER')")
+  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+    User owner = userRepository.getOne(Long.parseLong(hostId));
+    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
+    property.setId(propertyId);
+    return propertyService.deleteProperty(property, isApproved);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/property/{propertyId}")
   public Property getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String propertyId) {
-      return propertyService.getProperty(propertyId);
+    return propertyService.getProperty(propertyId);
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
-    List properties = new ArrayList();
-
-   // System.out.println(searchRequest);
-
     return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
 

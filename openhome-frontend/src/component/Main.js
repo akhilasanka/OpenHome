@@ -3,6 +3,7 @@ import { Route } from "react-router-dom";
 
 import ListPropertiesComponent from './Properties/ListPropertiesComponent';
 import HostProperty from './Properties/HostProperty';
+import ViewProperty from './Properties/ViewProperty';
 import Home from './Home/Home';
 import Login from './Auth/login/Login';
 import OAuth2RedirectHandler from './Auth/oauth2/OAuth2RedirectHandler';
@@ -33,6 +34,7 @@ class Main extends Component {
                 <Route exact path="/search" component={SearchProperty} />
                 <Route exact path="/property/result" component={SearchResult}/>
                 <Route exact path="/property/host" exact component={HostProperty} />
+                <Route exact path="/property/view/:id" exact component={ViewProperty} />
                 <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
                 <Route exact path="/reservation/create" component={ReservationCreate} />

@@ -30,6 +30,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
 	@Query(value = "SELECT r from Reservation r where r.status='checkedIn' AND endDate < :currentDate")
 	List<Reservation> findAllCheckedInReservationsThatShouldBeCheckedOut(Date currentDate);
+	
+	@Query(value = "SELECT r from Reservation r where r.status='pendingHostCancelation'")
+	List<Reservation> findAllReservationsThatShouldBeCanceled();
 
 	List<Reservation> findAllByProperty(Property property);
 }

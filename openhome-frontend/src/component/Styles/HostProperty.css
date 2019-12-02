@@ -91,7 +91,7 @@ DatePicker:focus{
 }
 
 .carousel-img{
-    width:1100px;
+    width:100%;
     height: 500px;
 }
 
@@ -248,13 +248,22 @@ textarea{
     border-style: none !important;
 }
 
+.property-display-content{
+    background-color: white;
+}
+
 .property-display-img{
-    width: 560px;
+    width: 100%;
     height: 430px;
 }
 
-.property-display-img-content, .property-display-details-content{
-    padding: 2%;
+.property-display-img-content{
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.property-display-details-content{
+    text-align: left;
+    margin-left: 10%;
 }
 
 .property-display-pricing-content{
@@ -332,4 +341,20 @@ textarea{
 
 .error-div{
     padding: 10% 25%;
+}
+
+.property-display-pricing-content{
+    /* background-color: yellow; */
+    padding-left: 5%;
+    padding-top : 2%;
+
+}
+
+.details-content-headline-text {
+    margin-left: 10%;
+    text-align: left;
+}
+
+.property-description-content{
+    text-align: left;
 }
