@@ -5,10 +5,7 @@ import Alert from 'react-s-alert';
 
 class BillingStats extends Component {
     constructor(props) {
-        super(props);
-        // sample response to test things out.
-        // changes in BE. Add 0:"All properties" to validProperties
-        // change key in validProperties to Long/Integer.
+        super(props)
         this.state = {data:null, selected_option:null, selected_month: null};
         this.handleOptionSelect = this.handleOptionSelect.bind(this);
         this.handleMonthSelect = this.handleMonthSelect.bind(this);
@@ -16,52 +13,42 @@ class BillingStats extends Component {
 
     }
     handleOptionSelect(event) {
-        this.setState({selected_option: parseInt(event.target.value)});
+        this.setState({selected_option: event.target.value});
     }
     handleMonthSelect(event) {
         this.setState({selected_month: event.target.value});
     }
 
     componentDidMount() {
-        this.setState({data:{"success":true,
-            "validProperties":{0:"All Properties", 5:"one more prop", 4:"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California"},
-            "allMonths":["Jan `19","Feb `19","Mar `19","Apr `19","May `19","Jun `19","Jul `19","Aug `19","Sep `19","Oct `19","Nov `19","Dec `19"],
-            "lineItems":[{"transactionMonth":"Nov `19","transactionId":1,"reservationId":1,"propertyId":4,"propertyName":"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":-10.0,"chargedDate":"29 Nov `19","type":"Change/Cancel Penalty","card":"HOST"},
-            {"transactionMonth":"Nov `19","transactionId":2,"reservationId":1,"propertyId":4,"propertyName":"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":-10.0,"chargedDate":"29 Nov `19","type":"Change/Cancel Penalty","card":"HOST"},
-            {"transactionMonth":"Nov `19","transactionId":3,"reservationId":1,"propertyId":4,"propertyName":"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":-10.0,"chargedDate":"29 Nov `19","type":"Change/Cancel Penalty","card":"HOST"},
-            {"transactionMonth":"Nov `19","transactionId":4,"reservationId":2,"propertyId":4,"propertyName":"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":100.0,"chargedDate":"29 Nov `19","type":"Guest Change/Cancel Credit","card":"4444"},
-            {"transactionMonth":"Nov `19","transactionId":5,"reservationId":3,"propertyId":4,"propertyName":"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":500.0,"chargedDate":"29 Nov `19","type":"Guest Check-in credit","card":"4444"},
-            {"transactionMonth":"Nov `19","transactionId":6,"reservationId":1,"propertyId":4,"propertyName":"Townhouse (Private Room) at 5805 Charlotte dr apt 270,San jose,California","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":-10.0,"chargedDate":"29 Nov `19","type":"Change/Cancel Penalty","card":"HOST"},
-            {"transactionMonth":"Nov `19","transactionId":7,"reservationId":2,"propertyId":5,"propertyName":"One More Property","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":100.0,"chargedDate":"29 Nov `19","type":"Guest Change/Cancel Credit","card":"4444"},
-            {"transactionMonth":"Nov `19","transactionId":8,"reservationId":3,"propertyId":5,"propertyName":"One More Property","startDate":"29 Nov `19","endDate":"29 Nov `19","amount":500.0,"chargedDate":"29 Nov `19","type":"Guest Check-in credit","card":"4444"}],
-            
-            }, selected_option:0, selected_month: "Jan `19"})
+        axios({
+            method:'GET',
+            url:API_BASE_URL + '/stats/getbillingsummary',
+            headers: {"Authorization" : "Bearer "+localStorage.getItem(ACCESS_TOKEN)}
+        }).then(response => {
+            console.log(response)
+            this.setState({data: response.data, selected_option:"0", 
+                selected_month: response.data.allMonths[0]})
+        })
     }
 
     makeTable(dataArr, isGuest) {
         let retData = <div>There were no charges for {this.state.selected_month}</div>; 
-        let tableHeader = <tr>
-            <td>Property</td>
-            <td>StartDate</td>
-            <td>End Date</td>
-            <td>Amount</td>
-            <td>Memo</td>
-            <td>Charged on</td>
-        </tr>;
+        let cardUsedHeaderCol = null
         if(isGuest) {
-            tableHeader = <tr>
-                <td>Property</td>
-                <td>StartDate</td>
-                <td>End Date</td>
-                <td>Amount</td>
-                <td>Memo</td>
-                <td>Charged on</td>
-                <td>Card Used</td>
-            </tr>;
+            cardUsedHeaderCol = <th>Card Used</th>;
         }
+        let tableHeader = <tr>
+            <th>Property</th>
+            <th>StartDate</th>
+            <th>End Date</th>
+            <th>Amount</th>
+            <th>Memo</th>
+            <th>Charged on</th>
+            {cardUsedHeaderCol}
+        </tr>;
         let dataRows = dataArr.filter((elem) => {
-            return (this.state.selected_option === 0 || 
-                elem.propertyId === this.state.selected_option) && 
+            return (this.state.selected_option === "0" || 
+                elem.propertyId === parseInt(this.state.selected_option)) && 
                 elem.transactionMonth === this.state.selected_month;
         })
         if(dataRows !== null && dataRows.length > 0) {
