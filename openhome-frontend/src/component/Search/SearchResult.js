@@ -13,7 +13,7 @@ class SearchResult extends Component {
         //maintain the state required for this component
         this.state = {
             results : this.props.location.state.results,
-            
+
             //for pagination
             paginated_results:[],
             results_per_page: 1,
@@ -71,7 +71,7 @@ class SearchResult extends Component {
                                 <label className="row">Weekend Price($): {record.weekendPrice}</label>
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ class SearchResult extends Component {
                         </div>
                 </div>
             </div>
-            
+
         )
     }
 }

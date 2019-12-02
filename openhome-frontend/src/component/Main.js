@@ -16,6 +16,7 @@ import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
 import ReservationCreate from './Reservation/ReservationCreate'
+import ReservationListGuest from './Reservation/ReservationListGuest'
 import TimeManagement from './System/TimeManagement'
 import VerifyAuthCode from './Auth/signup/VerifyAuthCode';
 import EditProperty from './Properties/EditProperty';
@@ -36,6 +37,7 @@ class Main extends Component {
                 <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
                 <Route exact path="/reservation/create" component={ReservationCreate} />
+                <Route exact path="/reservation/list/guest" component={ReservationListGuest} />
                 <Route exact path="/system/timeManagement" component={TimeManagement} />
                 <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
             </div>

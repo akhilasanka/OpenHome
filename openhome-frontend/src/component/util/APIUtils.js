@@ -56,6 +56,14 @@ export function getReservationPrice(getReservationPriceRequest) {
   });
 }
 
+export function getReservationList(getReservationListRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/list",
+      method: 'POST',
+      body: JSON.stringify(getReservationListRequest)
+  });
+}
+
 // System Time Related Methods
 export function getCurrentSystemTime() {
   var options = {
