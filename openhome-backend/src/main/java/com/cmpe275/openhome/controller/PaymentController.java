@@ -68,7 +68,7 @@ public class PaymentController {
             return new PayMethodResponse(payMethod);
     }
 
-    // todo For testing only. Remove it later?
+    // for testing only. Not to be called from FE.
     @GetMapping("/insertsampletransaction")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> insertSampleTransaction(@CurrentUser UserPrincipal userPrincipal) {

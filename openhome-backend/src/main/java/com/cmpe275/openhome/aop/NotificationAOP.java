@@ -61,13 +61,16 @@ public class NotificationAOP {
         }
     }
 
-    //todo wire up to AOP
-    public void deletePropertyNotification(JoinPoint joinPoint, Long propertyId) {
+    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.deleteProperty(..))")
+    public void deletePropertyNotification(JoinPoint joinPoint) {
+        Long propertyId = (Long) joinPoint.getArgs()[3];
         updatePropertyNotificationHelper(propertyId, "deleted");
     }
 
-    // todo wire up to AOP
-    public void updatePropertyNotification(JoinPoint joinPoint, Long propertyId) {
+
+    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.editProperty(..))")
+    public void updatePropertyNotification(JoinPoint joinPoint) {
+        Long propertyId = (Long) joinPoint.getArgs()[3];
         updatePropertyNotificationHelper(propertyId, "updated");
     }
 
@@ -99,8 +102,8 @@ public class NotificationAOP {
         }
     }
 
-    public void reserveNotifyHelper(Long reserveId, String changetype) {
-        Reservation r = reservationRepository.findReservationById(reserveId);
+    public void reserveNotifyHelper(Reservation r, String changetype) {
+        //Reservation r = reservationRepository.findReservationById(reserveId);
         if(r != null) {
             final String hostEmail = r.getProperty().getOwner().getEmail();
             final String guestEmail = r.getGuest().getEmail();
@@ -115,41 +118,34 @@ public class NotificationAOP {
         }
     }
 
-    // todo wire up to AOP
-    public void createReservationNotification(JoinPoint joinPoint, Long reserveId) {
+    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.service.ReservationService.createReservation(..))")
+    public void createReservationNotification(JoinPoint joinPoint) {
         System.out.println("Sending email after reservation");
-        reserveNotifyHelper(reserveId, "created");
+        Reservation reservation = (Reservation) joinPoint.getArgs()[0];
+        reserveNotifyHelper(reservation, "created");
     }
 
-    // todo wire up to AOP
-    public void updateReservationNotification(JoinPoint joinPoint, Long reserveId) {
+    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.service.ReservationService.updateReservation(..))")
+    public void updateReservationNotification(JoinPoint joinPoint) {
         System.out.println("Sending email after reservation update/delete");
-        reserveNotifyHelper(reserveId, "changed");
+        Reservation reservation = (Reservation) joinPoint.getArgs()[0];
+        switch (reservation.getStatus()) {
+            case checkedIn:
+                reserveNotifyHelper(reservation, "check-in");
+                break;
+            case checkedOut:
+                reserveNotifyHelper(reservation, "check-out");
+                break;
+            case cancelled:
+                reserveNotifyHelper(reservation, "cancelled");
+                break;
+            case pendingHostCancelation:
+                reserveNotifyHelper(reservation, "cancelled by host (Changes take effect the next reservation day)");
+                break;
+            default:
+                reserveNotifyHelper(reservation, "changed");
+        }
     }
-    // todo wire up to AOP
-    public void deleteReservationNotification(JoinPoint joinPoint, Long reserveId) {
-        System.out.println("Sending email after reservation update/delete");
-        reserveNotifyHelper(reserveId, "deleted");
-    }
-
-    // todo wire up to AOP
-    public void checkInNotification(JoinPoint joinPoint, Long reserveId) {
-        System.out.println("Sending email after reservation checkin");
-        reserveNotifyHelper(reserveId, "check-in");
-    }
-
-    // todo wire up to AOP
-    public void checkOutNotification(JoinPoint joinPoint, Long reserveId) {
-        System.out.println("Sending email after reservation checkout");
-        reserveNotifyHelper(reserveId, "check-out");
-    }
-
-    // todo wire up to AOP
-    public void noShowNotification(JoinPoint joinPoint, Long reserveId) {
-        System.out.println("Sending email after reservation noshow");
-        reserveNotifyHelper(reserveId, "no-show");
-    }
-
 
     @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.postProperty(..))",
             returning = "re")

@@ -74,9 +74,10 @@ public class ReservationService {
     	Reservation createdReservation = reservationRepository.save(reservation);
     	return createdReservation;
     }
-    
+
+    // made public for AOP;
     @Transactional 
-    void updateReservation(Reservation reservation) {
+    public void updateReservation(Reservation reservation) {
     	findReservation(reservation.getId()); // throws exception if entity doesn't exist
     	reservationRepository.save(reservation);
     }
