@@ -27,7 +27,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	@Query(value = "SELECT r from Reservation r where property.id =:propertyId AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsForPropertyBetweenDates(long propertyId, Date startDate, Date endDate);
 
-	@Query(value = "SELECT r from Reservation r where (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
+	@Query(value = "SELECT r from Reservation r where r.status<>'cancelled' AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate);
 
 	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND startDate < :currentDate")
