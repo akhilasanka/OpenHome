@@ -46,7 +46,7 @@ class SearchResult extends Component {
 
     render() {
         let resultsDiv = this.state.paginated_results.map(record => {
-            var link = "/property/"+record.id;
+            var link = "/property/view/"+record.id;
             return(
                 <div class="card bg-light text-dark">
                 <div class="row">
