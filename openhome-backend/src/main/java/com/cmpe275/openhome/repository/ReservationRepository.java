@@ -33,10 +33,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	//************** FOR SEARCH START *******************
 
 	//There is a reservation with status ‘pendingCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate and reservation endDate
-	@Query(value = "SELECT r from Reservation r where r.status IN: statuses AND (startDate <= :endDate AND :startDate <= endDate)")
+	@Query(value = "SELECT r from Reservation r where r.status IN :statuses AND (startDate <= :endDate AND :startDate <= endDate)")
 	List<Reservation> findAllReservationsBasedOnEndDate(Date startDate, Date endDate, List<String> statuses);
 
-	@Query(value = "SELECT r from Reservation r where r.status IN: statuses AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	@Query(value = "SELECT r from Reservation r where r.status IN :statuses AND (startDate <= :endDate AND :startDate <= checkOutDate)")
 	List<Reservation> findAllReservationsBasedOnCheckoutDate(Date startDate, Date endDate, List<String> statuses);
 
 	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND (startDate <= :endDate AND :startDate <= endDate)")
