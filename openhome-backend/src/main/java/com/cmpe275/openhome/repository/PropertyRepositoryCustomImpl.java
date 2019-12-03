@@ -21,7 +21,7 @@ public class PropertyRepositoryCustomImpl implements PropertyRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public List<Property> findPropertiesBySearchCriteria(SearchRequest searchRequest, Set<Long> property_ids) {
+    public List<Property> findPropertiesBySearchCriteria(SearchRequest searchRequest, Set<Long> reserved_property_ids) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Property> cq = cb.createQuery(Property.class);
@@ -90,8 +90,8 @@ public class PropertyRepositoryCustomImpl implements PropertyRepositoryCustom {
         }
 
         predicates.add(cb.equal(propertyTable.get("isDeleted"), false));
-        if(property_ids.size()>0){
-            predicates.add(cb.not(propertyTable.get("id").in(property_ids)));
+        if(reserved_property_ids.size()>0){
+            predicates.add(cb.not(propertyTable.get("id").in(reserved_property_ids)));
         }
 
 

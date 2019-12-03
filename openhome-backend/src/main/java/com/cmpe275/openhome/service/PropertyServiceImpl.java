@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -180,10 +181,25 @@ public class PropertyServiceImpl implements PropertyService {
 	@Override
 	public List<SearchProperty> searchProperties(SearchRequest searchRequest) {
 
-	  	List<Reservation> reservationsInDateSelected = reservationService.findAllReservationsBetweenDates(searchRequest.getFrom(), searchRequest.getTo());
-		Set<Long> property_ids = reservationsInDateSelected.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
+	  	List<Reservation> reservationsPendingCheckIn = reservationService.findAllReservationsPendingCheckIn(searchRequest.getFrom(), searchRequest.getTo());
+	  	List<Reservation> reservationsCheckedIn = reservationService.findAllReservationsCheckedIn(searchRequest.getFrom(), searchRequest.getTo());
+	  	List<Reservation> reservationsCanceledAuto = reservationService.findAllReservationsCanceledAuto(searchRequest.getFrom(), searchRequest.getTo());
+	  	List<Reservation> reservationsGuestCanceledAfterCheckIn = reservationService.findAllReservationsGuestCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
+	  	List<Reservation> reservationsHostCanceledAfterCheckIn = reservationService.findAllReservationshostCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
+	  	Set<Long> property_ids_pendingCheckIn = reservationsPendingCheckIn.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_checkedIn = reservationsCheckedIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_canceledAuto = reservationsCanceledAuto.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_guestCanceledAfterCheckIn = reservationsGuestCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_hostCanceledAfterCheckIn = reservationsHostCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
 
-	  	List<Property> properties =  propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, property_ids);
+		Set<Long> reserved_property_ids = new HashSet<>();
+		reserved_property_ids.addAll(property_ids_pendingCheckIn);
+		reserved_property_ids.addAll(property_ids_checkedIn);
+		reserved_property_ids.addAll(property_ids_canceledAuto);
+		reserved_property_ids.addAll(property_ids_guestCanceledAfterCheckIn);
+		reserved_property_ids.addAll(property_ids_hostCanceledAfterCheckIn);
+
+	  	List<Property> properties =  propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
 
 	  	List<SearchProperty> searchProperties = new ArrayList<>();
 	  	for (Property p : properties) {
