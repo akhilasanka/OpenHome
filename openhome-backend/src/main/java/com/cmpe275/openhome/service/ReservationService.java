@@ -34,6 +34,9 @@ public class ReservationService {
     @Autowired
     PayProcessingUtil payProcessingUtil;
     
+    @Autowired
+    PropertyService propertyService;
+    
     // ToDo: add property and properties repository or service
     // ToDo: secure service methods with Roles?
     
@@ -57,6 +60,11 @@ public class ReservationService {
     	boolean isAfter365Days = endDate.isAfter(currentDate);
     	if (isAfter365Days) {
     		throw new Exception("Reservation Dates must be within 365 days from the current date");
+    	}
+    	
+    	// check date is valid range
+    	if (!propertyService.isDateRangeValid(reservation.getProperty(), startDate, endDate)) {
+    		throw new Exception("Reservation date range is not valid");
     	}
     	
     	// check properties are not double booked
@@ -157,9 +165,17 @@ public class ReservationService {
         		
             	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTPENALTY, penalty);
         	}
+        	
+        	// set status to cancelled and set the actual checkout date
+        	reservation.setStatus(ReservationStatusEnum.guestCanceledAfterCheckIn);
+        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDate.plusDays(1).atTime(11, 0));
+        	reservation.setCheckOutDate(actualCheckOutDate);
+    	}
+    	else {
+        	reservation.setStatus(ReservationStatusEnum.checkedOut);
+        	reservation.setCheckOutDate(reservation.getEndDate());
     	}
     	
-    	reservation.setStatus(ReservationStatusEnum.checkedOut);
     	updateReservation(reservation);
     }
     
@@ -177,6 +193,7 @@ public class ReservationService {
     	// if cancelled with more than 24 hours ahead of start date @ 3PM charge nothing
     	if (hoursBetweenCurrentTimeAndStartTime > 24) {
     		// no cancellation fee
+        	reservation.setStatus(ReservationStatusEnum.guestCanceledBeforeCheckIn);
     	}
     	else if (minutesBetweenCurrentTimeAndStartTime > 0){
         	// if cancelled before the start date @ 3PM charge 30% for just the Start Date
@@ -189,6 +206,7 @@ public class ReservationService {
     		);
     		
         	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTPENALTY, penalty);
+        	reservation.setStatus(ReservationStatusEnum.guestCanceledBeforeCheckIn);
     	}
     	else {
         	// if cancelled after the start date @ 3PM charge 30% for just the Start Date and Start Date + 1 if applicable
@@ -217,10 +235,14 @@ public class ReservationService {
         		
             	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTPENALTY, penalty);
         	}
+        	
+        	// set status to cancelled and set the actual checkout date
+        	reservation.setStatus(ReservationStatusEnum.guestCanceledAfterCheckIn);
+        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDateTime.plusDays(1).toLocalDate().atTime(11, 0));
+        	reservation.setCheckOutDate(actualCheckOutDate);
+        	
     	}
-    	
-    	reservation.setStatus(ReservationStatusEnum.cancelled);
-    	updateReservation(reservation);
+       	updateReservation(reservation);
     }
     
     @Transactional
@@ -241,7 +263,7 @@ public class ReservationService {
     	// guest has not checked in and cancellation can take place immediately
     	if (!guestHasCheckedIn) {
     		// set status to canceled
-        	reservation.setStatus(ReservationStatusEnum.cancelled);
+        	reservation.setStatus(ReservationStatusEnum.hostCanceledBeforeCheckIn);
         	updateReservation(reservation);
         	
     		// refund guest entire amount
@@ -284,7 +306,10 @@ public class ReservationService {
     		Date cancelationDate = DateUtils.convertLocalDateToDate(currentDateTime.toLocalDate().plusDays(1));
     		reservation.setHostCancelationDate(cancelationDate);
         	reservation.setStatus(ReservationStatusEnum.pendingHostCancelation);
-        	updateReservation(reservation);
+        	
+        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDateTime.plusDays(1).toLocalDate().atTime(11, 0));
+        	reservation.setCheckOutDate(actualCheckOutDate);
+        	updateReservation(reservation);        	
     	}
     }
 
@@ -351,8 +376,11 @@ public class ReservationService {
     	
     	// set the reservation statuses to checkedOut
     	for (Reservation reservation : checkedInReservations) {
-        	// set the reservation statuses to cancelled
-        	reservation.setStatus(ReservationStatusEnum.checkedOut);
+        	// set the reservation statuses to automatically cancelled and set end date
+        	reservation.setStatus(ReservationStatusEnum.automaticallyCanceled);
+        	
+        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(DateUtils.convertDateToLocalDate(reservation.getStartDate()).plusDays(1).atTime(11, 0));
+        	reservation.setCheckOutDate(actualCheckOutDate);
         	updateReservation(reservation);
     	}
     }
@@ -367,7 +395,7 @@ public class ReservationService {
     	// set the reservation statuses to checkedOut
     	for (Reservation reservation : pendingHostCancelationReservations) {
         	// set the reservation statuses to cancelled
-        	reservation.setStatus(ReservationStatusEnum.cancelled);
+        	reservation.setStatus(ReservationStatusEnum.hostCanceledAfterCheckIn);
         	updateReservation(reservation);
         	
         	LocalDateTime cancelationDate = DateUtils.convertDateToLocalDateTime(reservation.getHostCancelationDate());

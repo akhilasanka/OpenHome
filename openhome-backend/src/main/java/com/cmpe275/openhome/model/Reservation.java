@@ -42,6 +42,10 @@ public class Reservation {
     @Column(name="END_DATE")
     private Date endDate;
     
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="CHECKOUT_DATE")
+    private Date checkOutDate;
+    
     @NotNull
     @Column(name="STATUS")
     @Enumerated(EnumType.STRING)
@@ -104,6 +108,14 @@ public class Reservation {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public Date getCheckOutDate() {
+		return checkOutDate;
+	}
+
+	public void setCheckOutDate(Date checkOutDate) {
+		this.checkOutDate = checkOutDate;
 	}
 
 	public ReservationStatusEnum getStatus() {
