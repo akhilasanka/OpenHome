@@ -64,4 +64,25 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	List<Reservation> findAllReservationsThatShouldBeCanceled();
 
 	List<Reservation> findAllByProperty(Property property);
+	
+	/* FOR RESERVATION INTEGRITY CHECK*/
+	@Query(value = "SELECT r from Reservation r where r.property=:property AND r.status='pendingCheckIn' AND (r.startDate <= :endDate AND :startDate <= r.endDate)")
+	List<Reservation> findConflictingReservationsThatArePendingCheckIn(Property property, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT r from Reservation r where r.property=:property AND r.status='checkedIn' AND (r.startDate <= :endDate AND :startDate <= r.endDate)")
+	List<Reservation> findConflictingReservationsThatAreCheckedIn(Property property, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT r from Reservation r where r.property=:property AND r.status='canceledAutomatically' AND (r.startDate <= :endDate AND :startDate <= r.checkOutDate)")
+	List<Reservation> findConflictingReservationsThatWereCanceledAutomatically(Property property, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT r from Reservation r where r.property=:property AND r.status='guestCanceledAfterCheckIn' AND (r.startDate <= :endDate AND :startDate <= r.checkOutDate)")
+	List<Reservation> findConflictingReservationsThatWereCanceledByGuestAfterCheckIn(Property property, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT r from Reservation r where r.property=:property AND r.status='hostCanceledAfterCheckIn' AND (r.startDate <= :endDate AND :startDate <= r.checkOutDate)")
+	List<Reservation> findConflictingReservationsThatWereCanceledByHostAfterCheckIn(Property property, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT r from Reservation r where r.property=:property AND r.status='pendingHostCancelation' AND (r.startDate <= :endDate AND :startDate <= r.checkOutDate)")
+	List<Reservation> findConflictingReservationsThatArePendingCancelationByHost(Property property, Date startDate, Date endDate);
+	/* END FOR RESERVATION INTEGRITY CHECK*/
+
 }

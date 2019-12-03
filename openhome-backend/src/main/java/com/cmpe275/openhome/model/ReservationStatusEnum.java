@@ -4,6 +4,10 @@ public enum ReservationStatusEnum {
 	pendingCheckIn,
 	checkedIn,
 	checkedOut,
-	cancelled,
+	automaticallyCanceled,
+	guestCanceledBeforeCheckIn,
+	guestCanceledAfterCheckIn,
+	hostCanceledBeforeCheckIn,
+	hostCanceledAfterCheckIn,
 	pendingHostCancelation
 }

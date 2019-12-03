@@ -15,6 +15,7 @@ import com.cmpe275.openhome.util.SystemDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -219,5 +220,53 @@ public class PropertyServiceImpl implements PropertyService {
 	public Property getProperty(String propertyId) {
 		return propertyRepository.findById(Long.parseLong(propertyId))
 				.orElseThrow(() -> new ResourceNotFoundException("Property", "id", propertyId));
+	}
+	
+	@Override
+    public boolean isDateRangeValid(Property property, LocalDate startDate, LocalDate endDate) {
+    	boolean isValid = true;
+    	
+    	List<DayOfWeek> availableDaysList = getAvailableDaysList(property.getAvailableDays());
+    	for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+    		if (!availableDaysList.contains(date.getDayOfWeek())) {
+    			isValid = false;
+    			break;
+    		}
+    	}
+    	
+    	return isValid;
+    }
+
+	private List<DayOfWeek> getAvailableDaysList(String availableDays) {
+		List<DayOfWeek> availableDaysList = new ArrayList<DayOfWeek>();
+		if (availableDays.contains("M")) {
+			availableDaysList.add(DayOfWeek.MONDAY);
+		}
+		
+		if (availableDays.contains("TU")) {
+			availableDaysList.add(DayOfWeek.TUESDAY);
+		}
+		
+		if (availableDays.contains("W")) {
+			availableDaysList.add(DayOfWeek.WEDNESDAY);
+		}
+		
+		if (availableDays.contains("TH")) {
+			availableDaysList.add(DayOfWeek.THURSDAY);
+		}
+		
+		if (availableDays.contains("F")) {
+			availableDaysList.add(DayOfWeek.FRIDAY);
+		}
+		
+		if (availableDays.contains("SA")) {
+			availableDaysList.add(DayOfWeek.SATURDAY);
+		}
+		
+		if (availableDays.contains("SU")) {
+			availableDaysList.add(DayOfWeek.SUNDAY);
+		}
+		
+		return availableDaysList;
 	}
 }

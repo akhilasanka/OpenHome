@@ -136,12 +136,24 @@ public class NotificationAOP {
             case checkedOut:
                 reserveNotifyHelper(reservation, "check-out");
                 break;
-            case cancelled:
-                reserveNotifyHelper(reservation, "cancelled");
+            case automaticallyCanceled:
+                reserveNotifyHelper(reservation, "automaically canceled because of no-show");
+                break;
+            case guestCanceledBeforeCheckIn:
+                reserveNotifyHelper(reservation, "cancelled by guest before guesest to checked-in");
+                break;
+            case guestCanceledAfterCheckIn:
+                reserveNotifyHelper(reservation, "cancelled by guest after guest has checked-in");
                 break;
             case pendingHostCancelation:
                 reserveNotifyHelper(reservation, "cancelled by host (Changes take effect the next reservation day)");
                 break;
+            case hostCanceledBeforeCheckIn:
+                reserveNotifyHelper(reservation, "cancelled by host");
+                break;
+            case hostCanceledAfterCheckIn:
+                reserveNotifyHelper(reservation, "cancelled by host after guest has checked-in");
+                break;             
             default:
                 reserveNotifyHelper(reservation, "changed");
         }

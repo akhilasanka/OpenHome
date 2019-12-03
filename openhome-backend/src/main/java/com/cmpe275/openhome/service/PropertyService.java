@@ -1,5 +1,6 @@
 package com.cmpe275.openhome.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.cmpe275.openhome.model.Property;
@@ -19,4 +20,6 @@ public interface PropertyService {
 	List<SearchProperty> searchProperties(SearchRequest searchRequest);
 
 	Property getProperty(String propertyId);
+	
+    boolean isDateRangeValid(Property property, LocalDate startDate, LocalDate endDate);
 }
