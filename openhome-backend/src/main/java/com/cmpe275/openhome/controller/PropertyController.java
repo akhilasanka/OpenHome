@@ -2,10 +2,7 @@ package com.cmpe275.openhome.controller;
 
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
-import com.cmpe275.openhome.payload.PostPropertyRequest;
-import com.cmpe275.openhome.payload.PostPropertyResponse;
-import com.cmpe275.openhome.payload.SearchPropertyResponse;
-import com.cmpe275.openhome.payload.SearchRequest;
+import com.cmpe275.openhome.payload.*;
 import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
@@ -74,21 +71,35 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/edit")
   @PreAuthorize("hasRole('USER')")
-  public Boolean editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+  public EditPropertyResponse editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
     User owner = userRepository.getOne(Long.parseLong(hostId));
     Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
     property.setId(propertyId);
-    return propertyService.editProperty(property, isPenalityApproved);
+    EditPropertyStatus editStatus;
+    try {
+      editStatus = propertyService.editProperty(property, isPenalityApproved);
+    } catch(Exception e) {
+      editStatus = EditPropertyStatus.EditError;
+      return new EditPropertyResponse(editStatus, e.getMessage());
+    }
+      return new EditPropertyResponse(editStatus, "");
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
   @PreAuthorize("hasRole('USER')")
-  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+  public EditPropertyResponse deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
     User owner = userRepository.getOne(Long.parseLong(hostId));
     Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
     property.setId(propertyId);
-    return propertyService.deleteProperty(property, isPenalityApproved);
+    EditPropertyStatus editStatus;
+    try {
+      editStatus = propertyService.deleteProperty(property, isPenalityApproved);
+    } catch(Exception e) {
+      editStatus = EditPropertyStatus.EditError;
+      return new EditPropertyResponse(editStatus, e.getMessage());
+    }
+    return new EditPropertyResponse(editStatus, "");
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
