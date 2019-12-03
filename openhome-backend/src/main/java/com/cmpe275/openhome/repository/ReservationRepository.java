@@ -27,8 +27,35 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	@Query(value = "SELECT r from Reservation r where property.id =:propertyId AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsForPropertyBetweenDates(long propertyId, Date startDate, Date endDate);
 
-	@Query(value = "SELECT r from Reservation r where r.status<>'cancelled' AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
+	@Query(value = "SELECT r from Reservation r where (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate);
+
+	//************** FOR SEARCH START *******************
+
+	//There is a reservation with status ‘pendingCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate and reservation endDate
+	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND (startDate <= :endDate AND :startDate <= endDate)")
+	List<Reservation> findAllReservationsPendingCheckIn(Date startDate, Date endDate);
+
+	//There is a reservation with status ‘checkedIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation endDate
+	@Query(value = "SELECT r from Reservation r where r.status='checkedIn' AND (startDate <= :endDate AND :startDate <= endDate)")
+	List<Reservation> findAllReservationsCheckedIn(Date startDate, Date endDate);
+
+	//There is a reservation with status ‘canceledAutomatically’ with an overlap with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation checkoutDate
+	@Query(value = "SELECT r from Reservation r where r.status='canceledAutomatically' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	List<Reservation> findAllReservationsCanceledAuto(Date startDate, Date endDate);
+
+	//There is a reservation with status ‘guestCanceledAfterCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation checkoutDate
+	@Query(value = "SELECT r from Reservation r where r.status='guestCanceledAfterCheckIn' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	List<Reservation> findAllReservationsGuestCanceledAfterCheckIn(Date startDate, Date endDate);
+
+	//There is a reservation with status ‘hostCanceledAfterCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation checkoutDate
+	@Query(value = "SELECT r from Reservation r where r.status='hostCanceledAfterCheckIn' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	List<Reservation> findAllReservationshostCanceledAfterCheckIn(Date startDate, Date endDate);
+
+	@Query(value = "SELECT r from Reservation r where r.status='pendingHostCancelation' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate);
+
+	//************** FOR SEARCH END **********************
 
 	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND startDate < :currentDate")
 	List<Reservation> findAllPendingReservationsThatShouldBeCancelled(Date currentDate);

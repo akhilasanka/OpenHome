@@ -316,6 +316,34 @@ public class ReservationService {
 	public List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate) {
 		return reservationRepository.findAllReservationsBetweenDates(startDate, endDate);
 	}
+
+	// For search START ************
+
+	public List<Reservation> findAllReservationsPendingCheckIn(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationsPendingCheckIn(startDate,endDate);
+	}
+
+	public List<Reservation> findAllReservationsCheckedIn(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationsCheckedIn(startDate, endDate);
+	}
+
+	public List<Reservation> findAllReservationsCanceledAuto(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationsCanceledAuto(startDate, endDate);
+	}
+
+	public List<Reservation> findAllReservationsGuestCanceledAfterCheckIn(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationsGuestCanceledAfterCheckIn(startDate, endDate);
+	}
+
+	public List<Reservation> findAllReservationshostCanceledAfterCheckIn(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationshostCanceledAfterCheckIn(startDate, endDate);
+	}
+
+	public List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationsPendingHostCancelation(startDate, endDate);
+	}
+
+	// For search END **************
     
     @Transactional
     public void checkPendingReservations() throws Exception {
