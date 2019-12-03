@@ -47,14 +47,16 @@ class SearchProperty extends Component {
             else {
                 let curTime = this.state.curTime;
                 let curDate = curTime.substr(0,curTime.indexOf(','));
-                
-                console.log("From Date"+from);
-                var curFormmatedDate = curDate.split("/").reverse();
-                var tmp = curFormmatedDate[2];
-                curFormmatedDate[2] = curFormmatedDate[1];
-                curFormmatedDate[1] = tmp;
-                curFormmatedDate = curFormmatedDate.join("-");
-                console.log("Current formatted Date:"+curFormmatedDate);
+                let curDateSplit = curDate.split("/");
+                if(curDateSplit[0].length!=2){
+                    curDateSplit[0] = '0'+curDateSplit[0];
+                }
+                if(curDateSplit[1].length!=2){
+                    curDateSplit[1] = '0'+curDateSplit[1];
+                }
+                let curFormmatedDate = curDateSplit[2]+"-"+curDateSplit[0]+"-"+curDateSplit[1];
+                console.log("Formatted Date:"+curFormmatedDate);
+                console.log("From Date: "+from);
                 if(from < curFormmatedDate || to < curFormmatedDate){
                     swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
                     validInput = false;
@@ -64,7 +66,7 @@ class SearchProperty extends Component {
                         swal("Oops!", "Please make sure Max price is greater Min price.", "error");
                         validInput = false;
                     }
-                }
+             }
             }
         }
 
