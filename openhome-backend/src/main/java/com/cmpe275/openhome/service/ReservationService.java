@@ -339,6 +339,10 @@ public class ReservationService {
     	return reservationRepository.findAllReservationshostCanceledAfterCheckIn(startDate, endDate);
 	}
 
+	public List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate){
+    	return reservationRepository.findAllReservationsPendingHostCancelation(startDate, endDate);
+	}
+
 	// For search END **************
     
     @Transactional

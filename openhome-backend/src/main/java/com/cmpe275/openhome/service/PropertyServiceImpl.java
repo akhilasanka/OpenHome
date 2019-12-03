@@ -187,11 +187,14 @@ public class PropertyServiceImpl implements PropertyService {
 	  	List<Reservation> reservationsCanceledAuto = reservationService.findAllReservationsCanceledAuto(searchRequest.getFrom(), searchRequest.getTo());
 	  	List<Reservation> reservationsGuestCanceledAfterCheckIn = reservationService.findAllReservationsGuestCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
 	  	List<Reservation> reservationsHostCanceledAfterCheckIn = reservationService.findAllReservationshostCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
+	  	List<Reservation> reservationsPendingHostCancelation = reservationService.findAllReservationsPendingHostCancelation(searchRequest.getFrom(), searchRequest.getTo());
+
 	  	Set<Long> property_ids_pendingCheckIn = reservationsPendingCheckIn.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
 		Set<Long> property_ids_checkedIn = reservationsCheckedIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
 		Set<Long> property_ids_canceledAuto = reservationsCanceledAuto.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
 		Set<Long> property_ids_guestCanceledAfterCheckIn = reservationsGuestCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
 		Set<Long> property_ids_hostCanceledAfterCheckIn = reservationsHostCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_pendingHostCancelation = reservationsPendingHostCancelation.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
 
 		Set<Long> reserved_property_ids = new HashSet<>();
 		reserved_property_ids.addAll(property_ids_pendingCheckIn);
@@ -199,7 +202,8 @@ public class PropertyServiceImpl implements PropertyService {
 		reserved_property_ids.addAll(property_ids_canceledAuto);
 		reserved_property_ids.addAll(property_ids_guestCanceledAfterCheckIn);
 		reserved_property_ids.addAll(property_ids_hostCanceledAfterCheckIn);
-
+		reserved_property_ids.addAll(property_ids_pendingHostCancelation);
+		
 	  	List<Property> properties =  propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
 
 	  	List<SearchProperty> searchProperties = new ArrayList<>();

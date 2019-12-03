@@ -41,16 +41,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	List<Reservation> findAllReservationsCheckedIn(Date startDate, Date endDate);
 
 	//There is a reservation with status ‘canceledAutomatically’ with an overlap with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation checkoutDate
-	@Query(value = "SELECT r from Reservation r where r.status='canceledAutomatically' AND (startDate <= :endDate AND :startDate <= endDate)")
+	@Query(value = "SELECT r from Reservation r where r.status='canceledAutomatically' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
 	List<Reservation> findAllReservationsCanceledAuto(Date startDate, Date endDate);
 
 	//There is a reservation with status ‘guestCanceledAfterCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation checkoutDate
-	@Query(value = "SELECT r from Reservation r where r.status='guestCanceledAfterCheckIn' AND (startDate <= :endDate AND :startDate <= endDate)")
+	@Query(value = "SELECT r from Reservation r where r.status='guestCanceledAfterCheckIn' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
 	List<Reservation> findAllReservationsGuestCanceledAfterCheckIn(Date startDate, Date endDate);
 
 	//There is a reservation with status ‘hostCanceledAfterCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation checkoutDate
-	@Query(value = "SELECT r from Reservation r where r.status='hostCanceledAfterCheckIn' AND (startDate <= :endDate AND :startDate <= endDate)")
+	@Query(value = "SELECT r from Reservation r where r.status='hostCanceledAfterCheckIn' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
 	List<Reservation> findAllReservationshostCanceledAfterCheckIn(Date startDate, Date endDate);
+
+	@Query(value = "SELECT r from Reservation r where r.status='pendingHostCancelation' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate);
 
 	//************** FOR SEARCH END **********************
 
