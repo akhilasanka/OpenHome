@@ -83,34 +83,34 @@ public class PropertyServiceImpl implements PropertyService {
 	}
 
 	@Override
-	public EditPropertyStatus editProperty(Property property, Boolean isApprovedForPayingFine) throws Exception {
+	public EditPropertyStatus editProperty(Property newProperty, Boolean isApprovedForPayingFine) throws Exception {
 
 		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
 
 		//fetch record from DB to compare against edited changes
-		Optional<Property> fromDbOptional = propertyRepository.findById(property.getId());
+		Optional<Property> fromDbOptional = propertyRepository.findById(newProperty.getId());
 
 		if (!fromDbOptional.isPresent()) {
-			//if editing an invalid property which is not in DB
-			throw new Exception(String.format("property with id {} not found", property.getId()));
+			//if editing an invalid newProperty which is not in DB
+			throw new Exception(String.format("newProperty with id {} not found", newProperty.getId()));
 		}
 
-		Property fromDb = fromDbOptional.get();
+		Property oldProperty = fromDbOptional.get();
 
-		List initialAvailability = availableDaysList(fromDb.getAvailableDays());
-		List newAvailability = availableDaysList(fromDb.getAvailableDays());
+		List initialAvailability = availableDaysList(oldProperty.getAvailableDays());
+		List newAvailability = availableDaysList(newProperty.getAvailableDays());
 
-		Boolean hasAvailabilityChanged = initialAvailability.equals(newAvailability);
+		Boolean hasAvailabilityChanged = !initialAvailability.equals(newAvailability);
 
 		//if anything other than availability is changed, just save that change. if not continue
 		if(!hasAvailabilityChanged) {
-			Property savedProperty = propertyRepository.save(property);
+			Property savedProperty = propertyRepository.save(newProperty);
 			return EditPropertyStatus.EditSuccessful;
 		}
 
 		List<Reservation> cancelledReservations = new ArrayList<>();
 
-		List<Reservation> conflictingReservations = conflictingReservations(property, newAvailability);
+		List<Reservation> conflictingReservations = conflictingReservations(oldProperty, newAvailability);
 
 		if (conflictingReservations.size() > 0 && isApprovedForPayingFine) {
 			for (Reservation r : conflictingReservations) {
@@ -121,59 +121,52 @@ public class PropertyServiceImpl implements PropertyService {
 			return EditPropertyStatus.NeedsApproval;
 		}
 
-		Property savedProperty = propertyRepository.save(property);
+		Property savedProperty = propertyRepository.save(newProperty);
 		return EditPropertyStatus.EditSuccessful;
 	}
 
 	@Override
-	public Boolean deleteProperty(Property property, Boolean isApprovedForPayingFine) throws Exception {
+	public EditPropertyStatus deleteProperty(Property newProperty, Boolean isApprovedForPayingFine) throws Exception {
 
 		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
-		LocalDate sevenDaysFromNow = currentDate.plusDays(7);
 
-		List<Reservation> sevenDayReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
-				property.getId(),
-				DateUtils.convertLocalDateToDate(currentDate),
-				DateUtils.convertLocalDateToDate(sevenDaysFromNow)
-		);
+		//fetch record from DB to compare against edited changes
+		Optional<Property> fromDbOptional = propertyRepository.findById(newProperty.getId());
 
-		LocalDate oneYearFromNow = currentDate.plusDays(365);
-
-		List<Reservation> allReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
-				property.getId(),
-				DateUtils.convertLocalDateToDate(currentDate),
-				DateUtils.convertLocalDateToDate(oneYearFromNow)
-		);
-
-		List<Reservation> cancelledWithPenalty = new ArrayList<>();
-		List<Reservation> cancelledWithoutPenalty = new ArrayList<>();
-
-
-		if (sevenDayReservations.size() > 0 && isApprovedForPayingFine) {
-			for (Reservation r : sevenDayReservations) {
-				cancelledWithPenalty.add(r);
-				reservationService.hostCancelReservation(r);
-			}
-		} else if (sevenDayReservations.size() > 0 && !isApprovedForPayingFine) {
-			return false;
+		if (!fromDbOptional.isPresent()) {
+			//if editing an invalid newProperty which is not in DB
+			throw new Exception(String.format("newProperty with id {} not found", newProperty.getId()));
 		}
 
-		allReservations.forEach(r -> {
-			if (!sevenDayReservations.contains(r.getId())) {
-				cancelledWithoutPenalty.add(r);
-				try {
-					reservationService.hostCancelReservation(r);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		Property oldProperty = fromDbOptional.get();
+
+		List initialAvailability = availableDaysList(oldProperty.getAvailableDays());
+		List newAvailability = availableDaysList(newProperty.getAvailableDays());
+
+		Boolean hasAvailabilityChanged = !initialAvailability.equals(newAvailability);
+
+		//if anything other than availability is changed, just save that change. if not continue
+		if(!hasAvailabilityChanged) {
+			Property savedProperty = propertyRepository.save(newProperty);
+			return EditPropertyStatus.EditSuccessful;
+		}
+
+		List<Reservation> cancelledReservations = new ArrayList<>();
+
+		List<Reservation> conflictingReservations = conflictingReservations(oldProperty, newAvailability);
+
+		if (conflictingReservations.size() > 0 && isApprovedForPayingFine) {
+			for (Reservation r : conflictingReservations) {
+				cancelledReservations.add(r);
+				reservationService.hostCancelReservation(r);
 			}
-		});
+		} else if (conflictingReservations.size() > 0 && !isApprovedForPayingFine) {
+			return EditPropertyStatus.NeedsApproval;
+		}
 
-		property.setIsDeleted(true);
-
-		propertyRepository.save(property);
-		return true;
+		newProperty.setIsDeleted(true);
+		Property savedProperty = propertyRepository.save(newProperty);
+		return EditPropertyStatus.EditSuccessful;
 	}
 
 	@Override

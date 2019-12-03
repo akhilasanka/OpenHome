@@ -88,11 +88,18 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
   @PreAuthorize("hasRole('USER')")
-  public Boolean deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
+  public EditPropertyResponse deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
     User owner = userRepository.getOne(Long.parseLong(hostId));
     Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
     property.setId(propertyId);
-    return propertyService.deleteProperty(property, isPenalityApproved);
+    EditPropertyStatus editStatus;
+    try {
+      editStatus = propertyService.deleteProperty(property, isPenalityApproved);
+    } catch(Exception e) {
+      editStatus = EditPropertyStatus.EditError;
+      return new EditPropertyResponse(editStatus, e.getMessage());
+    }
+    return new EditPropertyResponse(editStatus, "");
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
