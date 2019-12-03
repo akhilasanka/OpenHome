@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.cmpe275.openhome.exception.PayTransactionException;
 import com.cmpe275.openhome.exception.ResourceNotFoundException;
 import com.cmpe275.openhome.model.ChargeType;
+import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.ReservationStatusEnum;
 import com.cmpe275.openhome.repository.ReservationRepository;
@@ -63,18 +64,24 @@ public class ReservationService {
     	}
     	
     	// check date is valid range
-    	if (!propertyService.isDateRangeValid(reservation.getProperty(), startDate, endDate)) {
+    	Property property = reservation.getProperty();
+    	if (!propertyService.isDateRangeValid(property, startDate, endDate)) {
     		throw new Exception("Reservation date range is not valid");
     	}
     	
-    	// check properties are not double booked
-    	List<Reservation> bookedReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
-    			reservation.getProperty().getId(),
-    			reservation.getStartDate(), 
-    			reservation.getEndDate()
-    	);
-    	
-    	if (!bookedReservations.isEmpty()) {
+    	// check if there are any conflicting reservations to prevent double booking
+    	Date startDateAt3PM = DateUtils.convertLocalDateTimeToDate(startDate.atTime(15, 0));
+    	Date endDateAt11AM = DateUtils.convertLocalDateTimeToDate(endDate.atTime(11, 0));
+
+    	List<Reservation> pending = reservationRepository.findConflictingReservationsThatArePendingCheckIn(property, startDateAt3PM, endDateAt11AM);
+    	List<Reservation> checkedIn = reservationRepository.findConflictingReservationsThatAreCheckedIn(property, startDateAt3PM, endDateAt11AM);
+    	List<Reservation> canceledAuto = reservationRepository.findConflictingReservationsThatWereCanceledAutomatically(property, startDateAt3PM, endDateAt11AM);
+    	List<Reservation> canceledByGuestAfterCheckIn = reservationRepository.findConflictingReservationsThatWereCanceledByGuestAfterCheckIn(property, startDateAt3PM, endDateAt11AM);
+    	List<Reservation> canceledByHostAfterCheckIn = reservationRepository.findConflictingReservationsThatWereCanceledByHostAfterCheckIn(property, startDateAt3PM, endDateAt11AM);
+    	List<Reservation> pendingCancelationByHost = reservationRepository.findConflictingReservationsThatArePendingCancelationByHost(property, startDateAt3PM, endDateAt11AM);
+
+    	boolean hasNoConflict = pending.isEmpty() && checkedIn.isEmpty() && canceledAuto.isEmpty() && canceledByGuestAfterCheckIn.isEmpty() && canceledByHostAfterCheckIn.isEmpty() && pendingCancelationByHost.isEmpty();
+    	if (!hasNoConflict) {
     		throw new Exception("Reservations are already booked within the specified Date Range");
     	}
     	
