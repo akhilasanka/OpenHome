@@ -296,6 +296,10 @@ public class PropertyServiceImpl implements PropertyService {
 
 		while (current.before(endDate)) {
 			days.add(current.getDay());
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(current);
+			calendar.add(Calendar.DATE, 1);
+			current = calendar.getTime();
 		}
 
 		return days;
