@@ -5,6 +5,8 @@ import com.cmpe275.openhome.exception.ResourceNotFoundException;
 
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
+import com.cmpe275.openhome.payload.EditPropertyResponse;
+import com.cmpe275.openhome.payload.EditPropertyStatus;
 import com.cmpe275.openhome.payload.SearchProperty;
 import com.cmpe275.openhome.payload.SearchRequest;
 import com.cmpe275.openhome.repository.PropertyRepository;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,52 +83,46 @@ public class PropertyServiceImpl implements PropertyService {
 	}
 
 	@Override
-	public Boolean editProperty(Property property, Boolean isApprovedForPayingFine) throws Exception {
+	public EditPropertyStatus editProperty(Property property, Boolean isApprovedForPayingFine) throws Exception {
 
 		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
-		LocalDate sevenDaysFromNow = currentDate.plusDays(7);
 
-		List<Reservation> sevenDayReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
-				property.getId(),
-				DateUtils.convertLocalDateToDate(currentDate),
-				DateUtils.convertLocalDateToDate(sevenDaysFromNow)
-		);
+		//fetch record from DB to compare against edited changes
+		Optional<Property> fromDbOptional = propertyRepository.findById(property.getId());
 
-		LocalDate oneYearFromNow = currentDate.plusDays(365);
-
-		List<Reservation> allReservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
-				property.getId(),
-				DateUtils.convertLocalDateToDate(currentDate),
-				DateUtils.convertLocalDateToDate(oneYearFromNow)
-		);
-
-		List<Reservation> cancelledWithPenalty = new ArrayList<>();
-		List<Reservation> cancelledWithoutPenalty = new ArrayList<>();
-
-
-		if (sevenDayReservations.size() > 0 && isApprovedForPayingFine) {
-			for (Reservation r : sevenDayReservations) {
-				cancelledWithPenalty.add(r);
-				reservationService.hostCancelReservation(r);
-			}
-		} else if (sevenDayReservations.size() > 0 && !isApprovedForPayingFine) {
-			return false;
+		if (!fromDbOptional.isPresent()) {
+			//if editing an invalid property which is not in DB
+			throw new Exception(String.format("property with id {} not found", property.getId()));
 		}
 
-		allReservations.forEach(r -> {
-			if (!sevenDayReservations.contains(r.getId())) {
-				cancelledWithoutPenalty.add(r);
-				try {
-					reservationService.hostCancelReservation(r);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		Property fromDb = fromDbOptional.get();
+
+		List initialAvailability = availableDaysList(fromDb.getAvailableDays());
+		List newAvailability = availableDaysList(fromDb.getAvailableDays());
+
+		Boolean hasAvailabilityChanged = initialAvailability.equals(newAvailability);
+
+		//if anything other than availability is changed, just save that change. if not continue
+		if(!hasAvailabilityChanged) {
+			Property savedProperty = propertyRepository.save(property);
+			return EditPropertyStatus.EditSuccessful;
+		}
+
+		List<Reservation> cancelledReservations = new ArrayList<>();
+
+		List<Reservation> conflictingReservations = conflictingReservations(property, newAvailability);
+
+		if (conflictingReservations.size() > 0 && isApprovedForPayingFine) {
+			for (Reservation r : conflictingReservations) {
+				cancelledReservations.add(r);
+				reservationService.hostCancelReservation(r);
 			}
-		});
+		} else if (conflictingReservations.size() > 0 && !isApprovedForPayingFine) {
+			return EditPropertyStatus.NeedsApproval;
+		}
 
 		Property savedProperty = propertyRepository.save(property);
-		return true;
+		return EditPropertyStatus.EditSuccessful;
 	}
 
 	@Override
@@ -225,6 +222,7 @@ public class PropertyServiceImpl implements PropertyService {
 		return propertyRepository.findById(Long.parseLong(propertyId))
 				.orElseThrow(() -> new ResourceNotFoundException("Property", "id", propertyId));
 	}
+
 	
 	@Override
     public boolean isDateRangeValid(Property property, LocalDate startDate, LocalDate endDate) {
@@ -246,31 +244,93 @@ public class PropertyServiceImpl implements PropertyService {
 		if (availableDays.contains("M")) {
 			availableDaysList.add(DayOfWeek.MONDAY);
 		}
-		
+
 		if (availableDays.contains("TU")) {
 			availableDaysList.add(DayOfWeek.TUESDAY);
 		}
-		
+
 		if (availableDays.contains("W")) {
 			availableDaysList.add(DayOfWeek.WEDNESDAY);
 		}
-		
+
 		if (availableDays.contains("TH")) {
 			availableDaysList.add(DayOfWeek.THURSDAY);
 		}
-		
+
 		if (availableDays.contains("F")) {
 			availableDaysList.add(DayOfWeek.FRIDAY);
 		}
-		
+
 		if (availableDays.contains("SA")) {
 			availableDaysList.add(DayOfWeek.SATURDAY);
 		}
-		
+
 		if (availableDays.contains("SU")) {
 			availableDaysList.add(DayOfWeek.SUNDAY);
 		}
-		
+
+		return availableDaysList;
+	}
+
+	private List<Reservation> conflictingReservations(Property property, List newAvailableDays) {
+		List conflictingReservations = new ArrayList();
+
+		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
+		LocalDate oneYearFromNow = currentDate.plusDays(365);
+
+		List<Reservation> reservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+				property.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(oneYearFromNow)
+		);
+
+		for (Reservation r : reservations) {
+			List<Integer> bookedDays = getDaysForDateRange(r.getStartDate(), r.getEndDate());
+			for (Integer day : bookedDays) {
+				if (!newAvailableDays.contains(day)){
+					conflictingReservations.add(r);
+					break;
+				}
+			}
+		}
+
+		return conflictingReservations;
+	}
+
+	private List<Integer> getDaysForDateRange(Date startDate, Date endDate) {
+		List days = new ArrayList();
+		Date current = startDate;
+
+		while (current.before(endDate)) {
+			days.add(current.getDay());
+		}
+
+		return days;
+	}
+
+	private List<Integer> availableDaysList(String availableDays) {
+	  	List availableDaysList = new ArrayList();
+	  	if (availableDays.contains("SU")) {
+	  		availableDaysList.add(0);
+		}
+		if (availableDays.contains("M")) {
+			availableDaysList.add(1);
+		}
+		if (availableDays.contains("TU")) {
+			availableDaysList.add(2);
+		}
+		if (availableDays.contains("W")) {
+			availableDaysList.add(3);
+		}
+		if (availableDays.contains("TH")) {
+			availableDaysList.add(4);
+		}
+		if (availableDays.contains("F")) {
+			availableDaysList.add(5);
+		}
+		if (availableDays.contains("SA")) {
+			availableDaysList.add(6);
+		}
 		return availableDaysList;
 	}
 }
