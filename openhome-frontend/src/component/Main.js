@@ -31,7 +31,7 @@ class Main extends Component {
                 <Route exact path="/property" exact component={ListPropertiesComponent} />
                 <Route exact path="/home" component={Home} />
                 <Route exact path="/login" component={Login} />
-                <Route exact path="/search" component={SearchProperty} />
+                <Route exact path="/property/search" component={SearchProperty} />
                 <Route exact path="/property/result" component={SearchResult}/>
                 <Route exact path="/property/host" exact component={HostProperty} />
                 <Route exact path="/property/view/:id" exact component={ViewProperty} />
@@ -55,6 +55,8 @@ class Main extends Component {
                     <Route exact path="/addpayment" component={Login} />
                     <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}/>
                     <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
+                <Route exact path="/property/search" component={SearchProperty} />
+                <Route exact path="/property/result" component={SearchResult}/>
                     <Alert stack={{limit: 3}}
                       timeout = {3000}
                       position='top-right' effect='slide' offset={65} />

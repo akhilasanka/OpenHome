@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import '../Styles/SearchResult.css';
 import ReactPaginate from 'react-paginate';
+import GuestNavigation from '../Navigation/GuestNavigation';
 
 class SearchResult extends Component {
     //call the constructor method
@@ -85,6 +86,7 @@ class SearchResult extends Component {
 
         return (
             <div style={{background:"white"}}>
+            <GuestNavigation/>
                 <div className="container">
                 <div className="row justify-content-center align-items-center" style={{ height: '75vh' }}>
                 <div className="col-12">
