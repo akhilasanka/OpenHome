@@ -19,6 +19,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -111,6 +113,17 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
+    Calendar calendar = Calendar.getInstance();
+
+    Date from = searchRequest.getFrom();
+    calendar.setTime(from);
+    calendar.add(Calendar.DATE, 1);
+    searchRequest.setFrom(calendar.getTime());
+
+    Date to = searchRequest.getTo();
+    calendar.setTime(to);
+    calendar.add(Calendar.DATE, 1);
+    searchRequest.setTo(calendar.getTime());
     return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
 

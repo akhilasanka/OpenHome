@@ -16,7 +16,7 @@ class SearchResult extends Component {
             
             //for pagination
             paginated_results:[],
-            results_per_page: 1,
+            results_per_page: 5,
             num_pages:0,
         }
         //for pagination

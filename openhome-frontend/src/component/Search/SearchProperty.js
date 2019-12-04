@@ -40,7 +40,7 @@ class SearchProperty extends Component {
             validInput = false;
         }
         else {
-            if (to < from) {
+            if (to <= from) {
                 swal("Oops!", "From Date must be before To.", "error");
                 validInput = false;
             }
@@ -77,6 +77,7 @@ class SearchProperty extends Component {
                 "propertyType": formData.get("propertyType"), "internet": formData.get("internet"),
                 "minPrice": parseInt(priceMin), "maxPrice": parseInt(priceMax), "desc": formData.get("desc")
             };
+            console.log("Data:");
             console.log(data);
             /*this.setState({
                 results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 

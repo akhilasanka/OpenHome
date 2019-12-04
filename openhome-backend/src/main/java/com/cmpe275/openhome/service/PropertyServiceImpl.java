@@ -18,6 +18,7 @@ import com.cmpe275.openhome.util.SystemDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -183,9 +184,11 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Override
 	public List<SearchProperty> searchProperties(SearchRequest searchRequest) {
+		System.out.println("Search Request:"+searchRequest);
 
 		List<Reservation> reservationsPendingBasedOnEndDate = reservationService.findAllReservationsPendingBasedOnEndDate(searchRequest.getFrom(), searchRequest.getTo());
 		List<Reservation> reservationsPendingBasedOnCheckoutDate = reservationService.findAllReservationsPendingBasedOnCheckoutDate(searchRequest.getFrom(), searchRequest.getTo());
+
 
 		Set<Long> property_ids_pendingCheckIn = reservationsPendingBasedOnEndDate.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
 		Set<Long> property_ids_checkedIn = reservationsPendingBasedOnCheckoutDate.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
@@ -198,10 +201,12 @@ public class PropertyServiceImpl implements PropertyService {
 		List<Property> properties = propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
 
 		List<Integer> requiredDays = getDaysForDateRange(searchRequest.getFrom(), searchRequest.getTo());
+		System.out.println("Required Days"+requiredDays);
 
 		List<SearchProperty> searchProperties = new ArrayList<>();
 		for (Property p : properties) {
 			List availableDays = availableDaysList(p.getAvailableDays());
+			System.out.println("Available Days:"+availableDays);
 
 			Boolean allRequiredDaysAvailable = true;
 			//check if property if available on all days requested
@@ -314,6 +319,9 @@ public class PropertyServiceImpl implements PropertyService {
 	}
 
 	private List<Integer> getDaysForDateRange(Date startDate, Date endDate) {
+	  	System.out.println("Start Date:"+startDate);
+	  	System.out.println("End Date:"+endDate);
+
 		List days = new ArrayList();
 		Date current = startDate;
 
