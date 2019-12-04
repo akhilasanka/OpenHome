@@ -361,7 +361,7 @@ class EditProperty extends Component {
             ).then((response) => {
                 console.log("*******************");
                 console.log(response);
-                if(response.data==false){
+                if(response.data.status=="NeedsApproval"){
                     swal({
                         title: "Caution",
                         text: "Changes will affect reservations already made. 15% of reservation amount will be charged as PENALITY. Are you sure you want to proceed?",
@@ -382,12 +382,15 @@ class EditProperty extends Component {
                                     headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                                 }
                             ).then((response) => {
-                               if(response.data==true){
+                               if(response.data.status=="EditSuccessful"){
                                 swal({
                                     title: 'OK',
                                     text: 'Updated with penality charged!',
                                     icon: 'success'
                                   });
+                               }
+                               else if(response.data.status=="EditError"){
+                                    swal("Oops!","Failed to make changes. Please try again! "+response.data.message,"error");
                                }
                             });
                         } else {
@@ -395,12 +398,12 @@ class EditProperty extends Component {
                         }
                       })
                 }
-                else{
+                else if(response.data.status=="EditSuccessful"){
                     swal("Sucessfully edited property!");
                 }
                 // this.props.history.push("/home");
             })
-                .catch(Alert.error("Failed to update property"))
+                .catch(Alert.error("Failed to update property. Please try again."))
         }
     };
 

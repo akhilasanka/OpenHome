@@ -7,6 +7,7 @@ import com.cmpe275.openhome.repository.UserRepository;
 import com.cmpe275.openhome.security.CurrentUser;
 import com.cmpe275.openhome.security.UserPrincipal;
 import com.cmpe275.openhome.service.PropertyService;
+import com.cmpe275.openhome.util.DateUtils;
 import com.cmpe275.openhome.util.PropertyJsonToModelUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +19,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -111,6 +115,24 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
+    Calendar calendar = Calendar.getInstance();
+
+    Date from = searchRequest.getFrom();
+    calendar.setTime(from);
+    calendar.add(Calendar.DATE, 1);
+    from = calendar.getTime();
+    LocalDate fromLocalDate = DateUtils.convertDateToLocalDate(from);
+    Date fromDateAt3PM = DateUtils.convertLocalDateTimeToDate(fromLocalDate.atTime(15,0));
+    searchRequest.setFrom(fromDateAt3PM);
+
+    Date to = searchRequest.getTo();
+    calendar.setTime(to);
+    calendar.add(Calendar.DATE, 1);
+    to = calendar.getTime();
+    LocalDate toLocalDate = DateUtils.convertDateToLocalDate(to);
+    Date toDateAt11AM = DateUtils.convertLocalDateTimeToDate(toLocalDate.atTime(11,0));
+    searchRequest.setTo(toDateAt11AM);
+    
     return new SearchPropertyResponse(propertyService.searchProperties(searchRequest));
   }
 

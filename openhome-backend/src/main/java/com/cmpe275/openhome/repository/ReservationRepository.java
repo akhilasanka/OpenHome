@@ -30,10 +30,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	@Query(value = "SELECT r from Reservation r where (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
 	List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate);
 
+	@Query(value = "SELECT r from Reservation r where property.id =:propertyId AND r.status IN :statuses AND (startDate BETWEEN :startDate AND :endDate OR endDate BETWEEN :startDate AND :endDate)")
+	List<Reservation> findReservationsBetweenDatesForGivenStatus(long propertyId, Date startDate, Date endDate, List<String> statuses);
+
 	//************** FOR SEARCH START *******************
 
 	//There is a reservation with status ‘pendingCheckIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate and reservation endDate
-	@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND (startDate <= :endDate AND :startDate <= endDate)")
+	@Query(value = "SELECT r from Reservation r where r.status IN :statuses AND (startDate <= :endDate AND :startDate <= endDate)")
+	List<Reservation> findAllReservationsBasedOnEndDate(Date startDate, Date endDate, List<String> statuses);
+
+	@Query(value = "SELECT r from Reservation r where r.status IN :statuses AND (startDate <= :endDate AND :startDate <= checkOutDate)")
+	List<Reservation> findAllReservationsBasedOnCheckoutDate(Date startDate, Date endDate, List<String> statuses);
+
+	/*@Query(value = "SELECT r from Reservation r where r.status='pendingCheckIn' AND (startDate <= :endDate AND :startDate <= endDate)")
 	List<Reservation> findAllReservationsPendingCheckIn(Date startDate, Date endDate);
 
 	//There is a reservation with status ‘checkedIn’ with an overlap between searchStartDate-searchEndDate and reservation startDate - reservation endDate
@@ -53,7 +62,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	List<Reservation> findAllReservationshostCanceledAfterCheckIn(Date startDate, Date endDate);
 
 	@Query(value = "SELECT r from Reservation r where r.status='pendingHostCancelation' AND (startDate <= :endDate AND :startDate <= checkOutDate)")
-	List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate);
+	List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate);*/
 
 	//************** FOR SEARCH END **********************
 
