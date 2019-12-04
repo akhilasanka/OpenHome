@@ -329,17 +329,17 @@ public class ReservationService {
 
 	public List<Reservation> findAllReservationsPendingBasedOnEndDate(Date startDate, Date endDate){
     	List statuses = new ArrayList();
-    	statuses.add("pendingCheckIn");
-    	statuses.add("checkIn");
+    	statuses.add(ReservationStatusEnum.pendingCheckIn);
+    	statuses.add(ReservationStatusEnum.checkedIn);
 		return reservationRepository.findAllReservationsBasedOnEndDate(startDate, endDate, statuses);
 	}
 
 	public List<Reservation> findAllReservationsPendingBasedOnCheckoutDate(Date startDate, Date endDate){
 		List statuses = new ArrayList();
-		statuses.add("canceledAutomatically");
-		statuses.add("guestCanceledAfterCheckIn");
-		statuses.add("hostCanceledAfterCheckIn");
-		statuses.add("pendingHostCancelation");
+		statuses.add(ReservationStatusEnum.automaticallyCanceled);
+		statuses.add(ReservationStatusEnum.guestCanceledAfterCheckIn);
+		statuses.add(ReservationStatusEnum.hostCanceledAfterCheckIn);
+		statuses.add(ReservationStatusEnum.pendingHostCancelation);
 
 		return reservationRepository.findAllReservationsBasedOnCheckoutDate(startDate, endDate, statuses);
 	}
