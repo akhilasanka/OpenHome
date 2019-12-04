@@ -119,6 +119,7 @@ class LoginForm extends Component {
     
     render() {
         return (
+            <div className="login">
             <form onSubmit={this.handleSubmit}>
                 <div className="form-item">
                     <input type="email" name="email" 
@@ -133,7 +134,8 @@ class LoginForm extends Component {
                 <div className="form-item">
                     <button type="submit" className="btn btn-block btn-primary">Login</button>
                 </div>
-            </form>                    
+            </form>       
+            </div>    
         );
     }
 }

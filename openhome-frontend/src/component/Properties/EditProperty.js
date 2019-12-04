@@ -5,6 +5,7 @@ import { ACCESS_TOKEN, API_BASE_URL } from "../constants";
 import axios from "axios";
 import Alert from "react-s-alert";
 import swal from 'sweetalert';
+import HostNavigation from '../Navigation/HostNavigation';
 
 class EditProperty extends Component {
 
@@ -590,6 +591,7 @@ class EditProperty extends Component {
 
         return (
             <div>
+             <HostNavigation/>
                 <div className="add-property-content">
                     {redirectVar}
                     <div className="container">

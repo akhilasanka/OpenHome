@@ -8,6 +8,7 @@ import { getCurrentSystemTime } from '../util/APIUtils';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
+import GuestNavigation from '../Navigation/GuestNavigation';
 
 class SearchProperty extends Component {
     constructor(props) {
@@ -107,7 +108,8 @@ class SearchProperty extends Component {
     render() {
         console.log(this.state.curTime);
         return (
-            <div>
+            <div style={{background:"white"}}>
+                <GuestNavigation/>
                 <div className='rowC backgroundImg' style={{ display: "flex", flexDirection: "row" }}>
                     <div className="card card-css">
                         <div className="container">
@@ -183,7 +185,7 @@ class SearchProperty extends Component {
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <div className="col-12" style={{ marginTop: "-2em", marginLeft: "19em" }}>
+                                                <div className="col-12" style={{ marginTop: "-4em", marginLeft: "19em" }}>
 
                                                     <button type="submit" className="btn btn-primary align-center">Search</button>
                                                 </div>
