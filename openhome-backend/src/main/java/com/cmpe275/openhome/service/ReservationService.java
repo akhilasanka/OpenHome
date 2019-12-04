@@ -266,7 +266,7 @@ public class ReservationService {
     	LocalDateTime startDateTime = DateUtils.convertDateToLocalDateTime(reservation.getStartDate());
     	LocalDateTime endDateTime = DateUtils.convertDateToLocalDateTime(reservation.getEndDate());
 
-    	boolean guestHasCheckedIn = reservation.getStatus().equals(ReservationStatusEnum.pendingCheckIn);
+    	boolean guestHasCheckedIn = reservation.getStatus().equals(ReservationStatusEnum.checkedIn);
     	// guest has not checked in and cancellation can take place immediately
     	if (!guestHasCheckedIn) {
     		// set status to canceled
