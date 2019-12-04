@@ -5,6 +5,7 @@ import com.cmpe275.openhome.exception.ResourceNotFoundException;
 
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
+import com.cmpe275.openhome.model.ReservationStatusEnum;
 import com.cmpe275.openhome.payload.EditPropertyResponse;
 import com.cmpe275.openhome.payload.EditPropertyStatus;
 import com.cmpe275.openhome.payload.SearchProperty;
@@ -153,14 +154,25 @@ public class PropertyServiceImpl implements PropertyService {
 
 		List<Reservation> cancelledReservations = new ArrayList<>();
 
-		List<Reservation> conflictingReservations = conflictingReservations(oldProperty, newAvailability);
+		List statusList = new ArrayList<>();
+		statusList.add(ReservationStatusEnum.checkedIn);
+		statusList.add(ReservationStatusEnum.pendingCheckIn);
 
-		if (conflictingReservations.size() > 0 && isApprovedForPayingFine) {
-			for (Reservation r : conflictingReservations) {
+		LocalDate oneYearFromNow = currentDate.plusDays(365);
+
+		List<Reservation> reservations = reservationRepository.findReservationsBetweenDatesForGivenStatus(
+				oldProperty.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(oneYearFromNow),
+				statusList
+		);
+
+		if (reservations.size() > 0 && isApprovedForPayingFine) {
+			for (Reservation r : reservations) {
 				cancelledReservations.add(r);
 				reservationService.hostCancelReservation(r);
 			}
-		} else if (conflictingReservations.size() > 0 && !isApprovedForPayingFine) {
+		} else if (reservations.size() > 0 && !isApprovedForPayingFine) {
 			return EditPropertyStatus.NeedsApproval;
 		}
 
@@ -190,7 +202,9 @@ public class PropertyServiceImpl implements PropertyService {
 		List<SearchProperty> searchProperties = new ArrayList<>();
 		for (Property p : properties) {
 			List availableDays = availableDaysList(p.getAvailableDays());
+
 			Boolean allRequiredDaysAvailable = true;
+			//check if property if available on all days requested
 			for (Integer day : requiredDays) {
 				if (!availableDays.contains(day)) {
 					allRequiredDaysAvailable = false;
@@ -275,10 +289,15 @@ public class PropertyServiceImpl implements PropertyService {
 		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
 		LocalDate oneYearFromNow = currentDate.plusDays(365);
 
-		List<Reservation> reservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+		List statusList = new ArrayList<>();
+		statusList.add(ReservationStatusEnum.checkedIn);
+		statusList.add(ReservationStatusEnum.pendingCheckIn);
+
+		List<Reservation> reservations = reservationRepository.findReservationsBetweenDatesForGivenStatus(
 				property.getId(),
 				DateUtils.convertLocalDateToDate(currentDate),
-				DateUtils.convertLocalDateToDate(oneYearFromNow)
+				DateUtils.convertLocalDateToDate(oneYearFromNow),
+				statusList
 		);
 
 		for (Reservation r : reservations) {
