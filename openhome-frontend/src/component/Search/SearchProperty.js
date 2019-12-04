@@ -5,13 +5,18 @@ import swal from 'sweetalert';
 import '../Styles/Search.css';
 import { API_BASE_URL } from '../constants';
 import { getCurrentSystemTime } from '../util/APIUtils';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
 
 class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
             results: [],
-            curTime: null
+            curTime: null,
+            startDate: null,
+            endDate: null
         }
     }
 
@@ -29,8 +34,10 @@ class SearchProperty extends Component {
         let validInput = true;
         var token = localStorage.getItem("accessToken");
 
-        var to = formData.get("to");
-        var from = formData.get("from");
+        var from = new Date(formData.get("from"));
+        var to = new Date(formData.get("to"));
+
+        console.log(this.state.startDate);
 
         var priceMin = formData.get("priceFrom");
         var priceMax = formData.get("priceTo");
@@ -40,33 +47,15 @@ class SearchProperty extends Component {
             validInput = false;
         }
         else {
-            if (to <= from) {
-                swal("Oops!", "From Date must be before To.", "error");
-                validInput = false;
+            let curTime = new Date(this.state.curTime);
+            if (from < curTime || to <curTime) {
+              swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
+              validInput = false;
             }
-            else {
-                let curTime = this.state.curTime;
-                let curDate = curTime.substr(0,curTime.indexOf(','));
-                let curDateSplit = curDate.split("/");
-                if(curDateSplit[0].length!=2){
-                    curDateSplit[0] = '0'+curDateSplit[0];
-                }
-                if(curDateSplit[1].length!=2){
-                    curDateSplit[1] = '0'+curDateSplit[1];
-                }
-                let curFormmatedDate = curDateSplit[2]+"-"+curDateSplit[0]+"-"+curDateSplit[1];
-                console.log("Formatted Date:"+curFormmatedDate);
-                console.log("From Date: "+from);
-                if(from < curFormmatedDate || to < curFormmatedDate){
-                    swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
-                    validInput = false;
-                }
-                else{
-                    if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
-                        swal("Oops!", "Please make sure Max price is greater Min price.", "error");
-                        validInput = false;
-                    }
-             }
+
+            if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
+                swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                validInput = false;
             }
         }
 
@@ -80,9 +69,9 @@ class SearchProperty extends Component {
             console.log("Data:");
             console.log(data);
             /*this.setState({
-                results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+                results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro",
                 "zip":"900000", "state":"CA"
-            }, { "id":2, "headline": "House by the ocean2", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+            }, { "id":2, "headline": "House by the ocean2", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro",
             "zip":"900000", "state":"CA"
         }]
             });*/
@@ -140,15 +129,17 @@ class SearchProperty extends Component {
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <label htmlFor="from" className="col-sm-4 col-form-label">From:*</label>
-                                                <div className="col-sm-8">
-                                                    <input type="date" className="form-control" name="from" required />
-                                                </div>
-                                            </div>
-                                            <div className="form-group row">
-                                                <label htmlFor="to" className="col-sm-3 col-form-label">&nbsp;&nbsp;To:*</label>
-                                                <div className="col-sm-9">
-                                                    <input type="date" className="form-control" name="to" required />
+                                                <label htmlFor="startDate" className="col-sm-3 col-form-label">Dates:*</label>
+                                                <div className="col-sm-12">
+                                                  <DateRangePicker
+                                                      startDate={this.state.startDate} // momentPropTypes.momentObj or null,
+                                                      startDateId="from" // PropTypes.string.isRequired,
+                                                      endDate={this.state.endDate} // momentPropTypes.momentObj or null,
+                                                      endDateId="to" // PropTypes.string.isRequired,
+                                                      onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                                                      focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                                                      onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+                                                  />
                                                 </div>
                                             </div>
                                             <div className="form-group row">
@@ -203,7 +194,7 @@ class SearchProperty extends Component {
                                     {this.state.results.length > 0 &&
                                         <Redirect to={{
                                             pathname: '/property/result',
-                                            state: { results: this.state.results }
+                                            state: { results: this.state.results, startDate: encodeURIComponent(this.state.startDate.toJSON()), endDate: encodeURIComponent(this.state.endDate.toJSON()) }
                                         }} />
                                     }
                                 </div>
