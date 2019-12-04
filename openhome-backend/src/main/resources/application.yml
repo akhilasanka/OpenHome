@@ -24,8 +24,8 @@ spring:
               - email
               - profile
           facebook:
-            clientId: 3625204797493313
-            clientSecret: b1055cdb5a9c05eabe172c44af36e752
+            clientId: 748580892307662
+            clientSecret: 2aac44f05c6a91d812f7e392512a358f
             redirectUriTemplate: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -59,3 +59,4 @@ app:
     # We're not using cookies because they won't work well in mobile clients.
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
+      - http://localhost:8080/login/oauth2/code/facebook
