@@ -5,6 +5,7 @@ import com.cmpe275.openhome.exception.ResourceNotFoundException;
 
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
+import com.cmpe275.openhome.model.ReservationStatusEnum;
 import com.cmpe275.openhome.payload.EditPropertyResponse;
 import com.cmpe275.openhome.payload.EditPropertyStatus;
 import com.cmpe275.openhome.payload.SearchProperty;
@@ -17,6 +18,7 @@ import com.cmpe275.openhome.util.SystemDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -153,14 +155,25 @@ public class PropertyServiceImpl implements PropertyService {
 
 		List<Reservation> cancelledReservations = new ArrayList<>();
 
-		List<Reservation> conflictingReservations = conflictingReservations(oldProperty, newAvailability);
+		List statusList = new ArrayList<>();
+		statusList.add(ReservationStatusEnum.checkedIn);
+		statusList.add(ReservationStatusEnum.pendingCheckIn);
 
-		if (conflictingReservations.size() > 0 && isApprovedForPayingFine) {
-			for (Reservation r : conflictingReservations) {
+		LocalDate oneYearFromNow = currentDate.plusDays(365);
+
+		List<Reservation> reservations = reservationRepository.findReservationsBetweenDatesForGivenStatus(
+				oldProperty.getId(),
+				DateUtils.convertLocalDateToDate(currentDate),
+				DateUtils.convertLocalDateToDate(oneYearFromNow),
+				statusList
+		);
+
+		if (reservations.size() > 0 && isApprovedForPayingFine) {
+			for (Reservation r : reservations) {
 				cancelledReservations.add(r);
 				reservationService.hostCancelReservation(r);
 			}
-		} else if (conflictingReservations.size() > 0 && !isApprovedForPayingFine) {
+		} else if (reservations.size() > 0 && !isApprovedForPayingFine) {
 			return EditPropertyStatus.NeedsApproval;
 		}
 
@@ -171,43 +184,53 @@ public class PropertyServiceImpl implements PropertyService {
 
 	@Override
 	public List<SearchProperty> searchProperties(SearchRequest searchRequest) {
+		System.out.println("Search Request:"+searchRequest);
 
-	  	List<Reservation> reservationsPendingCheckIn = reservationService.findAllReservationsPendingCheckIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsCheckedIn = reservationService.findAllReservationsCheckedIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsCanceledAuto = reservationService.findAllReservationsCanceledAuto(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsGuestCanceledAfterCheckIn = reservationService.findAllReservationsGuestCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsHostCanceledAfterCheckIn = reservationService.findAllReservationshostCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsPendingHostCancelation = reservationService.findAllReservationsPendingHostCancelation(searchRequest.getFrom(), searchRequest.getTo());
+		List<Reservation> reservationsPendingBasedOnEndDate = reservationService.findAllReservationsPendingBasedOnEndDate(searchRequest.getFrom(), searchRequest.getTo());
+		List<Reservation> reservationsPendingBasedOnCheckoutDate = reservationService.findAllReservationsPendingBasedOnCheckoutDate(searchRequest.getFrom(), searchRequest.getTo());
 
-	  	Set<Long> property_ids_pendingCheckIn = reservationsPendingCheckIn.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_checkedIn = reservationsCheckedIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_canceledAuto = reservationsCanceledAuto.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_guestCanceledAfterCheckIn = reservationsGuestCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_hostCanceledAfterCheckIn = reservationsHostCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_pendingHostCancelation = reservationsPendingHostCancelation.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
+
+		Set<Long> property_ids_pendingCheckIn = reservationsPendingBasedOnEndDate.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_checkedIn = reservationsPendingBasedOnCheckoutDate.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
 
 		Set<Long> reserved_property_ids = new HashSet<>();
 		reserved_property_ids.addAll(property_ids_pendingCheckIn);
 		reserved_property_ids.addAll(property_ids_checkedIn);
-		reserved_property_ids.addAll(property_ids_canceledAuto);
-		reserved_property_ids.addAll(property_ids_guestCanceledAfterCheckIn);
-		reserved_property_ids.addAll(property_ids_hostCanceledAfterCheckIn);
-		reserved_property_ids.addAll(property_ids_pendingHostCancelation);
-		
-	  	List<Property> properties =  propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
 
-	  	List<SearchProperty> searchProperties = new ArrayList<>();
-	  	for (Property p : properties) {
-	  		String imagesString = p.getPhotosArrayJson();
-	  		String[] images = imagesString.split(",");
-	  		String imageUrl = "";
-	  		if (images.length>0) {
-	  			imageUrl = images[0].replace("[", "").replace("\"","").replace("]", "");
+
+		List<Property> properties = propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
+
+		List<Integer> requiredDays = getDaysForDateRange(searchRequest.getFrom(), searchRequest.getTo());
+		System.out.println("Required Days"+requiredDays);
+
+		List<SearchProperty> searchProperties = new ArrayList<>();
+		for (Property p : properties) {
+			List availableDays = availableDaysList(p.getAvailableDays());
+			System.out.println("Available Days:"+availableDays);
+
+			Boolean allRequiredDaysAvailable = true;
+			//check if property if available on all days requested
+			for (Integer day : requiredDays) {
+				if (!availableDays.contains(day)) {
+					allRequiredDaysAvailable = false;
+					break;
+				}
 			}
-			SearchProperty sp = new SearchProperty(imageUrl,p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressState(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
+
+			if (!allRequiredDaysAvailable) {
+				continue;
+			}
+
+			String imagesString = p.getPhotosArrayJson();
+			String[] images = imagesString.split(",");
+			String imageUrl = "";
+			if (images.length > 0) {
+				imageUrl = images[0].replace("[", "").replace("\"", "").replace("]", "");
+			}
+			SearchProperty sp = new SearchProperty(imageUrl, p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressState(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
 			searchProperties.add(sp);
-	  	}
-	  	return searchProperties;
+		}
+		return searchProperties;
 	}
 
 	@Override
@@ -271,10 +294,15 @@ public class PropertyServiceImpl implements PropertyService {
 		LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
 		LocalDate oneYearFromNow = currentDate.plusDays(365);
 
-		List<Reservation> reservations = reservationRepository.findAllReservationsForPropertyBetweenDates(
+		List statusList = new ArrayList<>();
+		statusList.add(ReservationStatusEnum.checkedIn);
+		statusList.add(ReservationStatusEnum.pendingCheckIn);
+
+		List<Reservation> reservations = reservationRepository.findReservationsBetweenDatesForGivenStatus(
 				property.getId(),
 				DateUtils.convertLocalDateToDate(currentDate),
-				DateUtils.convertLocalDateToDate(oneYearFromNow)
+				DateUtils.convertLocalDateToDate(oneYearFromNow),
+				statusList
 		);
 
 		for (Reservation r : reservations) {
@@ -291,11 +319,18 @@ public class PropertyServiceImpl implements PropertyService {
 	}
 
 	private List<Integer> getDaysForDateRange(Date startDate, Date endDate) {
+	  	System.out.println("Start Date:"+startDate);
+	  	System.out.println("End Date:"+endDate);
+
 		List days = new ArrayList();
 		Date current = startDate;
 
 		while (current.before(endDate)) {
 			days.add(current.getDay());
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(current);
+			calendar.add(Calendar.DATE, 1);
+			current = calendar.getTime();
 		}
 
 		return days;

@@ -1,6 +1,7 @@
 package com.cmpe275.openhome.payload;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -98,10 +99,10 @@ public class SearchRequest {
 
     private String city;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date from;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date to;
 
     private String sharingType;
