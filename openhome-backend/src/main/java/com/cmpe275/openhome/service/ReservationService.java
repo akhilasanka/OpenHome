@@ -189,6 +189,19 @@ public class ReservationService {
     
     @Transactional
     public void guestCancelReservation(Reservation reservation) throws Exception {
+    	// reservation must not be canceled already
+    	List<ReservationStatusEnum> invalidStatuses = new ArrayList<ReservationStatusEnum>();
+    	invalidStatuses.add(ReservationStatusEnum.guestCanceledBeforeCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.guestCanceledAfterCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.hostCanceledBeforeCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.hostCanceledAfterCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.automaticallyCanceled);
+    	invalidStatuses.add(ReservationStatusEnum.pendingHostCancelation);
+    	
+    	if (invalidStatuses.contains(reservation.getStatus())) {
+    		throw new Exception("Reservation has already been canceled or is pending cancelation");
+    	}
+    	
     	// ToDo: Decipher Cancellation logic
     	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
 
@@ -254,7 +267,18 @@ public class ReservationService {
     }
     
     @Transactional
-    public void hostCancelReservation(Reservation reservation) throws Exception {	
+    public void hostCancelReservation(Reservation reservation) throws Exception {
+    	List<ReservationStatusEnum> invalidStatuses = new ArrayList<ReservationStatusEnum>();
+    	invalidStatuses.add(ReservationStatusEnum.guestCanceledBeforeCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.guestCanceledAfterCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.hostCanceledBeforeCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.hostCanceledAfterCheckIn);
+    	invalidStatuses.add(ReservationStatusEnum.automaticallyCanceled);
+    	invalidStatuses.add(ReservationStatusEnum.pendingHostCancelation);
+    	
+    	if (invalidStatuses.contains(reservation.getStatus())) {
+    		throw new Exception("Reservation has already been canceled or is pending cancelation");
+    	}
     	/*
     	 * A host can cancel any future reservation or the remaining days a reservation for guests who already checked in.
 		   If a cancelled day is within 7 days from now, host pays 15% penalty of the total fee for that day, including parking.

@@ -13,12 +13,16 @@ class SearchResult extends Component {
         //maintain the state required for this component
         this.state = {
             results : this.props.location.state.results,
-            
+            startDate: this.props.location.state.startDate, // will be URI encoded
+            endDate: this.props.location.state.endDate, // will be URI encoded
+
             //for pagination
             paginated_results:[],
             results_per_page: 5,
             num_pages:0,
         }
+
+        console.log(this.state.startDate);
         //for pagination
         this.handlePageClick = this.handlePageClick.bind(this);
     }
@@ -46,7 +50,7 @@ class SearchResult extends Component {
 
     render() {
         let resultsDiv = this.state.paginated_results.map(record => {
-            var link = "/property/view/"+record.id;
+            var link = "/property/view/"+record.id + '?startDate=' + this.state.startDate +'&endDate='+this.state.endDate;
             return(
                 <div class="card bg-light text-dark">
                 <div class="row">
@@ -71,7 +75,7 @@ class SearchResult extends Component {
                                 <label className="row">Weekend Price($): {record.weekendPrice}</label>
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -107,7 +111,7 @@ class SearchResult extends Component {
                         </div>
                 </div>
             </div>
-            
+
         )
     }
 }
