@@ -364,7 +364,7 @@ class EditProperty extends Component {
                 if(response.data.status=="NeedsApproval"){
                     swal({
                         title: "Caution",
-                        text: "Changes will affect reservations already made. 15% of reservation amount will be charged as PENALITY. Are you sure you want to proceed?",
+                        text: "Changes affecting existing reservations. 15% of reservation amount will be charged as PENALITY for reservations within a week. Are you sure you want to proceed?",
                         icon: "warning",
                         buttons: [
                           'No, cancel it!',
