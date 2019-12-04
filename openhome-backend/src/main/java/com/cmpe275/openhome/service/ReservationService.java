@@ -3,6 +3,7 @@ package com.cmpe275.openhome.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -326,28 +327,21 @@ public class ReservationService {
 
 	// For search START ************
 
-	public List<Reservation> findAllReservationsPendingCheckIn(Date startDate, Date endDate){
-    	return reservationRepository.findAllReservationsPendingCheckIn(startDate,endDate);
+	public List<Reservation> findAllReservationsPendingBasedOnEndDate(Date startDate, Date endDate){
+    	List statuses = new ArrayList();
+    	statuses.add("pendingCheckIn");
+    	statuses.add("checkIn");
+		return reservationRepository.findAllReservationsBasedOnEndDate(startDate, endDate, statuses);
 	}
 
-	public List<Reservation> findAllReservationsCheckedIn(Date startDate, Date endDate){
-    	return reservationRepository.findAllReservationsCheckedIn(startDate, endDate);
-	}
+	public List<Reservation> findAllReservationsPendingBasedOnCheckoutDate(Date startDate, Date endDate){
+		List statuses = new ArrayList();
+		statuses.add("canceledAutomatically");
+		statuses.add("guestCanceledAfterCheckIn");
+		statuses.add("hostCanceledAfterCheckIn");
+		statuses.add("pendingHostCancelation");
 
-	public List<Reservation> findAllReservationsCanceledAuto(Date startDate, Date endDate){
-    	return reservationRepository.findAllReservationsCanceledAuto(startDate, endDate);
-	}
-
-	public List<Reservation> findAllReservationsGuestCanceledAfterCheckIn(Date startDate, Date endDate){
-    	return reservationRepository.findAllReservationsGuestCanceledAfterCheckIn(startDate, endDate);
-	}
-
-	public List<Reservation> findAllReservationshostCanceledAfterCheckIn(Date startDate, Date endDate){
-    	return reservationRepository.findAllReservationshostCanceledAfterCheckIn(startDate, endDate);
-	}
-
-	public List<Reservation> findAllReservationsPendingHostCancelation(Date startDate, Date endDate){
-    	return reservationRepository.findAllReservationsPendingHostCancelation(startDate, endDate);
+		return reservationRepository.findAllReservationsBasedOnCheckoutDate(startDate, endDate, statuses);
 	}
 
 	// For search END **************

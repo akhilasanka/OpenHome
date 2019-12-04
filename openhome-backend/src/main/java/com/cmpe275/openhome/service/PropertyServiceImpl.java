@@ -172,42 +172,46 @@ public class PropertyServiceImpl implements PropertyService {
 	@Override
 	public List<SearchProperty> searchProperties(SearchRequest searchRequest) {
 
-	  	List<Reservation> reservationsPendingCheckIn = reservationService.findAllReservationsPendingCheckIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsCheckedIn = reservationService.findAllReservationsCheckedIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsCanceledAuto = reservationService.findAllReservationsCanceledAuto(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsGuestCanceledAfterCheckIn = reservationService.findAllReservationsGuestCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsHostCanceledAfterCheckIn = reservationService.findAllReservationshostCanceledAfterCheckIn(searchRequest.getFrom(), searchRequest.getTo());
-	  	List<Reservation> reservationsPendingHostCancelation = reservationService.findAllReservationsPendingHostCancelation(searchRequest.getFrom(), searchRequest.getTo());
+		List<Reservation> reservationsPendingBasedOnEndDate = reservationService.findAllReservationsPendingBasedOnEndDate(searchRequest.getFrom(), searchRequest.getTo());
+		List<Reservation> reservationsPendingBasedOnCheckoutDate = reservationService.findAllReservationsPendingBasedOnCheckoutDate(searchRequest.getFrom(), searchRequest.getTo());
 
-	  	Set<Long> property_ids_pendingCheckIn = reservationsPendingCheckIn.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_checkedIn = reservationsCheckedIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_canceledAuto = reservationsCanceledAuto.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_guestCanceledAfterCheckIn = reservationsGuestCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_hostCanceledAfterCheckIn = reservationsHostCanceledAfterCheckIn.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
-		Set<Long> property_ids_pendingHostCancelation = reservationsPendingHostCancelation.stream().map( r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_pendingCheckIn = reservationsPendingBasedOnEndDate.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
+		Set<Long> property_ids_checkedIn = reservationsPendingBasedOnCheckoutDate.stream().map(r -> r.getProperty().getId()).collect(Collectors.toSet());
 
 		Set<Long> reserved_property_ids = new HashSet<>();
 		reserved_property_ids.addAll(property_ids_pendingCheckIn);
 		reserved_property_ids.addAll(property_ids_checkedIn);
-		reserved_property_ids.addAll(property_ids_canceledAuto);
-		reserved_property_ids.addAll(property_ids_guestCanceledAfterCheckIn);
-		reserved_property_ids.addAll(property_ids_hostCanceledAfterCheckIn);
-		reserved_property_ids.addAll(property_ids_pendingHostCancelation);
-		
-	  	List<Property> properties =  propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
 
-	  	List<SearchProperty> searchProperties = new ArrayList<>();
-	  	for (Property p : properties) {
-	  		String imagesString = p.getPhotosArrayJson();
-	  		String[] images = imagesString.split(",");
-	  		String imageUrl = "";
-	  		if (images.length>0) {
-	  			imageUrl = images[0].replace("[", "").replace("\"","").replace("]", "");
+
+		List<Property> properties = propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
+
+		List<Integer> requiredDays = getDaysForDateRange(searchRequest.getFrom(), searchRequest.getTo());
+
+		List<SearchProperty> searchProperties = new ArrayList<>();
+		for (Property p : properties) {
+			List availableDays = availableDaysList(p.getAvailableDays());
+			Boolean allRequiredDaysAvailable = true;
+			for (Integer day : requiredDays) {
+				if (!availableDays.contains(day)) {
+					allRequiredDaysAvailable = false;
+					break;
+				}
 			}
-			SearchProperty sp = new SearchProperty(imageUrl,p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressState(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
+
+			if (!allRequiredDaysAvailable) {
+				continue;
+			}
+
+			String imagesString = p.getPhotosArrayJson();
+			String[] images = imagesString.split(",");
+			String imageUrl = "";
+			if (images.length > 0) {
+				imageUrl = images[0].replace("[", "").replace("\"", "").replace("]", "");
+			}
+			SearchProperty sp = new SearchProperty(imageUrl, p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressState(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
 			searchProperties.add(sp);
-	  	}
-	  	return searchProperties;
+		}
+		return searchProperties;
 	}
 
 	@Override
