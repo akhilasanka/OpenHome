@@ -9,6 +9,10 @@ import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import GuestNavigation from '../Navigation/GuestNavigation';
+import Alert from 'react-s-alert';
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/slide.css';
+
 
 class SearchProperty extends Component {
     constructor(props) {
