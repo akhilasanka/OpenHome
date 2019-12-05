@@ -5,6 +5,9 @@ import '../Styles/SearchResult.css';
 import ReactPaginate from 'react-paginate';
 import { API_BASE_URL, ACCESS_TOKEN } from '../constants';
 import HostNavigation from "../Navigation/HostNavigation";
+import Alert from 'react-s-alert';
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 
 class ListProperties extends Component {
         //call the constructor method

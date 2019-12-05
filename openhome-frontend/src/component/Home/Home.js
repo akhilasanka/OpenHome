@@ -38,17 +38,13 @@ class Home extends Component {
         }
         if(localStorage.role && localStorage.role === "host") {
             redirectVar = <Redirect to="/host/properties" />
+        } else if(localStorage.role && localStorage.role === "guest") {
+            redirectVar = <Redirect to="/property/search" />
         }
         return (
             
             <div>
             {redirectVar}
-                <div className="row" style={{marginLeft:"0em"}}>
-                    <input type="button" className="btn btn-primary btn-sm" onClick={this.handleLogout} style={{margin:"1em"}} value="Logout"/>
-                </div>
-                <div className="container">
-                    <h1> Welcome home! Succesfully logged in!</h1>
-                </div>
             </div>
             
         )

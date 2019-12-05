@@ -48,11 +48,42 @@ export function createReservation(createReservationRequest) {
   });
 }
 
+export function cancelReservation(cancelReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/cancel",
+      method: 'POST',
+      body: JSON.stringify(cancelReservationRequest)
+  });
+}
+
+export function checkInReservation(checkInReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/checkIn",
+      method: 'POST',
+      body: JSON.stringify(checkInReservationRequest)
+  });
+}
+
+export function checkOutReservation(checkOutReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/checkOut",
+      method: 'POST',
+      body: JSON.stringify(checkOutReservationRequest)
+  });
+}
+
 export function getReservationPrice(getReservationPriceRequest) {
   return request({
       url: API_BASE_URL + "/reservation/priceRequest",
       method: 'POST',
       body: JSON.stringify(getReservationPriceRequest)
+  });
+}
+
+export function getReservation(reservationId) {
+  return request({
+      url: API_BASE_URL + "/reservation/" + reservationId,
+      method: 'GET'
   });
 }
 
@@ -86,5 +117,13 @@ export function addToCurrentSystemTime(addTimeRequest) {
       url: API_BASE_URL + "/system/addTime",
       method: 'POST',
       body: JSON.stringify(addTimeRequest)
+  });
+}
+
+// Payment Method Utilities (HACKY)
+export function hasValidPaymentMethod() {
+  return request({
+      url: API_BASE_URL + "/pay/getvalidpaymentmethod",
+      method: 'GET'
   });
 }
