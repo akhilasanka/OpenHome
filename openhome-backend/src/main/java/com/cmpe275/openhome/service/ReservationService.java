@@ -54,7 +54,7 @@ public class ReservationService {
     	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());
     	long daysBetween = startDate.until(endDate, ChronoUnit.DAYS);
     	if (daysBetween < 1|| daysBetween > 14 ) {
-    		throw new Exception("Reservation Date Range must be between 1 and 14 days");
+    		throw new Exception("Reservation Date Range must be between 1 and 14 days.");
     	}
     	
     	// check reservation date range (must be within 365 days from today)
@@ -67,7 +67,7 @@ public class ReservationService {
     	// check date is valid range
     	Property property = reservation.getProperty();
     	if (!propertyService.isDateRangeValid(property, startDate, endDate)) {
-    		throw new Exception("Reservation date range is not valid");
+    		throw new Exception("Reservation date range is not valid.");
     	}
     	
     	// check if there are any conflicting reservations to prevent double booking
@@ -83,7 +83,7 @@ public class ReservationService {
 
     	boolean hasNoConflict = pending.isEmpty() && checkedIn.isEmpty() && canceledAuto.isEmpty() && canceledByGuestAfterCheckIn.isEmpty() && canceledByHostAfterCheckIn.isEmpty() && pendingCancelationByHost.isEmpty();
     	if (!hasNoConflict) {
-    		throw new Exception("Reservations are already booked within the specified Date Range");
+    		throw new Exception("Reservations are already booked within the specified Date Range.");
     	}
     	
     	reservation.setStatus(ReservationStatusEnum.pendingCheckIn);
@@ -102,7 +102,7 @@ public class ReservationService {
     public void checkInReservation(Reservation reservation) throws Exception {
     	// reservation must be pending check-in
     	if (!reservation.getStatus().equals(ReservationStatusEnum.pendingCheckIn)) {
-    		throw new Exception("Check-ins only allowed for Reservations that are pending check in");
+    		throw new Exception("Check-ins are only allowed for reservations that are pending check in.");
     	}
     	
     	// check if "current" time is between 3pm of Start Date and Next Day
@@ -113,7 +113,7 @@ public class ReservationService {
     	
     	LocalDateTime currentSystemTime = SystemDateTime.getCurSystemTime();
     	if (currentSystemTime.isBefore(validRangeStart) || currentSystemTime.isAfter(validRangeEnd)) {
-    		throw new Exception("Check-ins can only be made during between 3pm of the Start Date and 3am of the next day");
+    		throw new Exception("Check-ins can only be made during between 3pm of the Start Date and 3am of the next day.");
     	}
     	
     	// charge guest for total price
@@ -126,7 +126,7 @@ public class ReservationService {
     public void checkOutReservation(Reservation reservation) throws Exception {
     	// reservation must be checkedIn
     	if (!reservation.getStatus().equals(ReservationStatusEnum.checkedIn)) {
-    		throw new Exception("Check-outs only allowed for Reservations that are checked-in");
+    		throw new Exception("Check-outs are only allowed for Reservations that are checked-in.");
     	}
     	
     	// check if guest checked out with days remaining
@@ -188,7 +188,8 @@ public class ReservationService {
     }
     
     @Transactional
-    public void guestCancelReservation(Reservation reservation) throws Exception {
+    public Double guestCancelReservation(Reservation reservation) throws Exception {
+    	Double penalty = new Double(0);
     	// reservation must not be canceled already
     	List<ReservationStatusEnum> invalidStatuses = new ArrayList<ReservationStatusEnum>();
     	invalidStatuses.add(ReservationStatusEnum.guestCanceledBeforeCheckIn);
@@ -199,7 +200,7 @@ public class ReservationService {
     	invalidStatuses.add(ReservationStatusEnum.pendingHostCancelation);
     	
     	if (invalidStatuses.contains(reservation.getStatus())) {
-    		throw new Exception("Reservation has already been canceled or is pending cancelation");
+    		throw new Exception("Reservation has already been canceled or is pending cancelation.");
     	}
     	
     	// ToDo: Decipher Cancellation logic
@@ -218,7 +219,7 @@ public class ReservationService {
     	}
     	else if (minutesBetweenCurrentTimeAndStartTime > 0){
         	// if cancelled before the start date @ 3PM charge 30% for just the Start Date
-    		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
+    		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
     				startDateTime.toLocalDate(),
     				startDateTime.toLocalDate().plusDays(1), 
     				reservation.getWeekdayPrice(), 
@@ -234,7 +235,7 @@ public class ReservationService {
         	long daysBetween = startDateTime.toLocalDate().until(endDateTime.toLocalDate(), ChronoUnit.DAYS);
         	if (daysBetween == 1) {
         		// charge 30% penalty for first day
-        		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
+        		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
         				startDateTime.toLocalDate(),
         				startDateTime.toLocalDate().plusDays(1), 
         				reservation.getWeekdayPrice(), 
@@ -246,7 +247,7 @@ public class ReservationService {
         	}
         	else if (daysBetween > 1) {
         		// charge 30% penalty for first day and day after that 
-        		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
+        		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
         				startDateTime.toLocalDate(),
         				startDateTime.toLocalDate().plusDays(2), 
         				reservation.getWeekdayPrice(), 
@@ -264,10 +265,14 @@ public class ReservationService {
         	
     	}
        	updateReservation(reservation);
+       	
+       	return penalty;
     }
     
     @Transactional
-    public void hostCancelReservation(Reservation reservation) throws Exception {
+    public Double hostCancelReservation(Reservation reservation) throws Exception {
+    	Double penalty = new Double(0.0);
+    	
     	List<ReservationStatusEnum> invalidStatuses = new ArrayList<ReservationStatusEnum>();
     	invalidStatuses.add(ReservationStatusEnum.guestCanceledBeforeCheckIn);
     	invalidStatuses.add(ReservationStatusEnum.guestCanceledAfterCheckIn);
@@ -277,7 +282,7 @@ public class ReservationService {
     	invalidStatuses.add(ReservationStatusEnum.pendingHostCancelation);
     	
     	if (invalidStatuses.contains(reservation.getStatus())) {
-    		throw new Exception("Reservation has already been canceled or is pending cancelation");
+    		throw new Exception("Reservation has already been canceled or is pending cancelation.");
     	}
     	/*
     	 * A host can cancel any future reservation or the remaining days a reservation for guests who already checked in.
@@ -300,7 +305,7 @@ public class ReservationService {
         	
     		// refund guest entire amount
         	Double totalRefund = payProcessingUtil.calculateTotalPrice(
-        			startDateTime.toLocalDate(),  // add one because current day is still charged fully
+        			startDateTime.toLocalDate(),
         			endDateTime.toLocalDate(), 
     				reservation.getWeekdayPrice(), 
     				reservation.getWeekendPrice(), 
@@ -321,7 +326,7 @@ public class ReservationService {
     				penaltyEndDate = endDateTime.toLocalDate();
     			}
     			
-        		Double penalty = 0.15 * payProcessingUtil.calculateTotalPrice(
+        		penalty = 0.15 * payProcessingUtil.calculateTotalPrice(
         				startDateTime.toLocalDate(),
         				penaltyEndDate, 
         				reservation.getWeekdayPrice(), 
@@ -339,10 +344,42 @@ public class ReservationService {
     		reservation.setHostCancelationDate(cancelationDate);
         	reservation.setStatus(ReservationStatusEnum.pendingHostCancelation);
         	
-        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDateTime.plusDays(1).toLocalDate().atTime(11, 0));
+        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDateTime.plusDays(1).toLocalDate().atTime(15, 0));
         	reservation.setCheckOutDate(actualCheckOutDate);
-        	updateReservation(reservation);        	
+        	updateReservation(reservation); 
+        	
+    		// refund guest remainder of days
+        	Double totalRefund = payProcessingUtil.calculateTotalPrice(
+        			currentDateTime.toLocalDate().plusDays(1),  // add one day
+        			endDateTime.toLocalDate(), 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+        	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+        	
+        	// charge penalty to host 
+			LocalDate penaltyEndDate;
+			if (currentDateTimePlus7Days.toLocalDate().isBefore(endDateTime.toLocalDate())) {
+				penaltyEndDate = currentDateTimePlus7Days.toLocalDate();
+			}
+			else {
+				penaltyEndDate = endDateTime.toLocalDate();
+			}
+			
+    		penalty = 0.15 * payProcessingUtil.calculateTotalPrice(
+    				currentDateTime.toLocalDate().plusDays(1),
+    				penaltyEndDate, 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+    		
+        	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.HOSTPENALTY, penalty);
+        	
     	}
+    	
+    	return penalty;
     }
 
 	public List<Reservation> findAllReservationsBetweenDates(Date startDate, Date endDate) {
