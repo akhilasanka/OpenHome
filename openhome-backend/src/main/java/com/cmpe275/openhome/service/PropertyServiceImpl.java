@@ -233,6 +233,9 @@ public class PropertyServiceImpl implements PropertyService {
         List<Property> properties = propertyRepository.findByOwnerId(Long.parseLong(hostId));
 		List<SearchProperty> searchProperties = new ArrayList<>();
 		for (Property p : properties) {
+			if(p.getIsDeleted()) {
+				continue;
+			}
 			String imagesString = p.getPhotosArrayJson();
 			String[] images = imagesString.split(",");
 			String imageUrl = "";
