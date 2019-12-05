@@ -2,6 +2,7 @@ package com.cmpe275.openhome.payload;
 
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
+import com.cmpe275.openhome.util.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ public class ReservationStatsResponse {
     }
 
     public static class ReservationItem {
-        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-YYYY");
         private Long reservationId;
         private Long PropertyId;
         private String propertyName;
@@ -80,8 +80,8 @@ public class ReservationStatsResponse {
             ri.setReservationId(reservation.getId());
             ri.setPropertyId(property.getId());
             ri.setPropertyName(property.getPropertyName());
-            ri.setStartDate(DATE_FORMAT.format(reservation.getStartDate()));
-            ri.setEndDate(DATE_FORMAT.format(reservation.getEndDate()));
+            ri.setStartDate(DateUtils.formatForDisplay(reservation.getStartDate()));
+            ri.setEndDate(DateUtils.formatForDisplay(reservation.getEndDate()));
             ri.setWeekdayPrice(reservation.getWeekdayPrice());
             ri.setWeekendPrice(reservation.getWeekendPrice());
             ri.setStatus(reservation.getStatus().toString());
