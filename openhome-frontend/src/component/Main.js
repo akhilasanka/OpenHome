@@ -42,7 +42,6 @@ class Main extends Component {
                 <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
                 <Route exact path="/host/properties" exact component={ListProperties} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
-                <Route exact path="/reservation/create" component={ReservationCreate} />
                 <Route exact path="/reservation/cancel/:id" component={ReservationCancel} />
                 <Route exact path="/reservation/checkIn/:id" component={ReservationCheckIn} />
                 <Route exact path="/reservation/checkOut/:id" component={ReservationCheckOut} />
