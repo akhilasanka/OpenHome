@@ -53,6 +53,7 @@ class SearchProperty extends Component {
         }
         else {
             let curTime = new Date(this.state.curTime);
+            from.setTime(curTime.getTime());
             if (from < curTime || to <curTime) {
               swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
               validInput = false;
