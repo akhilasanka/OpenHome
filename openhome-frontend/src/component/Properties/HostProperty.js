@@ -488,10 +488,10 @@ class HostProperty extends Component {
                                             <label htmlFor="bedrooms"  className="col-sm-3">Bedrooms</label>
                                             <select className="form-control"  name="bedrooms" id="bedrooms" onChange={this.handleInputChange}>
                                                 <option value="" selected disabled hidden>-- Please Select --</option>
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4+</option>
+                                                <option value={"1"}>1</option>
+                                                <option value={"2"}>2</option>
+                                                <option value={"3"}>3</option>
+                                                <option value={"4"}>4+</option>
                                             </select>
                                         </div>
                                         <div className="form-group">
