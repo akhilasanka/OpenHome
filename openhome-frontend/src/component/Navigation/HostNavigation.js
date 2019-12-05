@@ -7,6 +7,7 @@ import { ACCESS_TOKEN, CLIENT_BASE_URL } from '../constants';
 import Alert from 'react-s-alert';
 import { timingSafeEqual } from 'crypto';
 import {Nav,Navbar} from 'react-bootstrap';
+import {Link} from "react-router-dom";
 
 
 class HostNavigation extends Component {
@@ -51,6 +52,7 @@ class HostNavigation extends Component {
                 <Nav className="mr-auto">
                     <Nav.Link href="/host/properties">My Properties</Nav.Link>
                     <Nav.Link href="/property/host">Add Property</Nav.Link>
+                    <Nav.Link href="/stats/reservations">Reservations</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
