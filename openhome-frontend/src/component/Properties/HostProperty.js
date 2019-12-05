@@ -4,6 +4,7 @@ import { Redirect } from 'react-router';
 import {ACCESS_TOKEN, API_BASE_URL} from "../constants";
 import axios from "axios";
 import Alert from "react-s-alert";
+import HostNavigation from "../Navigation/HostNavigation";
 
 class HostProperty extends Component {
 
@@ -233,7 +234,7 @@ class HostProperty extends Component {
             ).then((response)=>{
                 console.log(response)
                 Alert.success("Hosted property!");
-                // this.props.history.push("/home");
+                this.props.history.push("/home");
             })
                 .catch(Alert.error("Failed to add property"))
 
@@ -241,6 +242,19 @@ class HostProperty extends Component {
     };
 
     render() {
+
+        if(localStorage.verified && localStorage.verified === "false") {
+            return(
+                <div className="container-fluid">
+                    <HostNavigation />
+                    <div>
+                        <br/>
+                        <br/>
+                        Please verify your email id. If you have already verified. Logout and login back again to list your property!
+                    </div>
+                </div>
+            )
+        }
 
         let redirectVar = null;
         if (!localStorage.getItem(ACCESS_TOKEN)) {
@@ -396,8 +410,8 @@ class HostProperty extends Component {
             <div>
                 <div className="add-property-content">
                     {redirectVar}
+                    <HostNavigation />
                     <div className="container">
-                        <hr />
                         <div className="row">
                             <div className="menu-bar-ver col-3">
                                 <ul>
