@@ -65,7 +65,7 @@ class ReservationStats extends Component {
                 </tr>);
             });
             retData = <table className="table">
-            <thead>{tableHeader}</thead>
+            <thead class="thead-dark">{tableHeader}</thead>
             <tbody>{dataTableRows}</tbody>
             </table>
         }
@@ -115,7 +115,7 @@ class ReservationStats extends Component {
             <div>
                 {navigation}
             <div>
-                <div className="header-label">{headerLabel}</div>
+                <div className="header-label main-header-sum">{headerLabel}</div>
                 <div>{select}</div>
                 <div className="header-label">Past Reservations</div>
                 <div>{pastTable}</div>
