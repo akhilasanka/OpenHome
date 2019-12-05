@@ -71,6 +71,8 @@ public class ReservationStatsResponse {
         private String endDate;
         private Double weekdayPrice;
         private Double weekendPrice;
+        private String status;
+        private Double totalPrice;
 
         public static ReservationItem newItemFromReservation(Reservation reservation) {
             Property property = reservation.getProperty();
@@ -82,6 +84,8 @@ public class ReservationStatsResponse {
             ri.setEndDate(DATE_FORMAT.format(reservation.getEndDate()));
             ri.setWeekdayPrice(reservation.getWeekdayPrice());
             ri.setWeekendPrice(reservation.getWeekendPrice());
+            ri.setStatus(reservation.getStatus().toString());
+            ri.setTotalPrice(reservation.getTotalPrice());
             return ri;
         }
 
@@ -139,6 +143,22 @@ public class ReservationStatsResponse {
 
 		public void setWeekendPrice(Double weekendPrice) {
 			this.weekendPrice = weekendPrice;
+		}
+
+		public String getStatus() {
+			return status;
+		}
+
+		public void setStatus(String status) {
+			this.status = status;
+		}
+
+		public Double getTotalPrice() {
+			return totalPrice;
+		}
+
+		public void setTotalPrice(Double totalPrice) {
+			this.totalPrice = totalPrice;
 		}
         
     }
