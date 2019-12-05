@@ -105,7 +105,12 @@ class ViewReservation extends Component {
 
         let ownerName = "";
         if(this.state.propertyDetails.owner) {
-            ownerName = this.state.propertyDetails.owner.name
+            ownerName = this.state.propertyDetails.owner.name;
+        }
+
+        let guestName = "";
+        if(this.state.reservationDetails.guest) {
+            guestName = this.state.reservationDetails.guest.name;
         }
 
         // RESERVATION DETAILS
@@ -245,6 +250,11 @@ class ViewReservation extends Component {
 
                                         {parkingFee}
 
+                                        <tr>
+                                            <th scope="row">Owner</th>
+                                            <td>{ownerName}</td>
+                                        </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -274,6 +284,13 @@ class ViewReservation extends Component {
                                 </div>
                                 <div className="col-12">
                                     <div id="price">{totalPrice}</div>
+                                </div>
+
+                                <div className="col-12 col-form-label">
+                                    Guest name:
+                                </div>
+                                <div className="col-12">
+                                    <div id="guestName">{guestName}</div>
                                 </div>
 
                                 <div>

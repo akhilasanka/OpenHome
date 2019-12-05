@@ -21,8 +21,8 @@ class ReservationStats extends Component {
             <th>Property</th>
             <th>StartDate</th>
             <th>End Date</th>
-            <th>Weekday Price</th>
-            <th>Weekend Price</th>
+            <th>Total Price</th>
+            <th>Status</th>
         </tr>;
         let dataRows = dataArr.filter((elem) => {
             return this.state.selected_option === "0" ||
@@ -31,13 +31,37 @@ class ReservationStats extends Component {
         if(dataRows !== null && dataRows.length > 0) {
             const dataTableRows = dataRows.map(data => {
                 var reservationUrl = "/reservation/view/"+data.reservationId;
+                var totalPrice = data.totalPrice.toFixed(2);
 
+                // hacky for now lol
+                let reservationStatus = "";
+                let statusEnum = data.status;
+                if (statusEnum === 'pendingCheckIn') {
+                  reservationStatus = 'Pending Check-In'
+                }
+                else if (statusEnum === 'checkedIn') {
+                  reservationStatus = 'Checked-In'
+                }
+                else if (statusEnum === 'checkedOut') {
+                  reservationStatus = 'Checked-Out'
+                }
+                else if (statusEnum === 'automaticallyCanceled') {
+                  reservationStatus = 'Canceled Automatically (No Show!)'
+                }
+                else if (statusEnum === 'guestCanceledBeforeCheckIn' || statusEnum === 'guestCanceledAfterCheckIn') {
+                  reservationStatus = 'Canceled by Guest'
+                }
+                else if (statusEnum === 'hostCanceledBeforeCheckIn' || statusEnum === 'hostCanceledAfterCheckIn' || statusEnum ==='pendingHostCancelation') {
+                  reservationStatus = 'Canceled by Host'
+                }
+
+                console.log(data);
                 return (<tr>
                     <td><a href={reservationUrl}>{data.propertyName}</a></td>
                     <td>{data.startDate}</td>
                     <td>{data.endDate}</td>
-                    <td>{data.weekdayPrice}</td>
-                    <td>{data.weekendPrice}</td>
+                    <td>{totalPrice}</td>
+                    <td>{reservationStatus}</td>
                 </tr>);
             });
             retData = <table className="table">
