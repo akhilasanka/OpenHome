@@ -45,7 +45,9 @@ public class PaymentController {
         if(request == null || !request.validate()) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Unparsable request"));
         }
-        final PaymentMethod paymentMethod = new PaymentMethod();
+        PaymentMethod paymentMethod = paymentMethodRepository.findByUserId(request.getUserid());
+        if(paymentMethod == null)
+            paymentMethod = new PaymentMethod();
         final User user = userRepository.findById(request.getUserid()).orElse(null);
         paymentMethod.parseAddPayRequest(request, user);
         final PaymentMethod result = paymentMethodRepository.save(paymentMethod);
