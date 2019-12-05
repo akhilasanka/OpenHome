@@ -44,6 +44,9 @@ class HostNavigation extends Component {
 
     render() {
         console.log(this.state.isLoggedIn);
+        var redText = {
+            color: 'red'
+        }
         return (
             <div>
             {this.state.isLoggedIn ?
@@ -56,7 +59,7 @@ class HostNavigation extends Component {
                     <Nav.Link href="/stats/billing">Billing</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
-                    <Nav.Link href="/system/timeManagement">Time Management</Nav.Link>
+                    <Nav.Link href="/system/timeManagement" style={redText}>Time Management</Nav.Link>
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
                 </Nav>
             </Navbar>
