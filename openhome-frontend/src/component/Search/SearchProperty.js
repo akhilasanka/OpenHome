@@ -9,6 +9,10 @@ import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import GuestNavigation from '../Navigation/GuestNavigation';
+import Alert from 'react-s-alert';
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/slide.css';
+
 
 class SearchProperty extends Component {
     constructor(props) {
@@ -49,6 +53,7 @@ class SearchProperty extends Component {
         }
         else {
             let curTime = new Date(this.state.curTime);
+            from.setTime(curTime.getTime());
             if (from < curTime || to <curTime) {
               swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
               validInput = false;
