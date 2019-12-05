@@ -48,6 +48,30 @@ export function createReservation(createReservationRequest) {
   });
 }
 
+export function cancelReservation(cancelReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/cancel",
+      method: 'POST',
+      body: JSON.stringify(cancelReservationRequest)
+  });
+}
+
+export function checkInReservation(checkInReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/checkIn",
+      method: 'POST',
+      body: JSON.stringify(checkInReservationRequest)
+  });
+}
+
+export function checkOutReservation(checkOutReservationRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/checkOut",
+      method: 'POST',
+      body: JSON.stringify(checkOutReservationRequest)
+  });
+}
+
 export function getReservationPrice(getReservationPriceRequest) {
   return request({
       url: API_BASE_URL + "/reservation/priceRequest",
