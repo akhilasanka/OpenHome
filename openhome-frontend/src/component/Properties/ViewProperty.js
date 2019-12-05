@@ -36,7 +36,8 @@ class PropertyDisplay extends Component {
 
             startDate: getQueryStringValue('startDate'),
             endDate: getQueryStringValue('endDate'),
-            hasValidPaymentMethod: false
+            hasValidPaymentMethod: false,
+            redirect : false
         }
 
         //Bind
@@ -148,6 +149,7 @@ class PropertyDisplay extends Component {
 
     handleDeleteProperty = () => {
         var propertyID = this.props.match.params.id;
+        let redirect = false;
         console.log(API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/delete');
         axios(
             {
@@ -180,12 +182,12 @@ class PropertyDisplay extends Component {
                             }
                         ).then((response) => {
                            if(response.data.status=="EditSuccessful"){
+                            redirect = true;
                             swal({
                                 title: 'OK',
                                 text: 'Updated with penality charged!',
                                 icon: 'success'
                               });
-                            this.props.history.push("/host/properties")
                            }
                            else if(response.data.status=="EditError"){
                                 swal("Oops!","Failed to make changes. Please try again! "+response.data.message,"error");
@@ -198,7 +200,13 @@ class PropertyDisplay extends Component {
             }
             else if(response.data.status=="EditSuccessful"){
                 swal("Sucessfully deleted property!");
-                this.props.history.push("/host/properties")
+                redirect = true;
+                
+            }
+            if(redirect){
+                this.setState({
+                    redirect: true
+                })     
             }
         })
             .catch(Alert.error("Failed to delete property. Please try again."))
@@ -212,6 +220,10 @@ class PropertyDisplay extends Component {
         // if (this.state.errorRedirect === true) {
         //     redrirectVar = <Redirect to="/error" />
         // }
+        let redirectDiv = null;
+        if(this.state.redirect === true){
+            redirectDiv = <Redirect to="/host/properties"/>;
+        }
 
         var totalCost = 0;
 
@@ -355,6 +367,10 @@ class PropertyDisplay extends Component {
 
         return (
             <div>
+
+            
+            {redirectDiv}
+            <div>
                 {navigation}
                 <div className=" container property-display-content border">
                     <div className="row">
@@ -459,6 +475,7 @@ class PropertyDisplay extends Component {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         )
     }
