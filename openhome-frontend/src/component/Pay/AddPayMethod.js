@@ -78,7 +78,7 @@ class AddPayMethod extends Component {
             <div className="tab-content" style={tabContent}>
               <form role="form" onSubmit={this.handleSubmit}>
               <div className="form-group">
-                <label for="cardNumber">Card number</label>
+                <label class=" main-header-sum" for="cardNumber">Enter your card details</label>
                 <div className="input-group">
                   <input onChange={this.handleCardNumberChange} type="text" name="cardNumber" placeholder="Your 16 digit card number" 
                     className="form-control" pattern="[0-9]{16}" maxLength="16" required/>
