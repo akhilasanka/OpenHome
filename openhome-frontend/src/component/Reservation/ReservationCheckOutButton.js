@@ -18,13 +18,13 @@ class ReservationCheckOutButton extends Component {
         event.preventDefault();
         var reservationId = this.state.reservationId;
 
-        var checkInReservationRequest = {
+        var checkOutReservationRequest = {
           reservationId: reservationId
         }
 
-        checkOutReservation(checkInReservationRequest)
+        checkOutReservation(checkOutReservationRequest)
         .then(response => {
-          swal("Success!", response.message)
+          swal("Success!", response.message).then(() => {window.location.reload(false);});
         }).catch(error => {
             swal("Oops!", (error && error.message) || 'Oops! Something went wrong. Please try again!', "error");
         });
