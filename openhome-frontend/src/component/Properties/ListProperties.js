@@ -67,40 +67,52 @@ class ListProperties extends Component {
     }
 
     render() {
-
-        let resultsDiv = this.state.paginated_results.map(record => {
-            var link = "/property/view/"+record.id;
-            return(
-                <div class="card bg-light text-dark">
-                    <div class="row">
-                        <div class="col-3">
-                            <img class="card-img" src={record.imageUrl} alt="Card image" />
-                        </div>
-                        <div className="col">
-                            <div class="card-body">
-                                <div className="card-title result-title">
-                                    <a href={link}>{record.headline}</a>
-                                </div>
-                                <div className="row">
-                                    <div className="col">
-                                        <div className="addr">
-                                            <label className="row">Address:</label>
-                                            <label className="row">{record.street}</label>
-                                            <label className="row">{record.city}, {record.state} {record.zip}</label>
-                                        </div>
-                                    </div>
-                                    <div className="col" style={{marginLeft:"10em"}}>
-                                        <label className="row">Weekday Price($): {record.weekdayPrice}</label>
-                                        <label className="row">Weekend Price($): {record.weekendPrice}</label>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
+            let resultsDiv = ""
+            if(this.state.paginated_results.length == 0){
+                resultsDiv = <div>
+                    <div className="container-fluid">
+                        <br/>
+                        <br/>
+                        No Properties added yet!
                     </div>
                 </div>
-            )
-        });
+            }else{
+                resultsDiv = this.state.paginated_results.map(record => {
+                    var link = "/property/view/"+record.id;
+                    return(
+                        <div class="card bg-light text-dark">
+                            <div class="row">
+                                <div class="col-3">
+                                    <img class="card-img" src={record.imageUrl} alt="Card image" />
+                                </div>
+                                <div className="col">
+                                    <div class="card-body">
+                                        <div className="card-title result-title">
+                                            <a href={link}>{record.headline}</a>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col">
+                                                <div className="addr">
+                                                    <label className="row">Address:</label>
+                                                    <label className="row">{record.street}</label>
+                                                    <label className="row">{record.city}, {record.state} {record.zip}</label>
+                                                </div>
+                                            </div>
+                                            <div className="col" style={{marginLeft:"10em"}}>
+                                                <label className="row">Weekday Price($): {record.weekdayPrice}</label>
+                                                <label className="row">Weekend Price($): {record.weekendPrice}</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                });
+            }
+
+
 
         return (
             <div style={{background:"white"}}>
