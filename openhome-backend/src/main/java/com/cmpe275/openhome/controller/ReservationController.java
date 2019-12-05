@@ -27,6 +27,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -214,6 +216,23 @@ public class ReservationController {
 		}
     	
 		return totalPrice;
+    }
+    
+    @GetMapping("/reservation/{reservationId}")
+    @PreAuthorize("hasRole('USER')")
+    public Reservation getReservation(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long reservationId) {
+    	User user = userRepository.findById(userPrincipal.getId())
+    			.orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+    	
+    	Reservation reservation = reservationService.findReservation(reservationId);
+    	
+    	boolean isGuest = reservation.getGuest().getId().equals(user.getId());
+    	boolean isHost = reservation.getProperty().getOwner().getId().equals(user.getId());
+    	if (!isGuest && !isHost) {
+    		reservation = null;
+    	}
+    	
+		return reservation;
     }
     
 }

@@ -23,7 +23,7 @@ class ReservationCancelButton extends Component {
             text: "Canceling the reservation can incur a penalty of 15% for up to 2 days.\n\nAre you sure?",
             icon: "warning",
             buttons: [
-              'No, cancel it!',
+              'No, nevermind!',
               'Yes, I am sure!'
             ],
             dangerMode: true,

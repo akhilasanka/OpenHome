@@ -15,9 +15,7 @@ import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
-import ReservationCancel from './Reservation/ReservationCancel'
-import ReservationCheckIn from './Reservation/ReservationCheckIn'
-import ReservationCheckOut from './Reservation/ReservationCheckOut'
+import ViewReservation from './Reservation/ReservationView'
 import TimeManagement from './System/TimeManagement'
 import VerifyAuthCode from './Auth/signup/VerifyAuthCode';
 import EditProperty from './Properties/EditProperty';
@@ -41,9 +39,7 @@ class Main extends Component {
                 <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
                 <Route exact path="/host/properties" exact component={ListProperties} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
-                <Route exact path="/reservation/cancel/:id" component={ReservationCancel} />
-                <Route exact path="/reservation/checkIn/:id" component={ReservationCheckIn} />
-                <Route exact path="/reservation/checkOut/:id" component={ReservationCheckOut} />
+                <Route exact path="/reservation/view/:id" component={ViewReservation} />
                 <Route exact path="/system/timeManagement" component={TimeManagement} />
                 <Route exact path="/registration-confirmation" component={VerifyAuthCode} />
                 <Route exact path="/stats/reservations" component={ReservationStats} />
