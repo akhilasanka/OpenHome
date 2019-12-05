@@ -87,7 +87,7 @@ class BillingStats extends Component {
             retData = 
             <div>
                 <table className="table">
-                    <thead>{tableHeader}</thead>
+                    <thead class="thead-dark">{tableHeader}</thead>
                     <tbody>{dataTableRows}</tbody>
                 </table>
                 <div>In {this.state.selected_month} a total of {numReservations} reservations were made,
@@ -139,7 +139,7 @@ class BillingStats extends Component {
             <div>
                 {navigation}
             <div>
-                <div className="header-label">{headerLabel}</div>
+                <div className="header-label main-header-sum">{headerLabel}</div>
                 <div>{select}</div>
                 <div>{monthselect}</div>
                 <div className="header-label">Billing line items</div>

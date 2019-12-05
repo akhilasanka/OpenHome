@@ -39,6 +39,8 @@ class SearchProperty extends Component {
         let validInput = true;
         var token = localStorage.getItem("accessToken");
 
+        
+
         var from = new Date(formData.get("from"));
         var to = new Date(formData.get("to"));
 
@@ -152,6 +154,7 @@ class SearchProperty extends Component {
                                                       onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
                                                       focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
                                                       onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+                                                      required
                                                   />
                                                 </div>
                                             </div>
