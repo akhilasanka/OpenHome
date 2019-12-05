@@ -6,6 +6,8 @@ import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.notification.EmailNotification;
 import com.cmpe275.openhome.payload.AddPayRequest;
+import com.cmpe275.openhome.payload.EditPropertyResponse;
+import com.cmpe275.openhome.payload.EditPropertyStatus;
 import com.cmpe275.openhome.payload.PostPropertyResponse;
 import com.cmpe275.openhome.repository.PropertyRepository;
 import com.cmpe275.openhome.repository.ReservationRepository;
@@ -61,17 +63,21 @@ public class NotificationAOP {
         }
     }
 
-    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.deleteProperty(..))")
-    public void deletePropertyNotification(JoinPoint joinPoint) {
-        Long propertyId = (Long) joinPoint.getArgs()[3];
-        updatePropertyNotificationHelper(propertyId, "deleted");
+    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.deleteProperty(..))", returning = "epr")
+    public void deletePropertyNotification(JoinPoint joinPoint, EditPropertyResponse epr) {
+        if(epr.getStatus().equals(EditPropertyStatus.EditSuccessful)) {
+            Long propertyId = (Long) joinPoint.getArgs()[3];
+            updatePropertyNotificationHelper(propertyId, "deleted");
+        }
     }
 
 
-    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.editProperty(..))")
-    public void updatePropertyNotification(JoinPoint joinPoint) {
-        Long propertyId = (Long) joinPoint.getArgs()[3];
-        updatePropertyNotificationHelper(propertyId, "updated");
+    @AfterReturning(pointcut = "execution(* com.cmpe275.openhome.controller.PropertyController.editProperty(..))", returning = "epr")
+    public void updatePropertyNotification(JoinPoint joinPoint, EditPropertyResponse epr) {
+        if(epr.getStatus().equals(EditPropertyStatus.EditSuccessful)) {
+            Long propertyId = (Long) joinPoint.getArgs()[3];
+            updatePropertyNotificationHelper(propertyId, "updated");
+        }
     }
 
     public void updatePropertyNotificationHelper(Long propertyId, String changetype) {
@@ -137,10 +143,10 @@ public class NotificationAOP {
                 reserveNotifyHelper(reservation, "check-out");
                 break;
             case automaticallyCanceled:
-                reserveNotifyHelper(reservation, "automaically canceled because of no-show");
+                reserveNotifyHelper(reservation, "automatically canceled because of no-show");
                 break;
             case guestCanceledBeforeCheckIn:
-                reserveNotifyHelper(reservation, "cancelled by guest before guesest to checked-in");
+                reserveNotifyHelper(reservation, "cancelled by guest before guest to checked-in");
                 break;
             case guestCanceledAfterCheckIn:
                 reserveNotifyHelper(reservation, "cancelled by guest after guest has checked-in");

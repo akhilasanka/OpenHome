@@ -54,16 +54,21 @@ class BillingStats extends Component {
         })
         if(dataRows !== null && dataRows.length > 0) {
             const numReservations = dataRows.length;
-            const totalCredits = dataRows.filter(elem => {
+
+            const totalCreditsArr = dataRows.filter(elem => {
                 return parseFloat(elem.amount) > 0.0
-            }).map(elem => parseFloat(elem.amount)).reduce((total, elem) => {
+            }).map(elem => parseFloat(elem.amount))
+            const totalCredits = totalCreditsArr.length > 0 ? totalCreditsArr.reduce((total, elem) => {
                 return total + elem;
-            })
-            const totalCharges = -1.0* (dataRows.filter(elem => {
+            }) : 0.0;
+
+            const totalChargesArr = dataRows.filter(elem => {
                 return parseFloat(elem.amount) < 0.0
-            }).map(elem => parseFloat(elem.amount)).reduce((total, elem) => {
+            }).map(elem => parseFloat(elem.amount));
+            const totalCharges = totalChargesArr.length>0? -1.0*(totalChargesArr.reduce((total, elem) => {
                 return total + elem;
-            }));
+            })):0.0;
+
             const dataTableRows = dataRows.map(data => {
                 let cardData = null;
                 if(isGuest)
