@@ -113,6 +113,12 @@ public class PropertyController {
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
+  @GetMapping("/host/{hostId}/properties")
+  public List<SearchProperty> getProperties(@CurrentUser UserPrincipal userPrincipal, @PathVariable String hostId) {
+    return propertyService.getProperties(hostId);
+  }
+
+  @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
     Date from = searchRequest.getFrom();
