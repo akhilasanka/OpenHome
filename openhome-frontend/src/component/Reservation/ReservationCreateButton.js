@@ -15,7 +15,9 @@ class ReservationCreateButton extends Component {
         this.state.totalPrice = "Select a date range!";
         this.state.propertyId = props.propertyId;
         this.state.startDate = props.startDate;
+        this.state.startDateFormatted = new Date(props.startDate).toDateString()
         this.state.endDate =  props.endDate;
+        this.state.endDateFormatted = new Date(props.endDate).toDateString()
         this.state.enabled= props.enabled;
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -75,6 +77,14 @@ class ReservationCreateButton extends Component {
 
         return (
             <form onSubmit={this.handleSubmit} method="post">
+                <div className="form-group row">
+                    <div className="col-12 col-form-label">
+                        Dates:
+                    </div>
+                    <div className="col-12">
+                        <div id="dates">{this.state.startDateFormatted} - {this.state.endDateFormatted}</div>
+                    </div>
+                </div>
                 <div className="form-group row">
                     <div className="col-12 col-form-label">
                         Total:
