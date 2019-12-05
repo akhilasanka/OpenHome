@@ -17,6 +17,7 @@ import com.cmpe275.openhome.util.SystemDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,15 +58,19 @@ public class PaymentController {
     @GetMapping("/getvalidpaymentmethod")
     @PreAuthorize("hasRole('USER')")
     public PayMethodResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
-        final PaymentMethod payMethod = paymentMethodRepository.findById(userPrincipal.getId()).orElse(null);
+        final PaymentMethod payMethod = paymentMethodRepository.findByUserId(userPrincipal.getId());
         LocalDateTime curDateTime = SystemDateTime.getCurSystemTime();
         int curYear = curDateTime.getYear();
         int curMonth = curDateTime.getMonth().getValue();
+
         if(payMethod == null || payMethod.getExpiryYear() < curYear ||
-                (payMethod.getExpiryYear()==curYear && payMethod.getExpiryMonth()< curMonth))
+                (payMethod.getExpiryYear()==curYear && payMethod.getExpiryMonth()< curMonth)) {
+        	System.out.println("NULL");
             return new PayMethodResponse(null);
-        else
+        }
+        else {
             return new PayMethodResponse(payMethod);
+        }
     }
 
     // for testing only. Not to be called from FE.
@@ -84,4 +89,5 @@ public class PaymentController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    
 }

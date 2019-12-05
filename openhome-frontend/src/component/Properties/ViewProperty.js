@@ -7,6 +7,7 @@ import axios from 'axios';
 import {ACCESS_TOKEN, API_BASE_URL} from "../constants";
 import ReservationCreateButton from "../Reservation/ReservationCreateButton";
 import { getQueryStringValue } from '../util/URLUtils';
+import { hasValidPaymentMethod } from '../util/APIUtils';
 import {Link} from "react-router-dom";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -32,7 +33,8 @@ class PropertyDisplay extends Component {
             errorRedirect: false,
 
             startDate: getQueryStringValue('startDate'),
-            endDate: getQueryStringValue('endDate')
+            endDate: getQueryStringValue('endDate'),
+            hasValidPaymentMethod: false
         }
 
         //Bind
@@ -72,6 +74,13 @@ class PropertyDisplay extends Component {
                     errorRedirect: true
                 })
             }
+        });
+
+        hasValidPaymentMethod()
+        .then(response => {
+          this.setState({hasValidPaymentMethod: response.hasPayMethod});
+        }).catch(error => {
+          console.log(error);
         });
     }
 
@@ -317,7 +326,8 @@ class PropertyDisplay extends Component {
                     <button type="button" className="btn btn-danger align-center mb-3" onClick={this.handleDeleteProperty}>Delete Property</button>
                 </div>
         } else {
-            reservationOrEditDiv = <ReservationCreateButton propertyId={this.props.match.params.id} startDate={this.state.startDate} endDate={this.state.endDate}/>
+
+            reservationOrEditDiv = <ReservationCreateButton propertyId={this.props.match.params.id} startDate={this.state.startDate} endDate={this.state.endDate} enabled={this.state.hasValidPaymentMethod}/>
         }
 
         let navigation = <GuestNavigation />
