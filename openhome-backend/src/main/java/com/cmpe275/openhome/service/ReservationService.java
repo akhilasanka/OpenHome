@@ -404,11 +404,18 @@ public class ReservationService {
     public void checkPendingReservations() throws Exception {
     	// this will be a triggered by a background job at 3am 
     	// checks 'pending' reservations where the Start Date is in the past
-    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
+    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();    	
     	List<Reservation> pendingReservations = reservationRepository
     			.findAllPendingReservationsThatShouldBeCancelled(DateUtils.convertLocalDateTimeToDate(currentDateTime));
     	
     	for (Reservation reservation : pendingReservations) {
+        	LocalDateTime reservationStartDateTime = DateUtils.convertDateToLocalDateTime(reservation.getStartDate()); 	
+        	LocalDateTime reservationDayAfterStartDateTimeAt3AM = reservationStartDateTime.plusDays(1).withHour(3).withMinute(0).withSecond(0);
+        	    		
+    		if (currentDateTime.isBefore(reservationDayAfterStartDateTimeAt3AM)) {
+    			continue; // dont cancel early
+    		}
+    		
         	// set the reservation statuses to cancelled
         	reservation.setStatus(ReservationStatusEnum.automaticallyCanceled);
         	updateReservation(reservation);
