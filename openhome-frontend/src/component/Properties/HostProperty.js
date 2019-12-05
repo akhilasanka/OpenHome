@@ -422,7 +422,7 @@ class HostProperty extends Component {
                                     <li><a href="#" onClick={this.handlePricingClick}>Pricing</a></li>
                                 </ul>
                             </div>
-                            <div className="menu-bar-hor border col-8">
+                            <div className="menu-bar-hor col-8">
                                 <div className="add-property-form">
                                     <div className={this.state.locationActive ? "location-form show-form" : "location-form"}>
                                         <div className="location-form-headlinetext">

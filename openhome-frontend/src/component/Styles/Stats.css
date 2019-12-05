@@ -1,6 +1,24 @@
+body{
+    background-color: white !important;
+}
 .header-label {
     font-size: 22px;
+    margin-bottom: 15px;
+    margin-top: 30px;
 }
 .custom-select {
     width: 350px;
+}
+.main-header-sum{
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+.table {
+    margin: auto;
+    width: 80%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-color: #000;
 }

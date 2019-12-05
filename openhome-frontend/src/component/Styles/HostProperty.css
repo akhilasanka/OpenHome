@@ -165,7 +165,7 @@ DatePicker:focus{
     /* width: 75%; */
     background-color: white;
     margin-top:5%;
-
+    box-shadow: 10px 10px 15px 5px #aaaaaa;
 }
 
 .pad-top-20-pc{
