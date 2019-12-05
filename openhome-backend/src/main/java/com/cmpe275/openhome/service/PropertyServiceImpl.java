@@ -140,19 +140,6 @@ public class PropertyServiceImpl implements PropertyService {
 			throw new Exception(String.format("newProperty with id {} not found", newProperty.getId()));
 		}
 
-		Property oldProperty = fromDbOptional.get();
-
-		List initialAvailability = availableDaysList(oldProperty.getAvailableDays());
-		List newAvailability = availableDaysList(newProperty.getAvailableDays());
-
-		Boolean hasAvailabilityChanged = !initialAvailability.equals(newAvailability);
-
-		//if anything other than availability is changed, just save that change. if not continue
-		if(!hasAvailabilityChanged) {
-			Property savedProperty = propertyRepository.save(newProperty);
-			return EditPropertyStatus.EditSuccessful;
-		}
-
 		List<Reservation> cancelledReservations = new ArrayList<>();
 
 		List statusList = new ArrayList<>();
@@ -162,11 +149,12 @@ public class PropertyServiceImpl implements PropertyService {
 		LocalDate oneYearFromNow = currentDate.plusDays(365);
 
 		List<Reservation> reservations = reservationRepository.findReservationsBetweenDatesForGivenStatus(
-				oldProperty.getId(),
+				newProperty.getId(),
 				DateUtils.convertLocalDateToDate(currentDate),
 				DateUtils.convertLocalDateToDate(oneYearFromNow),
 				statusList
 		);
+		System.out.println("Reservations:"+reservations);
 
 		if (reservations.size() > 0 && isApprovedForPayingFine) {
 			for (Reservation r : reservations) {
@@ -178,6 +166,7 @@ public class PropertyServiceImpl implements PropertyService {
 		}
 
 		newProperty.setIsDeleted(true);
+		System.out.println("Deleted");
 		Property savedProperty = propertyRepository.save(newProperty);
 		return EditPropertyStatus.EditSuccessful;
 	}
