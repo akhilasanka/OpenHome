@@ -232,11 +232,11 @@ public class ReservationService {
     	}
     	else {
         	// if cancelled after the start date @ 3PM charge 30% for just the Start Date and Start Date + 1 if applicable
-        	long daysBetween = startDateTime.toLocalDate().until(endDateTime.toLocalDate(), ChronoUnit.DAYS);
+        	long daysBetween = currentDateTime.toLocalDate().until(endDateTime.toLocalDate(), ChronoUnit.DAYS);
         	if (daysBetween == 1) {
         		// charge 30% penalty for first day
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
-        				startDateTime.toLocalDate(),
+        				currentDateTime.toLocalDate(),
         				startDateTime.toLocalDate().plusDays(1), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
@@ -248,7 +248,7 @@ public class ReservationService {
         	else if (daysBetween > 1) {
         		// charge 30% penalty for first day and day after that 
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
-        				startDateTime.toLocalDate(),
+        				currentDateTime.toLocalDate(),
         				startDateTime.toLocalDate().plusDays(2), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
@@ -303,20 +303,12 @@ public class ReservationService {
         	reservation.setStatus(ReservationStatusEnum.hostCanceledBeforeCheckIn);
         	updateReservation(reservation);
         	
-    		// refund guest entire amount
-        	Double totalRefund = payProcessingUtil.calculateTotalPrice(
-        			startDateTime.toLocalDate(),
-        			endDateTime.toLocalDate(), 
-    				reservation.getWeekdayPrice(), 
-    				reservation.getWeekendPrice(), 
-    				reservation.getDailyParkingPrice()
-    		);
-        	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
-
-    		// if there are days within the 7 day range, host needs to pay 15% fee
-    		if (startDateTime.isBefore(currentDateTimePlus7Days)) {
+        	// check if there is an overlap between the dates
+        	boolean datesOverlap = startDateTime.isBefore(currentDateTimePlus7Days) && currentDateTime.isBefore(endDateTime);
+        	if (datesOverlap) {
+    			// if there are days within the 7 day range, host needs to pay 15% fee
     			
-    			// determine if Reservation End Date is before 6 Day Period
+    			// determine if Reservation End Date is before 7 Day Period
     			// pick the one that ends sooner
     			LocalDate penaltyEndDate;
     			if (currentDateTimePlus7Days.toLocalDate().isBefore(endDateTime.toLocalDate())) {
@@ -344,7 +336,7 @@ public class ReservationService {
     		reservation.setHostCancelationDate(cancelationDate);
         	reservation.setStatus(ReservationStatusEnum.pendingHostCancelation);
         	
-        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDateTime.plusDays(1).toLocalDate().atTime(15, 0));
+        	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(currentDateTime.plusDays(1).toLocalDate().atTime(11, 0));
         	reservation.setCheckOutDate(actualCheckOutDate);
         	updateReservation(reservation); 
         	
