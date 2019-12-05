@@ -50,6 +50,7 @@ class GuestNavigation extends Component {
                 <Navbar.Brand href="/">OpenHome</Navbar.Brand>
                 <Nav className="mr-auto">
                     <Nav.Link href="/stats/reservations">My Reservations</Nav.Link>
+                    <Nav.Link href="/stats/billing">Billing</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
