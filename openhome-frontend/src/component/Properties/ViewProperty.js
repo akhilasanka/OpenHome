@@ -12,6 +12,8 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import HostNavigation from "../Navigation/HostNavigation";
 import GuestNavigation from "../Navigation/GuestNavigation"; // Import css
+import Alert from "react-s-alert";
+import swal from 'sweetalert';
 
 class PropertyDisplay extends Component {
 
@@ -136,45 +138,60 @@ class PropertyDisplay extends Component {
     }
 
     handleDeleteProperty = () => {
-        confirmAlert({
-            title: 'Confirm Delete Property',
-            message: 'Are you sure you want to do this?',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: () => {
-                        axios.defaults.withCredentials = true;
-
-                        var data = {
-                            PropertyId: this.props.match.params.id
-                        }
-                        console.log('Data: ', data);
-
+        var propertyID = this.props.match.params.id;
+        console.log(API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/delete');
+        axios(
+            {
+                method: 'post',
+                url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/delete',
+                params: { "isPenalityApproved": false },
+                headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
+            }
+        ).then((response) => {
+            console.log("*******************");
+            console.log(response);
+            if(response.data.status=="NeedsApproval"){
+                swal({
+                    title: "Caution",
+                    text: "Changes affecting existing reservations. 15% of reservation amount will be charged as PENALITY for reservations within a week. Are you sure you want to proceed?",
+                    icon: "warning",
+                    buttons: [
+                      'No, cancel it!',
+                      'Yes, I am sure!'
+                    ],
+                    dangerMode: true,
+                  }).then(function(isConfirm) {
+                    if (isConfirm) {
                         axios(
                             {
-                                method: 'delete',
-                                url: API_BASE_URL + '/property/' + this.props.match.params.id,
-                                headers: {"Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN)}
+                                method: 'post',
+                                url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/delete',
+                                params: { "isPenalityApproved": true },
+                                headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                             }
-                        ).then(response => {
-                            if (response.status === 200) {
-                                this.props.history.push("/host/properties")
-                            }
-                        }).catch((err) => {
-                            if (err) {
-                                this.setState({
-                                    errorRedirect: true
-                                })
-                            }
+                        ).then((response) => {
+                           if(response.data.status=="EditSuccessful"){
+                            swal({
+                                title: 'OK',
+                                text: 'Updated with penality charged!',
+                                icon: 'success'
+                              });
+                           }
+                           else if(response.data.status=="EditError"){
+                                swal("Oops!","Failed to make changes. Please try again! "+response.data.message,"error");
+                           }
                         });
+                    } else {
+                      swal("Cancelled", "No changes have been made :)", "success");
                     }
-                },
-                {
-                    label: 'No',
-                    onClick: () => {}
-                }
-            ]
-        });
+                  })
+            }
+            else if(response.data.status=="EditSuccessful"){
+                swal("Sucessfully deleted property!");
+                this.props.history.push("/host/properties")
+            }
+        })
+            .catch(Alert.error("Failed to delete property. Please try again."))
     }
 
     render() {
