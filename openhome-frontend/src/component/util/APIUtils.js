@@ -112,3 +112,11 @@ export function addToCurrentSystemTime(addTimeRequest) {
       body: JSON.stringify(addTimeRequest)
   });
 }
+
+// Payment Method Utilities (HACKY)
+export function hasValidPaymentMethod() {
+  return request({
+      url: API_BASE_URL + "/pay/getvalidpaymentmethod",
+      method: 'GET'
+  });
+}

@@ -15,10 +15,11 @@ class ReservationCreateButton extends Component {
         this.state.totalPrice = "Select a date range!";
         this.state.propertyId = props.propertyId;
         this.state.startDate = props.startDate;
+        this.state.startDateFormatted = new Date(props.startDate).toDateString()
         this.state.endDate =  props.endDate;
-        if (this.state.propertyId == null){
-          this.state.propertyId = 4; // hard coded for now
-        }
+        this.state.endDateFormatted = new Date(props.endDate).toDateString()
+        this.state.enabled= props.enabled;
+
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -61,6 +62,7 @@ class ReservationCreateButton extends Component {
           createReservation(createReservationRequest)
           .then(response => {
             swal("Success!", "You've successfully created the reservation!")
+
           }).catch(error => {
               swal("Oops!", (error && error.message) || 'Oops! Something went wrong. Please try again!', "error");
           });
@@ -68,17 +70,33 @@ class ReservationCreateButton extends Component {
     }
 
     render() {
+        let buttonOrWarningElement = <button type="submit" className="btn btn-primary align-center">Reserve</button>;
+        if(localStorage.verified && localStorage.verified === "false") {
+            buttonOrWarningElement = <div className="alert alert-warning"> Please verify your email id. If you have already verified. Logout and login back again to make reservations!</div>
+        }
+        else if (!this.state.enabled){
+            buttonOrWarningElement = <div className="alert alert-warning"> To reserve you must add a payment method! <a href='/addpayment'>Click Here!</a> </div>
+        }
+
         return (
             <form onSubmit={this.handleSubmit} method="post">
+                <div className="form-group row">
+                    <div className="col-12 col-form-label">
+                        Dates:
+                    </div>
+                    <div className="col-12">
+                        <div id="dates">{this.state.startDateFormatted} - {this.state.endDateFormatted}</div>
+                    </div>
+                </div>
                 <div className="form-group row">
                     <div className="col-12 col-form-label">
                         Total:
                     </div>
                     <div className="col-12">
-                        <div id="total"><strong>{this.state.totalPrice}</strong></div>
+                        <div id="total">{this.state.totalPrice}</div>
                     </div>
                 </div>
-                <button type="submit" className="btn btn-primary align-center">Reserve</button>
+                {buttonOrWarningElement}
             </form>
         );
     }
