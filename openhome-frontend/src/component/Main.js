@@ -15,7 +15,6 @@ import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import SearchProperty from './Search/SearchProperty';
 import SearchResult from './Search/SearchResult';
-import ReservationCreate from './Reservation/ReservationCreate'
 import ReservationCancel from './Reservation/ReservationCancel'
 import ReservationCheckIn from './Reservation/ReservationCheckIn'
 import ReservationCheckOut from './Reservation/ReservationCheckOut'
@@ -42,7 +41,6 @@ class Main extends Component {
                 <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
                 <Route exact path="/host/properties" exact component={ListProperties} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
-                <Route exact path="/reservation/create" component={ReservationCreate} />
                 <Route exact path="/reservation/cancel/:id" component={ReservationCancel} />
                 <Route exact path="/reservation/checkIn/:id" component={ReservationCheckIn} />
                 <Route exact path="/reservation/checkOut/:id" component={ReservationCheckOut} />
