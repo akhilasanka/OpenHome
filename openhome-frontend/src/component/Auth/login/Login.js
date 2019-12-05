@@ -105,6 +105,13 @@ class LoginForm extends Component {
                     localStorage.setItem("id", response.data.id);
                     localStorage.setItem("role", response.data.role);
                     localStorage.setItem("verified", response.data.emailVerified);
+
+                    if(response.data.role === "host") {
+                        this.props.history.push("/host/properties")
+                    } else {
+                        this.props.history.push("/property/search")
+                    }
+                    window.location.reload(true)
                 }
               }).catch(error => {
                 console.log(error);
