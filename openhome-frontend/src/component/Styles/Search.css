@@ -1,9 +1,10 @@
 
 
+
 .backgroundImg{
     background-image: url('../img/img-house2.jpg');
      /* Full height */
-  height: 100vh; 
+  height: 100%; 
 
   /* Center and scale the image nicely */
   background-position: center;

@@ -53,7 +53,10 @@ class SearchProperty extends Component {
         }
         else {
             let curTime = new Date(this.state.curTime);
-            from.setTime(curTime.getTime());
+            from.setHours(15);
+            to.setHours(11);
+            console.log("From:"+from);
+            console.log("To:"+to);
             if (from < curTime || to <curTime) {
               swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
               validInput = false;
@@ -124,6 +127,7 @@ class SearchProperty extends Component {
                                 <div className="col-12">
                                     <div className="border-bottom row" style={{ marginBottom: "3%", marginTop: "2%" }}>
                                         <h3>Search For Property</h3>
+                                        <small>Note: check in at 3PM PST and check out at 11AM PST</small>
                                     </div>
                                     <form onSubmit={this.handleSearch} method="post">
                                         <div className="row">
@@ -190,7 +194,7 @@ class SearchProperty extends Component {
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <div className="col-12" style={{ marginTop: "-4em", marginLeft: "19em" }}>
+                                                <div className="col-12" style={{ marginTop: "-1em", marginLeft: "19em" }}>
 
                                                     <button type="submit" className="btn btn-primary align-center">Search</button>
                                                 </div>
