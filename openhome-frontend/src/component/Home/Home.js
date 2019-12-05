@@ -38,7 +38,7 @@ class Home extends Component {
         }
         if(localStorage.role && localStorage.role === "host") {
             redirectVar = <Redirect to="/host/properties" />
-        } else if(localStorage.role && localStorage.role === "host") {
+        } else if(localStorage.role && localStorage.role === "guest") {
             redirectVar = <Redirect to="/property/search" />
         }
         return (
