@@ -5,6 +5,8 @@ import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.Reservation;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.ApiResponse;
+import com.cmpe275.openhome.payload.ReservationCancelRequest;
+import com.cmpe275.openhome.payload.ReservationCheckInRequest;
 import com.cmpe275.openhome.payload.ReservationCreateRequest;
 import com.cmpe275.openhome.payload.ReservationPriceRequest;
 import com.cmpe275.openhome.repository.UserRepository;
@@ -16,6 +18,7 @@ import com.cmpe275.openhome.util.PayProcessingUtil;
 import com.cmpe275.openhome.util.DateUtils;
 
 import java.net.URI;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -46,7 +49,7 @@ public class ReservationController {
     
     @PostMapping("/reservation/create")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> testCreate(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationCreateRequest createRequest) {
+    public ResponseEntity<?> createReservation(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationCreateRequest createRequest) {
     	User guest = userRepository.findById(userPrincipal.getId())
     			.orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
     	
@@ -93,6 +96,101 @@ public class ReservationController {
         
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "Reservation created successfully!"));
+    }
+    
+    @PostMapping("/reservation/cancel")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> cancelReservation(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationCancelRequest cancelRequest) {
+    	User user = userRepository.findById(userPrincipal.getId())
+    			.orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+    	
+    	Reservation reservation = reservationService.findReservation(cancelRequest.getReservationId());
+    	
+    	boolean isGuest = reservation.getGuest().getId().equals(user.getId());
+    	boolean isHost = reservation.getProperty().getOwner().getId().equals(user.getId());
+        DecimalFormat df = new DecimalFormat("0.00");
+    	Double penalty = new Double(0);
+
+    	try {
+    		
+    		if (isGuest) {
+    			penalty = reservationService.guestCancelReservation(reservation);
+    		}
+    		else if (isHost) {
+    			penalty = reservationService.hostCancelReservation(reservation);
+    		}
+    		else {
+    			throw new Exception("User is neither host nor guest of this reservation. Cannot cancel!");
+    		}
+    	}
+    	catch (Exception e) {
+    		return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage()));
+    	}
+    	
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/reservation/cancel")
+                .buildAndExpand(reservation.getId()).toUri();
+        
+        return ResponseEntity.created(location)
+                .body(new ApiResponse(true, "Reservation was canceled successfully! A penalty of $" + df.format(penalty.doubleValue()) + " was charged."));
+    }
+    
+    @PostMapping("/reservation/checkIn")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> checkInReservation(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationCheckInRequest cancelRequest) {
+    	User user = userRepository.findById(userPrincipal.getId())
+    			.orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+    	
+    	Reservation reservation = reservationService.findReservation(cancelRequest.getReservationId());
+    	boolean isGuest = reservation.getGuest().getId().equals(user.getId());
+
+    	try {
+    		if (isGuest) {
+    			reservationService.checkInReservation(reservation);
+    		}
+    		else {
+    			throw new Exception("User is not a guest of this reservation. Cannot check-in!");
+    		}
+    	}
+    	catch (Exception e) {
+    		return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage()));
+    	}
+    	
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/reservation/checkIn")
+                .buildAndExpand(reservation.getId()).toUri();
+        
+        return ResponseEntity.created(location)
+                .body(new ApiResponse(true, "Reservation was checked-in successfuly! Enjoy your stay!"));
+    }
+    
+    @PostMapping("/reservation/checkOut")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> checkOutReservation(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReservationCheckInRequest cancelRequest) {
+    	User user = userRepository.findById(userPrincipal.getId())
+    			.orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+    	
+    	Reservation reservation = reservationService.findReservation(cancelRequest.getReservationId());
+    	boolean isGuest = reservation.getGuest().getId().equals(user.getId());
+
+    	try {
+    		if (isGuest) {
+    			reservationService.checkInReservation(reservation);
+    		}
+    		else {
+    			throw new Exception("User is not a guest of this reservation. Cannot check-out!");
+    		}
+    	}
+    	catch (Exception e) {
+    		return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage()));
+    	}
+    	
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/reservation/checkOut")
+                .buildAndExpand(reservation.getId()).toUri();
+        
+        return ResponseEntity.created(location)
+                .body(new ApiResponse(true, "Reservation was checked-out successfuly! See you next time!"));
     }
     
     @PostMapping("/reservation/priceRequest")
