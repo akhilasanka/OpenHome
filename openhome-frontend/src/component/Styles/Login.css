@@ -168,6 +168,17 @@
     background-color: #40a9ff;
     border-color: #40a9ff;
   }
+
+  .btn-danger {
+      color: #fff;
+      background-color: #cc0020;
+      border-color: #cc0020;
+  }
+
+  .btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active {
+    background-color: #cc0020;
+    border-color: #cc0020;
+  }
   
   .btn-success {
       color: #fff;

@@ -28,6 +28,7 @@ class OAuth2RedirectHandler extends Component {
                     console.log(response.data);
                     localStorage.setItem("id", response.data.id);
                     localStorage.setItem("role", response.data.role);
+                    localStorage.setItem("verified", response.data.emailVerified);
                 }
               }).catch(error => {
                 console.log(error);

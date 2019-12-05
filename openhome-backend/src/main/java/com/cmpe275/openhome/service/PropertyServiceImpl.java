@@ -239,11 +239,29 @@ public class PropertyServiceImpl implements PropertyService {
 				.orElseThrow(() -> new ResourceNotFoundException("Property", "id", propertyId));
 	}
 
-	
-	@Override
+    @Override
+    public List<SearchProperty> getProperties(String hostId) {
+        List<Property> properties = propertyRepository.findByOwnerId(Long.parseLong(hostId));
+		List<SearchProperty> searchProperties = new ArrayList<>();
+		for (Property p : properties) {
+			String imagesString = p.getPhotosArrayJson();
+			String[] images = imagesString.split(",");
+			String imageUrl = "";
+			if (images.length > 0) {
+				imageUrl = images[0].replace("[", "").replace("\"", "").replace("]", "");
+			}
+			SearchProperty sp = new SearchProperty(imageUrl, p.getId(), p.getHeadline(), p.getAddressStreet(), p.getAddressCity(), p.getAddressState(), p.getAddressZipcode(), p.getWeekdayPrice(), p.getWeekendPrice());
+			searchProperties.add(sp);
+		}
+		return searchProperties;
+	  }
+
+
+
+    @Override
     public boolean isDateRangeValid(Property property, LocalDate startDate, LocalDate endDate) {
     	boolean isValid = true;
-    	
+
     	List<DayOfWeek> availableDaysList = getAvailableDaysList(property.getAvailableDays());
     	for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
     		if (!availableDaysList.contains(date.getDayOfWeek())) {
@@ -251,7 +269,7 @@ public class PropertyServiceImpl implements PropertyService {
     			break;
     		}
     	}
-    	
+
     	return isValid;
     }
 

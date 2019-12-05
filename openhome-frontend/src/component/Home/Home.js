@@ -24,6 +24,7 @@ class Home extends Component {
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem("id");
         localStorage.removeItem("role");
+        localStorage.removeItem("verified")
         this.setState({
         });
         console.log("safely logged out!");
@@ -34,6 +35,9 @@ class Home extends Component {
         let redirectVar = '';
         if (!localStorage.getItem(ACCESS_TOKEN)) {
             redirectVar = <Redirect to="/login" />
+        }
+        if(localStorage.role && localStorage.role === "host") {
+            redirectVar = <Redirect to="/host/properties" />
         }
         return (
             

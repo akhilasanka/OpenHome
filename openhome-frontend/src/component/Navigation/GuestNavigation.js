@@ -33,6 +33,7 @@ class GuestNavigation extends Component {
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem("id");
         localStorage.removeItem("role");
+        localStorage.removeItem("verified")
         this.setState({
         });
         console.log("safely logged out!");

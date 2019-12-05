@@ -7,9 +7,10 @@ import { ACCESS_TOKEN, CLIENT_BASE_URL } from '../constants';
 import Alert from 'react-s-alert';
 import { timingSafeEqual } from 'crypto';
 import {Nav,Navbar} from 'react-bootstrap';
+import {Link} from "react-router-dom";
 
 
-class GuestNavigation extends Component {
+class HostNavigation extends Component {
     //call the constructor method
     constructor(props) {
         //Call the constrictor of Super class i.e The Component
@@ -33,6 +34,7 @@ class GuestNavigation extends Component {
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem("id");
         localStorage.removeItem("role");
+        localStorage.removeItem("verified")
         this.setState({
         });
         console.log("safely logged out!");
@@ -48,8 +50,9 @@ class GuestNavigation extends Component {
                 <Navbar bg="dark" variant="dark">
                 <Navbar.Brand href="/">OpenHome</Navbar.Brand>
                 <Nav className="mr-auto">
-                    <Nav.Link href="#home">My Properties</Nav.Link>
+                    <Nav.Link href="/host/properties">My Properties</Nav.Link>
                     <Nav.Link href="/property/host">Add Property</Nav.Link>
+                    <Nav.Link href="/stats/reservations">Reservations</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
@@ -72,4 +75,4 @@ class GuestNavigation extends Component {
         )
     }
 }
-export default GuestNavigation;
+export default HostNavigation;

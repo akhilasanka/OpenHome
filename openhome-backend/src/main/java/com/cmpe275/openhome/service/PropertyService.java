@@ -21,6 +21,8 @@ public interface PropertyService {
 	List<SearchProperty> searchProperties(SearchRequest searchRequest);
 
 	Property getProperty(String propertyId);
-	
+
     boolean isDateRangeValid(Property property, LocalDate startDate, LocalDate endDate);
+
+	List<SearchProperty> getProperties(String hostId);
 }
