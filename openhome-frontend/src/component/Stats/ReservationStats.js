@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import '../Styles/Stats.css';
 import axios from 'axios';
 import {API_BASE_URL, ACCESS_TOKEN } from '../constants';
-import Alert from 'react-s-alert';
+import GuestNavigation from '../Navigation/GuestNavigation';
+import HostNavigation from '../Navigation/HostNavigation';
 
 class ReservationStats extends Component {
     constructor(props) {
@@ -61,9 +62,9 @@ class ReservationStats extends Component {
         let curTable = noData;
         let futureTable = noData;
         let headerLabel = "Your reservation Summary";
-        
+        const isGuest = localStorage.getItem("role") === "guest";
         if(this.state.data!=null && this.state.selected_option!=null) {
-            const isGuest = localStorage.getItem("role") === "guest";
+            
             pastTable = this.makeTable(this.state.data.past);
             curTable = this.makeTable(this.state.data.current);
             futureTable = this.makeTable(this.state.data.future);
@@ -83,7 +84,10 @@ class ReservationStats extends Component {
                 </select>
             }
         }
+        let navigation = isGuest? <GuestNavigation/> : <HostNavigation/>;
         return(
+            <div>
+                {navigation}
             <div>
                 <div className="header-label">{headerLabel}</div>
                 <div>{select}</div>
@@ -93,6 +97,7 @@ class ReservationStats extends Component {
                 <div>{curTable}</div>
                 <div className="header-label">Future Reservations</div>
                 <div>{futureTable}</div>
+            </div>
             </div>
         )
     }
