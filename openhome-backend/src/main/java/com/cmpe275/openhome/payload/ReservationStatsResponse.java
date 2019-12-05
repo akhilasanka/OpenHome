@@ -63,7 +63,7 @@ public class ReservationStatsResponse {
     }
 
     public static class ReservationItem {
-        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-YYYY");
+        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-YYYY");
         private Long reservationId;
         private Long PropertyId;
         private String propertyName;
