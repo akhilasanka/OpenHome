@@ -95,7 +95,7 @@ class ReservationStats extends Component {
             curTable = this.makeTable(this.state.data.current);
             futureTable = this.makeTable(this.state.data.future);
             if(!isGuest) {
-                headerLabel = "Your reservation Summary for";
+                headerLabel = "Reservation Summary for your properties";
                 let options = Object.keys(this.state.data.validProperties).map(key => {
                         if(this.state.selected_option === key) {
                             return <option value={key} selected> {this.state.data.validProperties[key]}</option>

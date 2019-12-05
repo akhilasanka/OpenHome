@@ -49,12 +49,13 @@ class GuestNavigation extends Component {
                 <Navbar bg="dark" variant="dark">
                 <Navbar.Brand href="/">OpenHome</Navbar.Brand>
                 <Nav className="mr-auto">
+                    <Nav.Link href="/property/search">Search</Nav.Link>
                     <Nav.Link href="/stats/reservations">My Reservations</Nav.Link>
                     <Nav.Link href="/stats/billing">Billing</Nav.Link>
-                    <Nav.Link href="/system/timeManagement">Time Management</Nav.Link>
                     <Nav.Link href="/addpayment">Add Payment</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
+                    <Nav.Link href="/system/timeManagement">Time Management</Nav.Link>
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
                 </Nav>
             </Navbar>
