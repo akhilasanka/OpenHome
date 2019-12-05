@@ -49,6 +49,7 @@ class GuestNavigation extends Component {
                 <Navbar bg="dark" variant="dark">
                 <Navbar.Brand href="/">OpenHome</Navbar.Brand>
                 <Nav className="mr-auto">
+                    <Nav.Link href="/property/search">Search</Nav.Link>
                     <Nav.Link href="/stats/reservations">My Reservations</Nav.Link>
                     <Nav.Link href="/stats/billing">Billing</Nav.Link>
                     <Nav.Link href="/addpayment">Add Payment</Nav.Link>
