@@ -75,7 +75,7 @@ class ReservationCreateButton extends Component {
                         Total:
                     </div>
                     <div className="col-12">
-                        <div id="total">{this.state.totalPrice}</div>
+                        <div id="total"><strong>{this.state.totalPrice}</strong></div>
                     </div>
                 </div>
                 <button type="submit" className="btn btn-primary align-center">Reserve</button>
