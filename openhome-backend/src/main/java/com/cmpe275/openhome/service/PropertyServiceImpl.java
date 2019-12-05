@@ -200,7 +200,7 @@ public class PropertyServiceImpl implements PropertyService {
 
 		List<Property> properties = propertyRepositoryCustom.findPropertiesBySearchCriteria(searchRequest, reserved_property_ids);
 
-		List<Integer> requiredDays = getDaysForDateRange(searchRequest.getFrom(), searchRequest.getTo());
+		Set<Integer> requiredDays = getDaysForDateRange(searchRequest.getFrom(), searchRequest.getTo());
 		System.out.println("Required Days"+requiredDays);
 
 		List<SearchProperty> searchProperties = new ArrayList<>();
@@ -324,7 +324,7 @@ public class PropertyServiceImpl implements PropertyService {
 		);
 
 		for (Reservation r : reservations) {
-			List<Integer> bookedDays = getDaysForDateRange(r.getStartDate(), r.getEndDate());
+			Set<Integer> bookedDays = getDaysForDateRange(r.getStartDate(), r.getEndDate());
 			for (Integer day : bookedDays) {
 				if (!newAvailableDays.contains(day)){
 					conflictingReservations.add(r);
@@ -336,11 +336,11 @@ public class PropertyServiceImpl implements PropertyService {
 		return conflictingReservations;
 	}
 
-	private List<Integer> getDaysForDateRange(Date startDate, Date endDate) {
+	private Set<Integer> getDaysForDateRange(Date startDate, Date endDate) {
 	  	System.out.println("Start Date:"+startDate);
 	  	System.out.println("End Date:"+endDate);
 
-		List days = new ArrayList();
+		Set days = new HashSet();
 		Date current = startDate;
 
 		while (current.before(endDate)) {
