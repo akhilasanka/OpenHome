@@ -237,7 +237,7 @@ public class ReservationService {
         		// charge 30% penalty for first day
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
         				currentDateTime.toLocalDate(),
-        				startDateTime.toLocalDate().plusDays(1), 
+        				currentDateTime.toLocalDate().plusDays(1), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
         				reservation.getDailyParkingPrice()
@@ -249,7 +249,7 @@ public class ReservationService {
         		// charge 30% penalty for first day and day after that 
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
         				currentDateTime.toLocalDate(),
-        				startDateTime.toLocalDate().plusDays(2), 
+        				currentDateTime.toLocalDate().plusDays(2), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
         				reservation.getDailyParkingPrice()
@@ -389,6 +389,7 @@ public class ReservationService {
 
 	public List<Reservation> findAllReservationsPendingBasedOnCheckoutDate(Date startDate, Date endDate){
 		List statuses = new ArrayList();
+		statuses.add(ReservationStatusEnum.checkedOut);
 		statuses.add(ReservationStatusEnum.automaticallyCanceled);
 		statuses.add(ReservationStatusEnum.guestCanceledAfterCheckIn);
 		statuses.add(ReservationStatusEnum.hostCanceledAfterCheckIn);
@@ -409,7 +410,7 @@ public class ReservationService {
     	
     	for (Reservation reservation : pendingReservations) {
         	// set the reservation statuses to cancelled
-        	reservation.setStatus(ReservationStatusEnum.checkedOut);
+        	reservation.setStatus(ReservationStatusEnum.automaticallyCanceled);
         	updateReservation(reservation);
         	
         	try {
@@ -459,8 +460,7 @@ public class ReservationService {
     	// set the reservation statuses to checkedOut
     	for (Reservation reservation : checkedInReservations) {
         	// set the reservation statuses to automatically cancelled and set end date
-        	reservation.setStatus(ReservationStatusEnum.automaticallyCanceled);
-        	
+        	reservation.setStatus(ReservationStatusEnum.checkedOut);
         	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(DateUtils.convertDateToLocalDate(reservation.getStartDate()).plusDays(1).atTime(11, 0));
         	reservation.setCheckOutDate(actualCheckOutDate);
         	updateReservation(reservation);
