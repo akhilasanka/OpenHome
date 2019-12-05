@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import {API_BASE_URL, ACCESS_TOKEN } from '../constants';
 import Alert from 'react-s-alert';
+import GuestNavigation from '../Navigation/GuestNavigation';
+import HostNavigation from '../Navigation/HostNavigation';
 
 class AddPayMethod extends Component {
     constructor(props) {
@@ -68,7 +70,11 @@ class AddPayMethod extends Component {
             "margin": "auto",
             "margin-top": "30px"
         }
+        const isGuest = localStorage.getItem("role") === "guest";
+        let navigation = isGuest? <GuestNavigation/> : <HostNavigation/>;
         return (
+          <div>
+            {navigation}
             <div className="tab-content" style={tabContent}>
               <form role="form" onSubmit={this.handleSubmit}>
               <div className="form-group">
@@ -112,6 +118,7 @@ class AddPayMethod extends Component {
             </form>
 
             </div>
+          </div>
         );
     }
 }
