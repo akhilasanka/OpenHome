@@ -7,6 +7,11 @@ import axios from 'axios';
 import {ACCESS_TOKEN, API_BASE_URL} from "../constants";
 import ReservationCreateButton from "../Reservation/ReservationCreateButton";
 import { getQueryStringValue } from '../util/URLUtils';
+import {Link} from "react-router-dom";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import HostNavigation from "../Navigation/HostNavigation";
+import GuestNavigation from "../Navigation/GuestNavigation"; // Import css
 
 class PropertyDisplay extends Component {
 
@@ -35,6 +40,7 @@ class PropertyDisplay extends Component {
         this.handleArrivalDateChange = this.handleArrivalDateChange.bind(this);
         this.handleDepartureDateChange = this.handleDepartureDateChange.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleDeleteProperty = this.handleDeleteProperty.bind(this);
     }
 
     componentDidMount() {
@@ -126,6 +132,48 @@ class PropertyDisplay extends Component {
 
         this.setState({
             [name]: value
+        });
+    }
+
+    handleDeleteProperty = () => {
+        confirmAlert({
+            title: 'Confirm Delete Property',
+            message: 'Are you sure you want to do this?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => {
+                        axios.defaults.withCredentials = true;
+
+                        var data = {
+                            PropertyId: this.props.match.params.id
+                        }
+                        console.log('Data: ', data);
+
+                        axios(
+                            {
+                                method: 'delete',
+                                url: API_BASE_URL + '/property/' + this.props.match.params.id,
+                                headers: {"Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN)}
+                            }
+                        ).then(response => {
+                            if (response.status === 200) {
+                                this.props.history.push("/host/properties")
+                            }
+                        }).catch((err) => {
+                            if (err) {
+                                this.setState({
+                                    errorRedirect: true
+                                })
+                            }
+                        });
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {}
+                }
+            ]
         });
     }
 
@@ -257,36 +305,29 @@ class PropertyDisplay extends Component {
                 <div><h6>Weekends: <strong>${this.state.propertyDetails.weekendPrice.toFixed(2)}</strong><span> per night</span></h6></div>
         }
 
-        // let parkingCost = "";
-        // if(this.state.parkingFree === 'No') {
-        //     parkingCost = <div className="form-group">
-        //         <label htmlFor="parkingCost"  className="col-sm-3">Daily Parking Fee</label>
-        //         <input type="number" name="parkingCost" id="parkingCost" className="form-control form-control-lg" placeholder="in USD" onChange={this.handleInputChange} />
-        //     </div>
-        // }
-        //
-        //
-        // let weekdayRentPrice = "";
-        // if(this.state.alwaysAvailable === 'Yes'
-        //     || this.state.weeklyAvailability.some(item => this.state.weekdays.includes(item)) ) {
-        //     weekdayRentPrice = <div className="form-group">
-        //         <label htmlFor="alwaysAvailable" className="col-sm-3">Weekday Rent Price</label>
-        //         <input type="number" name="weekdayRentPrice" id="weekdayRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} />
-        //     </div>
-        // }
-        //
-        // let weekendRentPrice = "";
-        // if(this.state.alwaysAvailable === 'Yes'
-        //     || this.state.weeklyAvailability.some(item => this.state.weekends.includes(item)) ) {
-        //     weekendRentPrice = <div className="form-group">
-        //         <label htmlFor="alwaysAvailable" className="col-sm-3">Weekend Rent Price</label>
-        //         <input type="number" name="weekendRentPrice" id="weekendRentPrice" className="form-control form-control-lg" onChange={this.handleInputChange} />
-        //     </div>
-        // }
+        let reservationOrEditDiv = ""
+        if(this.state.propertyDetails.owner)
+            if(this.state.propertyDetails.owner.id.toString() === localStorage.id.toString()) {
+            console.log("Owner view")
+            let propertyEditLink = "/property/host/edit/" + this.props.match.params.id
+                reservationOrEditDiv =
+                <div>
+                    <a href={propertyEditLink} className="btn btn-primary align-center mb-3"> Edit Details </a>
+                    <br />
+                    <button type="button" className="btn btn-danger align-center mb-3" onClick={this.handleDeleteProperty}>Delete Property</button>
+                </div>
+        } else {
+            reservationOrEditDiv = <ReservationCreateButton propertyId={this.props.match.params.id} startDate={this.state.startDate} endDate={this.state.endDate}/>
+        }
+
+        let navigation = <GuestNavigation />
+        if(localStorage.role == "host") {
+            navigation = <HostNavigation />
+        }
 
         return (
             <div>
-                {/*{redrirectVar}*/}
+                {navigation}
                 <div className=" container property-display-content border">
                     <div className="row">
                         <div className="details-content-headline-text col-12 "><br/><h4>
@@ -376,7 +417,7 @@ class PropertyDisplay extends Component {
                                 {weekendRentPrice}
                             </div>
                             <div>
-                                <ReservationCreateButton propertyId={this.props.match.params.id} startDate={this.state.startDate} endDate={this.state.endDate}/>
+                                {reservationOrEditDiv}
                                 <hr/>
                                 <div className="center-content">
                                     <label htmlFor="ownername">Property Owner: </label>
