@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import {API_BASE_URL, ACCESS_TOKEN } from '../constants';
-import Alert from 'react-s-alert';
+import GuestNavigation from '../Navigation/GuestNavigation';
+import HostNavigation from '../Navigation/HostNavigation';
 
 class BillingStats extends Component {
     constructor(props) {
@@ -98,10 +99,9 @@ class BillingStats extends Component {
         let noData = <div>There were no charges for {this.state.selected_month}</div>; 
         let pastTable = noData;
         let headerLabel = "Your billing Summary";
-        
+        const isGuest = localStorage.getItem("role") === "guest";
         if(this.state.data!=null && this.state.selected_option!=null 
             && this.state.selected_month!=null) {
-            const isGuest = localStorage.getItem("role") === "guest";
             pastTable = this.makeTable(this.state.data.lineItems, isGuest);
             if(!isGuest) {
                 headerLabel = "Your billing Summary for";
@@ -129,13 +129,17 @@ class BillingStats extends Component {
                     {monthOptions}
                 </select>;
         }
+        let navigation = isGuest? <GuestNavigation/> : <HostNavigation/>;
         return(
+            <div>
+                {navigation}
             <div>
                 <div className="header-label">{headerLabel}</div>
                 <div>{select}</div>
                 <div>{monthselect}</div>
                 <div className="header-label">Billing line items</div>
                 <div>{pastTable}</div>
+            </div>
             </div>
         )
 
