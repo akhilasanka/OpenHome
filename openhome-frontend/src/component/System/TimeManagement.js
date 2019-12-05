@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import { getCurrentSystemTime, addToCurrentSystemTime } from '../util/APIUtils';
 import swal from 'sweetalert';
+import GuestNavigation from '../Navigation/GuestNavigation';
+import HostNavigation from '../Navigation/HostNavigation';
 
 class TimeManagement extends Component {
     render() {
@@ -14,8 +16,11 @@ class TimeManagement extends Component {
             }}/>;
         }
 
+        const isGuest = localStorage.getItem("role") === "guest";
+        let navigation = isGuest? <GuestNavigation/> : <HostNavigation/>;
         return (
             <div>
+                {navigation}
                 <div className="container">
                     <div className="content">
                         <div className="card">
