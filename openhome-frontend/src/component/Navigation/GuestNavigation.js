@@ -52,6 +52,7 @@ class GuestNavigation extends Component {
                     <Nav.Link href="/stats/reservations">My Reservations</Nav.Link>
                     <Nav.Link href="/stats/billing">Billing</Nav.Link>
                     <Nav.Link href="/system/timeManagement">Time Management</Nav.Link>
+                    <Nav.Link href="/addpayment">Add Payment</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>

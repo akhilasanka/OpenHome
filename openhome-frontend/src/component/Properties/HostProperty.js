@@ -245,9 +245,9 @@ class HostProperty extends Component {
 
         if(localStorage.verified && localStorage.verified === "false") {
             return(
-                <div className="container-fluid">
+                <div>
                     <HostNavigation />
-                    <div>
+                    <div className="container-fluid">
                         <br/>
                         <br/>
                         Please verify your email id. If you have already verified. Logout and login back again to list your property!

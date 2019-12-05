@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Long> {
     @Query("SELECT pm FROM PaymentMethod pm, Reservation r WHERE r.guest.id=pm.user.id AND r.id=:rid")
     PaymentMethod getPayByReservationId(@Param("rid") Long rid);
-    
-    @Query("SELECT pm FROM PaymentMethod pm WHERE pm.user.id = :userId")
+  
+    @Query("SELECT pm FROM PaymentMethod pm WHERE pm.user.id=:userId")
     PaymentMethod findByUserId(Long userId);
 }

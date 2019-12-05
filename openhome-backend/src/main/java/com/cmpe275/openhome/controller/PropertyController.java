@@ -1,5 +1,6 @@
 package com.cmpe275.openhome.controller;
 
+import antlr.StringUtils;
 import com.cmpe275.openhome.model.Property;
 import com.cmpe275.openhome.model.User;
 import com.cmpe275.openhome.payload.*;
@@ -92,18 +93,17 @@ public class PropertyController {
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
   @PreAuthorize("hasRole('USER')")
-  public EditPropertyResponse deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
-    User owner = userRepository.getOne(Long.parseLong(hostId));
-    Property property = PropertyJsonToModelUtil.getProperty(postPropertyRequest, owner);
-    property.setId(propertyId);
-    EditPropertyStatus editStatus;
+  public EditPropertyResponse deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId) throws Exception {
+
+    Property property = propertyService.getProperty(String.valueOf(propertyId));
+    EditPropertyStatus deleteStatus;
     try {
-      editStatus = propertyService.deleteProperty(property, isPenalityApproved);
+      deleteStatus = propertyService.deleteProperty(property, isPenalityApproved);
     } catch(Exception e) {
-      editStatus = EditPropertyStatus.EditError;
-      return new EditPropertyResponse(editStatus, e.getMessage());
+      deleteStatus = EditPropertyStatus.EditError;
+      return new EditPropertyResponse(deleteStatus, e.getMessage());
     }
-    return new EditPropertyResponse(editStatus, "");
+    return new EditPropertyResponse(deleteStatus, "");
   }
 
   @CrossOrigin(origins = "http://localhost:3000")
