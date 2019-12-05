@@ -54,6 +54,7 @@ class HostNavigation extends Component {
                     <Nav.Link href="/property/host">Add Property</Nav.Link>
                     <Nav.Link href="/stats/reservations">Reservations</Nav.Link>
                     <Nav.Link href="/stats/billing">Billing</Nav.Link>
+                    <Nav.Link href="/system/timeManagement">Time Management</Nav.Link>
                 </Nav>
                 <Nav className="mr-sm-2">
                     <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
@@ -71,8 +72,8 @@ class HostNavigation extends Component {
             </Navbar>
             }
             </div>
-            
-            
+
+
         )
     }
 }

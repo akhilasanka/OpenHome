@@ -44,7 +44,9 @@ public class PaymentController {
         if(request == null || !request.validate()) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Unparsable request"));
         }
-        final PaymentMethod paymentMethod = new PaymentMethod();
+        PaymentMethod paymentMethod = paymentMethodRepository.findByUserId(request.getUserid());
+        if(paymentMethod == null)
+            paymentMethod = new PaymentMethod();
         final User user = userRepository.findById(request.getUserid()).orElse(null);
         paymentMethod.parseAddPayRequest(request, user);
         final PaymentMethod result = paymentMethodRepository.save(paymentMethod);
@@ -57,7 +59,7 @@ public class PaymentController {
     @GetMapping("/getvalidpaymentmethod")
     @PreAuthorize("hasRole('USER')")
     public PayMethodResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
-        final PaymentMethod payMethod = paymentMethodRepository.findById(userPrincipal.getId()).orElse(null);
+        final PaymentMethod payMethod = paymentMethodRepository.findByUserId(userPrincipal.getId());
         LocalDateTime curDateTime = SystemDateTime.getCurSystemTime();
         int curYear = curDateTime.getYear();
         int curMonth = curDateTime.getMonth().getValue();
