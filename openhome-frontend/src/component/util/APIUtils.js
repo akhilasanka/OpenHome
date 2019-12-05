@@ -80,6 +80,13 @@ export function getReservationPrice(getReservationPriceRequest) {
   });
 }
 
+export function getReservation(reservationId) {
+  return request({
+      url: API_BASE_URL + "/reservation/" + reservationId,
+      method: 'GET'
+  });
+}
+
 // System Time Related Methods
 export function getCurrentSystemTime() {
   var options = {
