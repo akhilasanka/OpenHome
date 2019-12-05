@@ -109,7 +109,7 @@ class BillingStats extends Component {
             && this.state.selected_month!=null) {
             pastTable = this.makeTable(this.state.data.lineItems, isGuest);
             if(!isGuest) {
-                headerLabel = "Your billing Summary for";
+                headerLabel = "The billing Summary for your properties";
                 let options = Object.keys(this.state.data.validProperties).map(key => {
                         if(this.state.selected_option === key) {
                             return <option value={key} selected> {this.state.data.validProperties[key]}</option>
