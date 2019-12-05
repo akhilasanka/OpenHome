@@ -35,7 +35,7 @@ public class OpenhomeApplication extends SpringBootServletInitializer {
     @Bean
     public TaskScheduler taskScheduler() {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(2);
+        scheduler.setPoolSize(3);
         return scheduler;
     }
     
@@ -77,8 +77,8 @@ public class OpenhomeApplication extends SpringBootServletInitializer {
     public void scheduleHostCancelReservationProcess() {
     	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
     	
-    	// schedule 'checkPendingReservations' at 3pm
-    	LocalDateTime threePm = currentDateTime.withHour(15).withMinute(0).withSecond(0);
+    	// schedule 'checkPendingReservations' at 11am
+    	LocalDateTime threePm = currentDateTime.withHour(11).withMinute(0).withSecond(0);
     	long diff = Math.abs(ChronoUnit.SECONDS.between(currentDateTime, threePm));
     	if (diff < 30) {
     		try {
