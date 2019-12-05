@@ -21,6 +21,7 @@ import VerifyAuthCode from './Auth/signup/VerifyAuthCode';
 import EditProperty from './Properties/EditProperty';
 import ReservationStats from './Stats/ReservationStats';
 import BillingStats from './Stats/BillingStats';
+import ListProperties from "./Properties/ListProperties";
 
 class Main extends Component {
     render() {
@@ -36,6 +37,7 @@ class Main extends Component {
                 <Route exact path="/property/host" exact component={HostProperty} />
                 <Route exact path="/property/view/:id" exact component={ViewProperty} />
                 <Route exact path="/property/host/edit/:propertyID" exact component={EditProperty} />
+                <Route exact path="/host/properties" exact component={ListProperties} />
                 <Route exact path="/addpayment" component={AddPayMethod} />
                 <Route exact path="/reservation/create" component={ReservationCreate} />
                 <Route exact path="/system/timeManagement" component={TimeManagement} />
