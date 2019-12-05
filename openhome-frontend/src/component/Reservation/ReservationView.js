@@ -295,8 +295,8 @@ class ViewReservation extends Component {
 
                                 <div>
                                     <hr/>
-                                    <div className="row">
-                                      {cancelButton}
+                                    <div className="row row-align">
+                                      <p className="btn-align">{cancelButton}</p>
                                       {checkInButton}
                                       {checkOutButton}
                                     </div>
