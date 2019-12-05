@@ -61,9 +61,11 @@ class SearchProperty extends Component {
               swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
               validInput = false;
             }
-
-            if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
-                swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+            console.log("min:"+priceMin);
+            console.log("max:"+priceMax);
+            console.log("isgreater:"+priceMin > priceMax);
+            if (priceMax != '' && priceMin != '' && parseInt(priceMin) > parseInt(priceMax)) {
+                swal("Oops!", "Please make sure Max price is greater than Min price.", "error");
                 validInput = false;
             }
         }

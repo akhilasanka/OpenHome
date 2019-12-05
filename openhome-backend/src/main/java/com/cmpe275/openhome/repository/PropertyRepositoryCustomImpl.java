@@ -39,12 +39,13 @@ public class PropertyRepositoryCustomImpl implements PropertyRepositoryCustom {
             predicates.add(cb.equal(propertyTable.get("sharingType"), searchRequest.getSharingType()));
         }
 
+        System.out.println("Property type:"+searchRequest.getPropertyType());
         if (!searchRequest.getPropertyType().equals("Any")) {
-            if (searchRequest.getPropertyType() == "house") {
+            if (searchRequest.getPropertyType().equals("house")) {
                 predicates.add(cb.equal(propertyTable.get("propertyType"), "House"));
-            } else if (searchRequest.getPropertyType() == "townHouse") {
+            } else if (searchRequest.getPropertyType().equals("townHouse")) {
                 predicates.add(cb.equal(propertyTable.get("propertyType"), "Townhouse"));
-            } else if (searchRequest.getPropertyType() == "condoApt") {
+            } else if (searchRequest.getPropertyType().equals("condoApt")) {
                 predicates.add(cb.equal(propertyTable.get("propertyType"), "Condo/Apartment"));
             }
         }
@@ -84,7 +85,7 @@ public class PropertyRepositoryCustomImpl implements PropertyRepositoryCustom {
             List<Predicate> keyword_predicates = new ArrayList<Predicate>();
 
             for (String keyword : keywords) {
-                keyword_predicates.add(cb.like(propertyTable.get("description"), keyword));
+                keyword_predicates.add(cb.like(propertyTable.get("description"), "%"+keyword+"%"));
             }
             predicates.add(cb.or(keyword_predicates.toArray(new Predicate[]{})));
         }

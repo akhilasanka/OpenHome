@@ -176,6 +176,7 @@ class PropertyDisplay extends Component {
                                 text: 'Updated with penality charged!',
                                 icon: 'success'
                               });
+                            this.props.history.push("/host/properties")
                            }
                            else if(response.data.status=="EditError"){
                                 swal("Oops!","Failed to make changes. Please try again! "+response.data.message,"error");
