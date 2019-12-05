@@ -232,11 +232,11 @@ public class ReservationService {
     	}
     	else {
         	// if cancelled after the start date @ 3PM charge 30% for just the Start Date and Start Date + 1 if applicable
-        	long daysBetween = startDateTime.toLocalDate().until(endDateTime.toLocalDate(), ChronoUnit.DAYS);
+        	long daysBetween = currentDateTime.toLocalDate().until(endDateTime.toLocalDate(), ChronoUnit.DAYS);
         	if (daysBetween == 1) {
         		// charge 30% penalty for first day
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
-        				startDateTime.toLocalDate(),
+        				currentDateTime.toLocalDate(),
         				startDateTime.toLocalDate().plusDays(1), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
@@ -248,7 +248,7 @@ public class ReservationService {
         	else if (daysBetween > 1) {
         		// charge 30% penalty for first day and day after that 
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
-        				startDateTime.toLocalDate(),
+        				currentDateTime.toLocalDate(),
         				startDateTime.toLocalDate().plusDays(2), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
