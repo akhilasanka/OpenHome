@@ -71,7 +71,10 @@ class ReservationCreateButton extends Component {
 
     render() {
         let buttonOrWarningElement = <button type="submit" className="btn btn-primary align-center">Reserve</button>;
-        if (!this.state.enabled){
+        if(localStorage.verified && localStorage.verified === "false") {
+            buttonOrWarningElement = <div className="alert alert-warning"> Please verify your email id. If you have already verified. Logout and login back again to make reservations!</div>
+        }
+        else if (!this.state.enabled){
             buttonOrWarningElement = <div className="alert alert-warning"> To reserve you must add a payment method! <a href='/addpayment'>Click Here!</a> </div>
         }
 
