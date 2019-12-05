@@ -5,12 +5,13 @@ import {Redirect} from 'react-router';
 import '../Styles/HostProperty.css'
 import axios from 'axios';
 import {ACCESS_TOKEN, API_BASE_URL} from "../constants";
-import ReservationCreate from "../Reservation/ReservationCreate";
+import ReservationCreateButton from "../Reservation/ReservationCreateButton";
+import { getQueryStringValue } from '../util/URLUtils';
 
 class PropertyDisplay extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             arrivalDate: new Date(),
@@ -23,7 +24,10 @@ class PropertyDisplay extends Component {
             totalCost: 0,
             weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
             weekends: ['Saturday', 'Sunday'],
-            errorRedirect: false
+            errorRedirect: false,
+
+            startDate: getQueryStringValue('startDate'),
+            endDate: getQueryStringValue('endDate')
         }
 
         //Bind
@@ -372,7 +376,7 @@ class PropertyDisplay extends Component {
                                 {weekendRentPrice}
                             </div>
                             <div>
-                                <ReservationCreate/>
+                                <ReservationCreateButton propertyId={this.props.match.params.id} startDate={this.state.startDate} endDate={this.state.endDate}/>
                                 <hr/>
                                 <div className="center-content">
                                     <label htmlFor="ownername">Property Owner: </label>

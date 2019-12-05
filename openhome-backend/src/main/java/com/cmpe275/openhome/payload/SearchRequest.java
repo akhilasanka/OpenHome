@@ -1,6 +1,7 @@
 package com.cmpe275.openhome.payload;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -92,17 +93,23 @@ public class SearchRequest {
         this.desc = desc;
     }
 
+    public String getZip() {return zip; }
+
+    public void setZip(String zip) {this.zip = zip; }
+
     private String city;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date from;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date to;
 
     private String sharingType;
 
-    public SearchRequest(String city, Date from, Date to, String sharingType, String propertyType, String internet, double minPrice, double maxPrice, String desc) {
+    private String zip;
+
+    public SearchRequest(String city, String zip, Date from, Date to, String sharingType, String propertyType, String internet, double minPrice, double maxPrice, String desc) {
         this.city = city;
         this.from = from;
         this.to = to;
@@ -112,6 +119,7 @@ public class SearchRequest {
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
         this.desc = desc;
+        this.zip = zip;
     }
 
     private String propertyType;

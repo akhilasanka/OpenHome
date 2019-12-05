@@ -4,13 +4,29 @@ import { Redirect } from 'react-router';
 import swal from 'sweetalert';
 import '../Styles/Search.css';
 import { API_BASE_URL } from '../constants';
+import { getCurrentSystemTime } from '../util/APIUtils';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+import GuestNavigation from '../Navigation/GuestNavigation';
 
 class SearchProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            results: []
+            results: [],
+            curTime: null,
+            startDate: null,
+            endDate: null
         }
+    }
+
+    componentDidMount = () => {
+        getCurrentSystemTime().then(response => {
+            this.setState({
+              curTime : response.toLocaleString()
+            })
+          });
     }
 
     handleSearch = async (event) => {
@@ -19,8 +35,10 @@ class SearchProperty extends Component {
         let validInput = true;
         var token = localStorage.getItem("accessToken");
 
-        var to = formData.get("to");
-        var from = formData.get("from");
+        var from = new Date(formData.get("from"));
+        var to = new Date(formData.get("to"));
+
+        console.log(this.state.startDate);
 
         var priceMin = formData.get("priceFrom");
         var priceMax = formData.get("priceTo");
@@ -30,15 +48,15 @@ class SearchProperty extends Component {
             validInput = false;
         }
         else {
-            if (to < from) {
-                swal("Oops!", "From Date must be before To.", "error");
-                validInput = false;
+            let curTime = new Date(this.state.curTime);
+            if (from < curTime || to <curTime) {
+              swal("Oops!", "Current System time is "+curTime+". Please select a date on or after current time.", "error");
+              validInput = false;
             }
-            else {
-                if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
-                    swal("Oops!", "Please make sure Max price is greater Min price.", "error");
-                    validInput = false;
-                }
+
+            if (priceMax != '' && priceMin != '' && priceMin > priceMax) {
+                swal("Oops!", "Please make sure Max price is greater Min price.", "error");
+                validInput = false;
             }
         }
 
@@ -49,11 +67,12 @@ class SearchProperty extends Component {
                 "propertyType": formData.get("propertyType"), "internet": formData.get("internet"),
                 "minPrice": parseInt(priceMin), "maxPrice": parseInt(priceMax), "desc": formData.get("desc")
             };
+            console.log("Data:");
             console.log(data);
             /*this.setState({
-                results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+                results : [{ "id":1,"headline": "House by the ocean", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro",
                 "zip":"900000", "state":"CA"
-            }, { "id":2, "headline": "House by the ocean2", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro", 
+            }, { "id":2, "headline": "House by the ocean2", "imageurl":"https://picsum.photos/id/866/200/200", "weekendprice":60, "weekdayprice":50, city:"Santa Clara", street:"El Sandro",
             "zip":"900000", "state":"CA"
         }]
             });*/
@@ -72,15 +91,14 @@ class SearchProperty extends Component {
                 })
                 .then((responseData) => {
                     console.log("responseData", responseData);
-                    if (responseData.dataFound === false) {
-                        swal("No results found for given entry. Please try with different values.");
-                    } else {
                         var results = responseData;
                         console.log(results);
                         this.setState({
                             results : results.properties
                         });
-                    }
+                        if(results.properties.length==0){
+                            swal("Unable to find properties with given values. Please refine search criteria!");
+                        }
                 }).catch(function (err) {
                     console.log(err)
                 });
@@ -88,9 +106,10 @@ class SearchProperty extends Component {
 
     }
     render() {
-
+        console.log(this.state.curTime);
         return (
-            <div>
+            <div style={{background:"white"}}>
+                <GuestNavigation/>
                 <div className='rowC backgroundImg' style={{ display: "flex", flexDirection: "row" }}>
                     <div className="card card-css">
                         <div className="container">
@@ -112,21 +131,23 @@ class SearchProperty extends Component {
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <label htmlFor="from" className="col-sm-4 col-form-label">From:*</label>
-                                                <div className="col-sm-8">
-                                                    <input type="date" className="form-control" name="from" required />
-                                                </div>
-                                            </div>
-                                            <div className="form-group row">
-                                                <label htmlFor="to" className="col-sm-3 col-form-label">&nbsp;&nbsp;To:*</label>
-                                                <div className="col-sm-9">
-                                                    <input type="date" className="form-control" name="to" required />
+                                                <label htmlFor="startDate" className="col-sm-3 col-form-label">Dates:*</label>
+                                                <div className="col-sm-12">
+                                                  <DateRangePicker
+                                                      startDate={this.state.startDate} // momentPropTypes.momentObj or null,
+                                                      startDateId="from" // PropTypes.string.isRequired,
+                                                      endDate={this.state.endDate} // momentPropTypes.momentObj or null,
+                                                      endDateId="to" // PropTypes.string.isRequired,
+                                                      onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                                                      focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                                                      onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+                                                  />
                                                 </div>
                                             </div>
                                             <div className="form-group row">
                                                 <label htmlFor="sharingType" className="col-form-label" style={{ marginLeft: "1.5em" }}>Sharing Type:</label>
-                                                <label> <input type="radio" name="sharingType" value="entirePlace" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Entire Place</label>&nbsp;&nbsp;
-                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="room" style={{ marginTop: "0.8em" }} />&nbsp;A Room</label>
+                                                <label> <input type="radio" name="sharingType" value="Entire Place" style={{ marginLeft: "2em", marginTop: "0.8em" }} />&nbsp;Entire Place</label>&nbsp;&nbsp;
+                                                    &nbsp;&nbsp;<label> <input type="radio" name="sharingType" value="Private Room" style={{ marginTop: "0.8em" }} />&nbsp;A Room</label>
 
                                             </div>
                                             <div className="form-group row">
@@ -164,7 +185,7 @@ class SearchProperty extends Component {
                                                 </div>
                                             </div>
                                             <div className="form-group row">
-                                                <div className="col-12" style={{ marginTop: "-2em", marginLeft: "19em" }}>
+                                                <div className="col-12" style={{ marginTop: "-4em", marginLeft: "19em" }}>
 
                                                     <button type="submit" className="btn btn-primary align-center">Search</button>
                                                 </div>
@@ -175,7 +196,7 @@ class SearchProperty extends Component {
                                     {this.state.results.length > 0 &&
                                         <Redirect to={{
                                             pathname: '/property/result',
-                                            state: { results: this.state.results }
+                                            state: { results: this.state.results, startDate: encodeURIComponent(this.state.startDate.toJSON()), endDate: encodeURIComponent(this.state.endDate.toJSON()) }
                                         }} />
                                     }
                                 </div>

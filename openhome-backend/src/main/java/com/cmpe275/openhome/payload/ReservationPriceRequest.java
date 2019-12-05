@@ -6,10 +6,10 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class ReservationCreateRequest {
-	@NotNull
-	private Long propertyId;
-	
+public class ReservationPriceRequest {
+    @NotNull
+    private Long propertyId;
+    
     @NotNull
     @DateTimeFormat( pattern="yyyy-MM-dd")
     private Date startDate;
@@ -17,7 +17,7 @@ public class ReservationCreateRequest {
     @NotNull
     @DateTimeFormat( pattern="yyyy-MM-dd")
     private Date endDate;
-    
+
 	public Long getPropertyId() {
 		return propertyId;
 	}
@@ -26,7 +26,7 @@ public class ReservationCreateRequest {
 		this.propertyId = propertyId;
 	}
 
-    public Date getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 

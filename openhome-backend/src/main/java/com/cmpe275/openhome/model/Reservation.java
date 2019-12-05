@@ -42,6 +42,10 @@ public class Reservation {
     @Column(name="END_DATE")
     private Date endDate;
     
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="CHECKOUT_DATE")
+    private Date checkOutDate;
+    
     @NotNull
     @Column(name="STATUS")
     @Enumerated(EnumType.STRING)
@@ -61,6 +65,10 @@ public class Reservation {
 
 	@Column(name = "PRICE")
     private Double totalPrice; // calculated based on the weekday and weekend price
+	
+	@Column(name = "HOST_CANCELATION_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date hostCancelationDate; // the date that the host cancelation was initiated from
 
 	public Long getId() {
 		return id;
@@ -102,6 +110,14 @@ public class Reservation {
 		this.endDate = endDate;
 	}
 
+	public Date getCheckOutDate() {
+		return checkOutDate;
+	}
+
+	public void setCheckOutDate(Date checkOutDate) {
+		this.checkOutDate = checkOutDate;
+	}
+
 	public ReservationStatusEnum getStatus() {
 		return status;
 	}
@@ -140,5 +156,13 @@ public class Reservation {
 
 	public void setTotalPrice(Double totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+
+	public Date getHostCancelationDate() {
+		return hostCancelationDate;
+	}
+
+	public void setHostCancelationDate(Date hostCancelationDate) {
+		this.hostCancelationDate = hostCancelationDate;
 	}
 }

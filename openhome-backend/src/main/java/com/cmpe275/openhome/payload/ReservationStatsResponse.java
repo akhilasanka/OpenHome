@@ -11,15 +11,18 @@ import java.util.Map;
 
 public class ReservationStatsResponse {
     private boolean success = false;
-
-    public Map<Long, String> getValidProperties() {
-        return validProperties;
-    }
-
     private Map<Long, String> validProperties = new HashMap<>();
     private List<ReservationItem> past = new ArrayList<>();
     private List<ReservationItem> current = new ArrayList<>();
     private List<ReservationItem> future = new ArrayList<>();
+
+    public ReservationStatsResponse() {
+        validProperties.put(0L, "All properties");
+    }
+
+    public Map<Long, String> getValidProperties() {
+        return validProperties;
+    }
 
     public List<ReservationItem> getPast() {
         return past;

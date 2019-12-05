@@ -196,6 +196,7 @@ class HostProperty extends Component {
             e.preventDefault();
 
             const data = {
+                isDeleted: false,
                 propertyContact: this.state.propertyContact,
                 streetAddress: this.state.streetAddress,
                 city: this.state.city,

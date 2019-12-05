@@ -39,6 +39,7 @@ export function signup(signupRequest) {
     });
 }
 
+// Reservation related methods
 export function createReservation(createReservationRequest) {
   return request({
       url: API_BASE_URL + "/reservation/create",
@@ -47,6 +48,15 @@ export function createReservation(createReservationRequest) {
   });
 }
 
+export function getReservationPrice(getReservationPriceRequest) {
+  return request({
+      url: API_BASE_URL + "/reservation/priceRequest",
+      method: 'POST',
+      body: JSON.stringify(getReservationPriceRequest)
+  });
+}
+
+// System Time Related Methods
 export function getCurrentSystemTime() {
   var options = {
       url: API_BASE_URL + "/system/time",
@@ -71,7 +81,6 @@ export function getCurrentSystemTime() {
   );
 }
 
-// System Time Related Methods
 export function addToCurrentSystemTime(addTimeRequest) {
   return request({
       url: API_BASE_URL + "/system/addTime",

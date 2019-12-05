@@ -17,6 +17,10 @@ public class BillingSummaryResponse {
     private List<String> allMonths = null;
     private List<LineItem> lineItems = new ArrayList<>();
 
+    public BillingSummaryResponse() {
+        validProperties.put(0L, "All properties");
+    }
+
     public void addLineItem(LineItem lineItem) {
         if(lineItem == null)
             return;
