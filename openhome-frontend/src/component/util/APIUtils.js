@@ -80,6 +80,13 @@ export function getReservationPrice(getReservationPriceRequest) {
   });
 }
 
+export function getReservation(reservationId) {
+  return request({
+      url: API_BASE_URL + "/reservation/" + reservationId,
+      method: 'GET'
+  });
+}
+
 // System Time Related Methods
 export function getCurrentSystemTime() {
   var options = {
@@ -110,5 +117,13 @@ export function addToCurrentSystemTime(addTimeRequest) {
       url: API_BASE_URL + "/system/addTime",
       method: 'POST',
       body: JSON.stringify(addTimeRequest)
+  });
+}
+
+// Payment Method Utilities (HACKY)
+export function hasValidPaymentMethod() {
+  return request({
+      url: API_BASE_URL + "/pay/getvalidpaymentmethod",
+      method: 'GET'
   });
 }
