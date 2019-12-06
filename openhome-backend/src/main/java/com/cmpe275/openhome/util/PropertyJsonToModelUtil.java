@@ -18,7 +18,7 @@ import java.util.Map;
 public class PropertyJsonToModelUtil {
 
     private static final Gson JSON_CONVERTER = new Gson();
-    private static final String ALWAYS_AVAILABLE_DAYS = "SUMTUWTHFSA";
+    private static final String ALWAYS_AVAILABLE_DAYS = "MTUWTHFSASU";
     private static final Map<String, String> FULL_DAY_TO_COMPRESS_MAP = new HashMap<String, String>();
     static {
         FULL_DAY_TO_COMPRESS_MAP.put("monday","M");
