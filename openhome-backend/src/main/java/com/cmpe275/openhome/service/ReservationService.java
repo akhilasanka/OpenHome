@@ -132,24 +132,24 @@ public class ReservationService {
     	// check if guest checked out with days remaining
     	// if so current day is charged fully and the other days are treated as cancelations    	
     	LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
-    	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());
-
-    	// calculate refund
-    	Double totalRefund = payProcessingUtil.calculateTotalPrice(
-    			currentDate.plusDays(1),  // add one because current day is still charged fully
-    			endDate, 
-				reservation.getWeekdayPrice(), 
-				reservation.getWeekendPrice(), 
-				reservation.getDailyParkingPrice()
-		);
-    	
-    	// refund guest 
-    	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+    	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());    	
     	
     	// charge penalties for days remaining
     	if (!currentDate.equals(endDate)) {
+        	// calculate refund    	
+        	Double totalRefund = payProcessingUtil.calculateTotalPrice(
+        			currentDate.plusDays(1),  // add one because current day is still charged fully
+        			endDate, 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+        	
         	long daysToCharge = currentDate.plusDays(1).until(endDate, ChronoUnit.DAYS);
         	if (daysToCharge == 1) {
+            	// refund guest 
+            	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+            	
         		// charge 30% penalty for next day
         		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
             			currentDate.plusDays(1),
@@ -162,6 +162,9 @@ public class ReservationService {
             	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTPENALTY, penalty);
         	}
         	else if (daysToCharge > 1) {
+            	// refund guest 
+            	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+            	
         		//charge 30% penalty for next day and day after that 
         		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
             			currentDate.plusDays(1),
