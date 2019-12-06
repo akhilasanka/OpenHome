@@ -24,7 +24,7 @@ class ReservationCheckInButton extends Component {
 
         checkInReservation(checkInReservationRequest)
         .then(response => {
-          swal("Success!", response.message)
+          swal("Success!", response.message).then(() => {window.location.reload(false);});
         }).catch(error => {
             swal("Oops!", (error && error.message) || 'Oops! Something went wrong. Please try again!', "error");
         });
