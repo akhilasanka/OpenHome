@@ -177,7 +177,7 @@ public class ReservationController {
 
     	try {
     		if (isGuest) {
-    			reservationService.checkInReservation(reservation);
+    			reservationService.checkOutReservation(reservation);
     		}
     		else {
     			throw new Exception("User is not a guest of this reservation. Cannot check-out!");

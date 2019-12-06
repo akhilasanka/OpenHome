@@ -132,24 +132,24 @@ public class ReservationService {
     	// check if guest checked out with days remaining
     	// if so current day is charged fully and the other days are treated as cancelations    	
     	LocalDate currentDate = SystemDateTime.getCurSystemTime().toLocalDate();
-    	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());
-
-    	// calculate refund
-    	Double totalRefund = payProcessingUtil.calculateTotalPrice(
-    			currentDate.plusDays(1),  // add one because current day is still charged fully
-    			endDate, 
-				reservation.getWeekdayPrice(), 
-				reservation.getWeekendPrice(), 
-				reservation.getDailyParkingPrice()
-		);
-    	
-    	// refund guest 
-    	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+    	LocalDate endDate = DateUtils.convertDateToLocalDate(reservation.getEndDate());    	
     	
     	// charge penalties for days remaining
     	if (!currentDate.equals(endDate)) {
+        	// calculate refund    	
+        	Double totalRefund = payProcessingUtil.calculateTotalPrice(
+        			currentDate.plusDays(1),  // add one because current day is still charged fully
+        			endDate, 
+    				reservation.getWeekdayPrice(), 
+    				reservation.getWeekendPrice(), 
+    				reservation.getDailyParkingPrice()
+    		);
+        	
         	long daysToCharge = currentDate.plusDays(1).until(endDate, ChronoUnit.DAYS);
         	if (daysToCharge == 1) {
+            	// refund guest 
+            	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+            	
         		// charge 30% penalty for next day
         		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
             			currentDate.plusDays(1),
@@ -162,6 +162,9 @@ public class ReservationService {
             	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTPENALTY, penalty);
         	}
         	else if (daysToCharge > 1) {
+            	// refund guest 
+            	payProcessingUtil.recordPayment(reservation.getId(), ChargeType.GUESTREFUND, totalRefund);
+            	
         		//charge 30% penalty for next day and day after that 
         		Double penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
             			currentDate.plusDays(1),
@@ -237,7 +240,7 @@ public class ReservationService {
         		// charge 30% penalty for first day
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
         				currentDateTime.toLocalDate(),
-        				startDateTime.toLocalDate().plusDays(1), 
+        				currentDateTime.toLocalDate().plusDays(1), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
         				reservation.getDailyParkingPrice()
@@ -249,7 +252,7 @@ public class ReservationService {
         		// charge 30% penalty for first day and day after that 
         		penalty = 0.30 * payProcessingUtil.calculateTotalPrice(
         				currentDateTime.toLocalDate(),
-        				startDateTime.toLocalDate().plusDays(2), 
+        				currentDateTime.toLocalDate().plusDays(2), 
         				reservation.getWeekdayPrice(), 
         				reservation.getWeekendPrice(), 
         				reservation.getDailyParkingPrice()
@@ -389,6 +392,7 @@ public class ReservationService {
 
 	public List<Reservation> findAllReservationsPendingBasedOnCheckoutDate(Date startDate, Date endDate){
 		List statuses = new ArrayList();
+		statuses.add(ReservationStatusEnum.checkedOut);
 		statuses.add(ReservationStatusEnum.automaticallyCanceled);
 		statuses.add(ReservationStatusEnum.guestCanceledAfterCheckIn);
 		statuses.add(ReservationStatusEnum.hostCanceledAfterCheckIn);
@@ -403,13 +407,20 @@ public class ReservationService {
     public void checkPendingReservations() throws Exception {
     	// this will be a triggered by a background job at 3am 
     	// checks 'pending' reservations where the Start Date is in the past
-    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();
+    	LocalDateTime currentDateTime = SystemDateTime.getCurSystemTime();    	
     	List<Reservation> pendingReservations = reservationRepository
     			.findAllPendingReservationsThatShouldBeCancelled(DateUtils.convertLocalDateTimeToDate(currentDateTime));
     	
     	for (Reservation reservation : pendingReservations) {
+        	LocalDateTime reservationStartDateTime = DateUtils.convertDateToLocalDateTime(reservation.getStartDate()); 	
+        	LocalDateTime reservationDayAfterStartDateTimeAt3AM = reservationStartDateTime.plusDays(1).withHour(3).withMinute(0).withSecond(0);
+        	    		
+    		if (currentDateTime.isBefore(reservationDayAfterStartDateTimeAt3AM)) {
+    			continue; // dont cancel early
+    		}
+    		
         	// set the reservation statuses to cancelled
-        	reservation.setStatus(ReservationStatusEnum.checkedOut);
+        	reservation.setStatus(ReservationStatusEnum.automaticallyCanceled);
         	updateReservation(reservation);
         	
         	try {
@@ -459,8 +470,7 @@ public class ReservationService {
     	// set the reservation statuses to checkedOut
     	for (Reservation reservation : checkedInReservations) {
         	// set the reservation statuses to automatically cancelled and set end date
-        	reservation.setStatus(ReservationStatusEnum.automaticallyCanceled);
-        	
+        	reservation.setStatus(ReservationStatusEnum.checkedOut);
         	Date actualCheckOutDate = DateUtils.convertLocalDateTimeToDate(DateUtils.convertDateToLocalDate(reservation.getStartDate()).plusDays(1).atTime(11, 0));
         	reservation.setCheckOutDate(actualCheckOutDate);
         	updateReservation(reservation);

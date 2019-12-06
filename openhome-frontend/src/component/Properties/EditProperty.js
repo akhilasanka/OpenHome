@@ -94,40 +94,41 @@ class EditProperty extends Component {
                 let satSelected = false;
                 let sunSelected = false;
                 if (adString && adString !== "") {
-                    if (adString.startsWith("M")) {
+                    if (adString.includes("M")) {
+                        console.log("Monday");
                         monSelected = true;
-                        adString = adString.substr(1);
-                        count++;
+                        count = count+1;
                     }
-                    if (adString.startsWith("TU")) {
+                    console.log(adString);
+                    if (adString.includes("TU")) {
+                        console.log("Tuesday");
                         tueSelected = true;
-                        adString = adString.substr(2);
-                        count++;
+                        count = count+1;
                     }
-                    if (adString.startsWith("W")) {
+                    if (adString.includes("W")) {
+                        console.log("Wednesday");
                         wedSelected = true;
-                        adString = adString.substr(1);
-                        count++;
+                        count = count+1;
                     }
-                    if (adString.startsWith("TH")) {
+                    if (adString.includes("TH")) {
+                        console.log("Thursday");
                         thuSelected = true;
-                        adString = adString.substr(2);
-                        count++;
+                        count = count +1;
                     }
-                    if (adString.startsWith("F")) {
+                    if (adString.includes("F")) {
+                        console.log("Friday");
                         friSelected = true;
-                        adString = adString.substr(1);
-                        count++;
+                        count = count +1;
                     }
-                    if (adString.startsWith("SA")) {
+                    if (adString.includes("SA")) {
+                        console.log("Saturday");
                         satSelected = true;
-                        adString = adString.substr(2);
-                        count++;
+                        count = count +1;
                     }
-                    if (adString.startsWith("SU")) {
+                    if (adString.includes("SU")) {
+                        console.log("Sunday");
                         sunSelected = true;
-                        adString = adString.substr(2);
-                        count++;
+                        count = count + 1;
                     }
                 }
 
@@ -175,6 +176,7 @@ class EditProperty extends Component {
                     satSelected: satSelected,
                     sunSelected: sunSelected,
                 });
+                console.log(count);
             }).catch(function (err) {
                 console.log(err)
             });

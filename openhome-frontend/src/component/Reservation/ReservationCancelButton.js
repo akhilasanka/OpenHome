@@ -17,10 +17,15 @@ class ReservationCancelButton extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
         var reservationId = this.state.reservationId;
+        const isGuest = localStorage.getItem("role") === "guest";
+        var penalty = "15%";
+        if (isGuest) {
+          penalty= "30%"
+        }
 
         swal({
             title: "Caution",
-            text: "Canceling the reservation can incur a penalty of 15% for up to 2 days.\n\nAre you sure?",
+            text: "Canceling the reservation can incur a penalty of " +  penalty + " for up to 2 days.\n\nAre you sure?",
             icon: "warning",
             buttons: [
               'No, nevermind!',
@@ -35,7 +40,7 @@ class ReservationCancelButton extends Component {
 
                 cancelReservation(cancelReservationRequest)
                 .then(response => {
-                  swal("Success!", response.message)
+                  swal("Success!", response.message).then(() => {window.location.reload(false);});
                 }).catch(error => {
                     swal("Oops!", (error && error.message) || 'Oops! Something went wrong. Please try again!', "error");
                 });

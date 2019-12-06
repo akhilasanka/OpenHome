@@ -19,6 +19,7 @@ class ReservationCreateButton extends Component {
         this.state.endDate =  props.endDate;
         this.state.endDateFormatted = new Date(props.endDate).toDateString()
         this.state.enabled= props.enabled;
+        this.state.redirectAfterBooking = false;
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -61,7 +62,7 @@ class ReservationCreateButton extends Component {
 
           createReservation(createReservationRequest)
           .then(response => {
-            swal("Success!", "You've successfully created the reservation!")
+            swal("Success!", "You've successfully created the reservation!").then(() => {this.setState({redirectAfterBooking: true});});
 
           }).catch(error => {
               swal("Oops!", (error && error.message) || 'Oops! Something went wrong. Please try again!', "error");
@@ -70,6 +71,10 @@ class ReservationCreateButton extends Component {
     }
 
     render() {
+        if (this.state.redirectAfterBooking) {
+            return <Redirect to="/stats/reservations" />;
+        }
+
         let buttonOrWarningElement = <button type="submit" className="btn btn-primary align-center">Reserve</button>;
         if(localStorage.verified && localStorage.verified === "false") {
             buttonOrWarningElement = <div className="alert alert-warning"> Please verify your email id. If you have already verified. Logout and login back again to make reservations!</div>

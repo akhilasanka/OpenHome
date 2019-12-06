@@ -267,10 +267,9 @@ textarea{
 }
 
 .property-display-pricing-content{
-    /* background-color: yellow; */
-    padding-left: 5%;
-    padding-top : 2%;
-
+    /* padding-left: 5%;
+    padding-top : 2%; */
+    padding: 35px;
 }
 
 .profile-content .headline-text{
@@ -343,13 +342,6 @@ textarea{
     padding: 10% 25%;
 }
 
-.property-display-pricing-content{
-    /* background-color: yellow; */
-    padding-left: 5%;
-    padding-top : 2%;
-
-}
-
 .details-content-headline-text {
     margin-left: 10%;
     text-align: left;
@@ -357,4 +349,9 @@ textarea{
 
 .property-description-content{
     text-align: left;
+}
+
+.btn-align{
+    margin-left: 75px;
+    margin-right: 50px;
 }
