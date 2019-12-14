@@ -22,7 +22,7 @@ class VerifyAuthCode extends Component {
         var data = { authcode: authcode };
         await axios({
             method: 'post',
-            url: API_BASE_URL + '/auth/verify',
+            url: API_BASE_URL + '/api/auth/verify',
             data: data,
             config: { headers: { 'Content-Type': 'multipart/form-data' } },
             headers: { "Authorization": `Bearer ${token}` }

@@ -25,14 +25,14 @@ class Login extends Component {
             }, 100);
         }
     }
-    
+
     render() {
         if(this.props.authenticated) {
             return <Redirect
                 to={{
                 pathname: "/",
                 state: { from: this.props.location }
-            }}/>;            
+            }}/>;
         }
 
         return (
@@ -78,16 +78,16 @@ class LoginForm extends Component {
 
     handleInputChange(event) {
         const target = event.target;
-        const inputName = target.name;        
+        const inputName = target.name;
         const inputValue = target.value;
 
         this.setState({
             [inputName] : inputValue
-        });        
+        });
     }
 
     handleSubmit(event) {
-        event.preventDefault();   
+        event.preventDefault();
 
         const loginRequest = Object.assign({}, this.state);
 
@@ -96,7 +96,7 @@ class LoginForm extends Component {
             localStorage.setItem(ACCESS_TOKEN, response.accessToken);
             axios({
                 method: 'get',
-                url: API_BASE_URL+"/user/me",
+                url: API_BASE_URL+"/api/user/me",
                 headers: {"Authorization" : `Bearer ${response.accessToken}`}
             })
             .then(response => {
@@ -115,7 +115,7 @@ class LoginForm extends Component {
                 }
               }).catch(error => {
                 console.log(error);
-              }); 
+              });
             Alert.success("You're successfully logged in!");
             this.props.history.push("/home");
         }).catch(error => {
@@ -124,26 +124,26 @@ class LoginForm extends Component {
             //Alert.error((error && error.message) || 'Oops! Something went wrong. Please try again!');
         });
     }
-    
+
     render() {
         return (
             <div className="login">
             <form onSubmit={this.handleSubmit}>
                 <div className="form-item">
-                    <input type="email" name="email" 
+                    <input type="email" name="email"
                         className="form-control" placeholder="Email"
                         value={this.state.email} onChange={this.handleInputChange} required/>
                 </div>
                 <div className="form-item">
-                    <input type="password" name="password" 
+                    <input type="password" name="password"
                         className="form-control" placeholder="Password"
                         value={this.state.password} onChange={this.handleInputChange} required/>
                 </div>
                 <div className="form-item">
                     <button type="submit" className="btn btn-block btn-primary">Login</button>
                 </div>
-            </form>       
-            </div>    
+            </form>
+            </div>
         );
     }
 }

@@ -100,6 +100,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/",
+                		"/property/**",
+                		"/host/**",
+                		"/reservation/**",
+                		"/stats/**",
+                		"/system/**",
+                		"/login",
+                		"/signup",
+                		"/home",
+                		"/addpayment",
+                		"/registration-confirmation/**",
+                		"/oauth2/redirect",
                         "/error",
                         "/favicon.ico",
                         "/**/*.png",
@@ -110,14 +121,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                 .permitAll()
-                .antMatchers("/auth/**", "/oauth2/**")
+                .antMatchers("/api/auth/**", "/api/oauth2/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
+                .baseUri("/api/oauth2/authorize")
                 .authorizationRequestRepository(cookieAuthorizationRequestRepository())
                 .and()
                 //.redirectionEndpoint()
@@ -136,6 +147,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/system/time");
+        web.ignoring().antMatchers("/api/system/time");
     }
 }

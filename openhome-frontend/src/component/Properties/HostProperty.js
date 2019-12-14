@@ -227,7 +227,7 @@ class HostProperty extends Component {
             axios(
                 {
                     method:'post',
-                    url:API_BASE_URL + '/hosts/'+ localStorage.id + '/property',
+                    url:API_BASE_URL + '/api/hosts/'+ localStorage.id + '/property',
                     data:data,
                     headers: {"Authorization" : "Bearer "+localStorage.getItem(ACCESS_TOKEN)}
                 }

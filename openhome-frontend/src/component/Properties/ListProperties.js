@@ -41,7 +41,7 @@ class ListProperties extends Component {
         axios(
             {
                 method: 'get',
-                url: API_BASE_URL + '/host/' + localStorage.id + '/properties',
+                url: API_BASE_URL + '/api/host/' + localStorage.id + '/properties',
                 headers: {"Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN)}
             }
         ).then(response => {
