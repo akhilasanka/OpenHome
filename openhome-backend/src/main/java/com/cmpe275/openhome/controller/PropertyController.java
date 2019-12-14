@@ -36,13 +36,11 @@ public class PropertyController {
   @Autowired
   private PropertyService propertyService;
 
-  @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/hosts/{hostName}/properties")
   public List<Property> getAllProperties(@PathVariable String hostName) {
 	 return propertyService.getHardcodedPropertyList(); // TODO: proper impl!
   }
 
-  @CrossOrigin(origins = "http://localhost:8080")
   @PostMapping("/hosts/{hostId}/property")
   @PreAuthorize("hasRole('USER')")
   public ResponseEntity<?> postProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String hostId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) {
@@ -74,7 +72,6 @@ public class PropertyController {
                     "Property registered successfully@"));
   }
 
-  @CrossOrigin(origins = "http://localhost:8080")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/edit")
   @PreAuthorize("hasRole('USER')")
   public EditPropertyResponse editProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId, @Valid @RequestBody PostPropertyRequest postPropertyRequest) throws Exception {
@@ -91,7 +88,6 @@ public class PropertyController {
       return new EditPropertyResponse(editStatus, "");
   }
 
-  @CrossOrigin(origins = "http://localhost:8080")
   @PostMapping("/hosts/{hostId}/property/{propertyId}/delete")
   @PreAuthorize("hasRole('USER')")
   public EditPropertyResponse deleteProperty(@CurrentUser UserPrincipal userPrincipal, @RequestParam Boolean isPenalityApproved, @PathVariable String hostId, @PathVariable long propertyId) throws Exception {
@@ -107,19 +103,16 @@ public class PropertyController {
     return new EditPropertyResponse(deleteStatus, "");
   }
 
-  @CrossOrigin(origins = "http://localhost:8080")
   @GetMapping("/property/{propertyId}")
   public Property getProperty(@CurrentUser UserPrincipal userPrincipal, @PathVariable String propertyId) {
     return propertyService.getProperty(propertyId);
   }
 
-  @CrossOrigin(origins = "http://localhost:8080")
   @GetMapping("/host/{hostId}/properties")
   public List<SearchProperty> getProperties(@CurrentUser UserPrincipal userPrincipal, @PathVariable String hostId) {
     return propertyService.getProperties(hostId);
   }
 
-  @CrossOrigin(origins = "http://localhost:8080")
   @PostMapping("/property/search")
   public SearchPropertyResponse searchProperty(@CurrentUser UserPrincipal userPrincipal, @RequestBody SearchRequest searchRequest) {
     Date from = searchRequest.getFrom();
