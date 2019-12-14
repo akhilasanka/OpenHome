@@ -25,7 +25,7 @@ const request = (options) => {
 
 export function login(loginRequest) {
     return request({
-        url: API_BASE_URL + "/auth/login",
+        url: API_BASE_URL + "/api/auth/login",
         method: 'POST',
         body: JSON.stringify(loginRequest)
     });
@@ -33,7 +33,7 @@ export function login(loginRequest) {
 
 export function signup(signupRequest) {
     return request({
-        url: API_BASE_URL + "/auth/signup",
+        url: API_BASE_URL + "/api/auth/signup",
         method: 'POST',
         body: JSON.stringify(signupRequest)
     });
@@ -42,7 +42,7 @@ export function signup(signupRequest) {
 // Reservation related methods
 export function createReservation(createReservationRequest) {
   return request({
-      url: API_BASE_URL + "/reservation/create",
+      url: API_BASE_URL + "/api/reservation/create",
       method: 'POST',
       body: JSON.stringify(createReservationRequest)
   });
@@ -50,7 +50,7 @@ export function createReservation(createReservationRequest) {
 
 export function cancelReservation(cancelReservationRequest) {
   return request({
-      url: API_BASE_URL + "/reservation/cancel",
+      url: API_BASE_URL + "/api/reservation/cancel",
       method: 'POST',
       body: JSON.stringify(cancelReservationRequest)
   });
@@ -58,7 +58,7 @@ export function cancelReservation(cancelReservationRequest) {
 
 export function checkInReservation(checkInReservationRequest) {
   return request({
-      url: API_BASE_URL + "/reservation/checkIn",
+      url: API_BASE_URL + "/api/reservation/checkIn",
       method: 'POST',
       body: JSON.stringify(checkInReservationRequest)
   });
@@ -66,7 +66,7 @@ export function checkInReservation(checkInReservationRequest) {
 
 export function checkOutReservation(checkOutReservationRequest) {
   return request({
-      url: API_BASE_URL + "/reservation/checkOut",
+      url: API_BASE_URL + "/api/reservation/checkOut",
       method: 'POST',
       body: JSON.stringify(checkOutReservationRequest)
   });
@@ -74,7 +74,7 @@ export function checkOutReservation(checkOutReservationRequest) {
 
 export function getReservationPrice(getReservationPriceRequest) {
   return request({
-      url: API_BASE_URL + "/reservation/priceRequest",
+      url: API_BASE_URL + "/api/reservation/priceRequest",
       method: 'POST',
       body: JSON.stringify(getReservationPriceRequest)
   });
@@ -82,7 +82,7 @@ export function getReservationPrice(getReservationPriceRequest) {
 
 export function getReservation(reservationId) {
   return request({
-      url: API_BASE_URL + "/reservation/" + reservationId,
+      url: API_BASE_URL + "/api/reservation/" + reservationId,
       method: 'GET'
   });
 }
@@ -90,7 +90,7 @@ export function getReservation(reservationId) {
 // System Time Related Methods
 export function getCurrentSystemTime() {
   var options = {
-      url: API_BASE_URL + "/system/time",
+      url: API_BASE_URL + "/api/system/time",
       method: 'GET'
   }
 
@@ -114,7 +114,7 @@ export function getCurrentSystemTime() {
 
 export function addToCurrentSystemTime(addTimeRequest) {
   return request({
-      url: API_BASE_URL + "/system/addTime",
+      url: API_BASE_URL + "/api/system/addTime",
       method: 'POST',
       body: JSON.stringify(addTimeRequest)
   });
@@ -123,7 +123,7 @@ export function addToCurrentSystemTime(addTimeRequest) {
 // Payment Method Utilities (HACKY)
 export function hasValidPaymentMethod() {
   return request({
-      url: API_BASE_URL + "/pay/getvalidpaymentmethod",
+      url: API_BASE_URL + "/api/pay/getvalidpaymentmethod",
       method: 'GET'
   });
 }

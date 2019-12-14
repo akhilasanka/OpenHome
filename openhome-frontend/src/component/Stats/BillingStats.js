@@ -23,17 +23,17 @@ class BillingStats extends Component {
     componentDidMount() {
         axios({
             method:'GET',
-            url:API_BASE_URL + '/stats/getbillingsummary',
+            url:API_BASE_URL + '/api/stats/getbillingsummary',
             headers: {"Authorization" : "Bearer "+localStorage.getItem(ACCESS_TOKEN)}
         }).then(response => {
             console.log(response)
-            this.setState({data: response.data, selected_option:"0", 
+            this.setState({data: response.data, selected_option:"0",
                 selected_month: response.data.allMonths[0]})
         })
     }
 
     makeTable(dataArr, isGuest) {
-        let retData = <div>There were no charges for {this.state.selected_month}</div>; 
+        let retData = <div>There were no charges for {this.state.selected_month}</div>;
         let cardUsedHeaderCol = null
         if(isGuest) {
             cardUsedHeaderCol = <th>Card Used</th>;
@@ -48,8 +48,8 @@ class BillingStats extends Component {
             {cardUsedHeaderCol}
         </tr>;
         let dataRows = dataArr.filter((elem) => {
-            return (this.state.selected_option === "0" || 
-                elem.propertyId === parseInt(this.state.selected_option)) && 
+            return (this.state.selected_option === "0" ||
+                elem.propertyId === parseInt(this.state.selected_option)) &&
                 elem.transactionMonth === this.state.selected_month;
         })
         if(dataRows !== null && dataRows.length > 0) {
@@ -84,7 +84,7 @@ class BillingStats extends Component {
                     {cardData}
                 </tr>);
             });
-            retData = 
+            retData =
             <div>
                 <table className="table">
                     <thead class="thead-dark">{tableHeader}</thead>
@@ -101,11 +101,11 @@ class BillingStats extends Component {
     render() {
         let select = null;
         let monthselect = null;
-        let noData = <div>There were no charges for {this.state.selected_month}</div>; 
+        let noData = <div>There were no charges for {this.state.selected_month}</div>;
         let pastTable = noData;
         let headerLabel = "Your billing Summary";
         const isGuest = localStorage.getItem("role") === "guest";
-        if(this.state.data!=null && this.state.selected_option!=null 
+        if(this.state.data!=null && this.state.selected_option!=null
             && this.state.selected_month!=null) {
             pastTable = this.makeTable(this.state.data.lineItems, isGuest);
             if(!isGuest) {
@@ -118,7 +118,7 @@ class BillingStats extends Component {
                         }
                     }
                 );
-                select = <select onChange={this.handleOptionSelect} 
+                select = <select onChange={this.handleOptionSelect}
                     class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
                     {options}
                 </select>
@@ -126,10 +126,10 @@ class BillingStats extends Component {
             let monthOptions = this.state.data.allMonths.map(month => {
                 if(this.state.selected_month === month)
                     return (<option value={month} selected>{month}</option>);
-                else 
+                else
                     return (<option value={month}>{month}</option>);
             })
-            monthselect = <select onChange={this.handleMonthSelect} 
+            monthselect = <select onChange={this.handleMonthSelect}
                     class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
                     {monthOptions}
                 </select>;

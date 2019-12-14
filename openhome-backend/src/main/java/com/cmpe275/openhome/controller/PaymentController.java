@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/pay")
+@RequestMapping("/api")
 public class PaymentController {
 
     @Autowired
@@ -40,7 +40,7 @@ public class PaymentController {
 
     @Autowired
     PayProcessingUtil payProcessingUtil;
-    @PostMapping("/addpaymethod")
+    @PostMapping("/pay/addpaymethod")
     public ResponseEntity<?> addPayMethod(@Valid @RequestBody AddPayRequest request) {
         if(request == null || !request.validate()) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Unparsable request"));
@@ -57,7 +57,7 @@ public class PaymentController {
         return ResponseEntity.ok(new ApiResponse(true, "Successfully saved the payment method"));
     }
 
-    @GetMapping("/getvalidpaymentmethod")
+    @GetMapping("/pay/getvalidpaymentmethod")
     @PreAuthorize("hasRole('USER')")
     public PayMethodResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         final PaymentMethod payMethod = paymentMethodRepository.findByUserId(userPrincipal.getId());
@@ -76,7 +76,7 @@ public class PaymentController {
     }
 
     // for testing only. Not to be called from FE.
-    @GetMapping("/insertsampletransaction")
+    @GetMapping("/pay/insertsampletransaction")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> insertSampleTransaction(@CurrentUser UserPrincipal userPrincipal) {
         try {

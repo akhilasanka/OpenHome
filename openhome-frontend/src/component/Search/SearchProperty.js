@@ -39,7 +39,7 @@ class SearchProperty extends Component {
         let validInput = true;
         var token = localStorage.getItem("accessToken");
 
-        
+
 
         var from = new Date(formData.get("from"));
         var to = new Date(formData.get("to"));
@@ -90,7 +90,7 @@ class SearchProperty extends Component {
             });*/
             await axios({
                 method: 'post',
-                url: API_BASE_URL + '/property/search',
+                url: API_BASE_URL + '/api/property/search',
                 data: data,
                 config: { headers: { 'Content-Type': 'multipart/form-data' } },
                 headers: { "Authorization": `Bearer ${token}` }
