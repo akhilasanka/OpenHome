@@ -51,12 +51,12 @@ app:
   auth:
     tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
     tokenExpirationMsec: 864000000
-    clientURL: http://openhome275.us-west-1.elasticbeanstalk.com
+    clientURL: https://www.cmpe275-openhome.tk
   oauth2:
     # After successfully authenticating with the OAuth2 Provider,
     # we'll be generating an auth token for the user and sending the token to the
     # redirectUri mentioned by the client in the /oauth2/authorize request.
     # We're not using cookies because they won't work well in mobile clients.
     authorizedRedirectUris:
-      - http://openhome275.us-west-1.elasticbeanstalk.com/oauth2/redirect
-      - http://openhome275.us-west-1.elasticbeanstalk.com/login/oauth2/code/facebook
+      - https://www.cmpe275-openhome.tk/oauth2/redirect
+      - https://www.cmpe275-openhome.tk/login/oauth2/code/facebook
