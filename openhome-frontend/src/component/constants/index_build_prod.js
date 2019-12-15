@@ -1,5 +1,5 @@
-export const API_BASE_URL = 'https://www.cmpe275-openhome.tk/';
-export const CLIENT_BASE_URL = 'https://www.cmpe275-openhome.tk/'
+export const API_BASE_URL = 'https://www.cmpe275-openhome.tk';
+export const CLIENT_BASE_URL = 'https://www.cmpe275-openhome.tk'
 export const ACCESS_TOKEN = 'accessToken';
 
 export const OAUTH2_REDIRECT_URI = 'https://www.cmpe275-openhome.tk/oauth2/redirect'
