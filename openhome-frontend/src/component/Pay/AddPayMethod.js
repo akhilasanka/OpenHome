@@ -27,7 +27,7 @@ class AddPayMethod extends Component {
         axios(
             {
                 method:'post',
-                url:API_BASE_URL + '/pay/addpaymethod',
+                url:API_BASE_URL + '/api/pay/addpaymethod',
                 data:{
                     userid:parseInt(localStorage.getItem("id")),
                     cardNumber:this.state.cardnumber,
@@ -80,7 +80,7 @@ class AddPayMethod extends Component {
               <div className="form-group">
                 <label class=" main-header-sum" for="cardNumber">Enter your card details</label>
                 <div className="input-group">
-                  <input onChange={this.handleCardNumberChange} type="text" name="cardNumber" placeholder="Your 16 digit card number" 
+                  <input onChange={this.handleCardNumberChange} type="text" name="cardNumber" placeholder="Your 16 digit card number"
                     className="form-control" pattern="[0-9]{16}" maxLength="16" required/>
                   <div className="input-group-append">
                     <span className="input-group-text text-muted">

@@ -26,7 +26,6 @@ import java.net.URI;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
@@ -45,7 +44,7 @@ public class AuthController {
     private AuthService authService;
 
 
-    @PostMapping("/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -61,7 +60,7 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/api/auth/signup")
         public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if(userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new BadRequestException("Email address already in use.");
@@ -88,7 +87,7 @@ public class AuthController {
                 .body(new ApiResponse(true, "User registered successfully@"));
     }
 
-    @RequestMapping(value = "/verify", method = RequestMethod.POST )
+    @RequestMapping(value = "/api/auth/verify", method = RequestMethod.POST )
     public ResponseEntity<?> verify( @RequestBody Map<String, Object> payload) {
         System.out.println(payload);
         String authcode = (String) payload.get("authcode");

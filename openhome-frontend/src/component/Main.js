@@ -25,6 +25,7 @@ import ListProperties from "./Properties/ListProperties";
 
 class Main extends Component {
     render() {
+        console.log(process.env.NODE_ENV);
         if (localStorage.getItem(ACCESS_TOKEN)!== null) {
         return (
             <div>

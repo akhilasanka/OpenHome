@@ -74,7 +74,7 @@ class ReservationStats extends Component {
     componentDidMount() {
         axios({
             method:'GET',
-            url:API_BASE_URL + '/stats/getreservations',
+            url:API_BASE_URL + '/api/stats/getreservations',
             headers: {"Authorization" : "Bearer "+localStorage.getItem(ACCESS_TOKEN)}
         }).then(response => {
             console.log(response)

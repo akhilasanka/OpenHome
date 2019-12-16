@@ -59,7 +59,7 @@ class PropertyDisplay extends Component {
         axios(
             {
                 method: 'get',
-                url: API_BASE_URL + '/property/' + this.props.match.params.id,
+                url: API_BASE_URL + '/api/property/' + this.props.match.params.id,
                 headers: {"Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN)}
             }
         ).then(response => {
@@ -154,7 +154,7 @@ class PropertyDisplay extends Component {
         axios(
             {
                 method: 'post',
-                url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/delete',
+                url: API_BASE_URL + '/api/hosts/' + localStorage.id + '/property/' + propertyID + '/delete',
                 params: { "isPenalityApproved": false },
                 headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
             }
@@ -176,7 +176,7 @@ class PropertyDisplay extends Component {
                         axios(
                             {
                                 method: 'post',
-                                url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/delete',
+                                url: API_BASE_URL + '/api/hosts/' + localStorage.id + '/property/' + propertyID + '/delete',
                                 params: { "isPenalityApproved": true },
                                 headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
                             }
@@ -201,12 +201,12 @@ class PropertyDisplay extends Component {
             else if(response.data.status=="EditSuccessful"){
                 swal("Sucessfully deleted property!");
                 redirect = true;
-                
+
             }
             if(redirect){
                 this.setState({
                     redirect: true
-                })     
+                })
             }
         })
             .catch(Alert.error("Failed to delete property. Please try again."))
@@ -368,7 +368,7 @@ class PropertyDisplay extends Component {
         return (
             <div>
 
-            
+
             {redirectDiv}
             <div>
                 {navigation}

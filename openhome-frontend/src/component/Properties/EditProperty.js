@@ -69,7 +69,7 @@ class EditProperty extends Component {
         var token = localStorage.getItem("accessToken");
         await axios({
             method: 'get',
-            url: API_BASE_URL + '/property/' + propertyID,
+            url: API_BASE_URL + '/api/property/' + propertyID,
             config: { headers: { 'Content-Type': 'multipart/form-data' } },
             headers: { "Authorization": `Bearer ${token}` }
         })
@@ -366,7 +366,7 @@ class EditProperty extends Component {
             axios(
                 {
                     method: 'post',
-                    url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + this.state.propertyID + '/edit',
+                    url: API_BASE_URL + '/api/hosts/' + localStorage.id + '/property/' + this.state.propertyID + '/edit',
                     params: { "isPenalityApproved": false },
                     data: data,
                     headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
@@ -389,7 +389,7 @@ class EditProperty extends Component {
                             axios(
                                 {
                                     method: 'post',
-                                    url: API_BASE_URL + '/hosts/' + localStorage.id + '/property/' + propertyID + '/edit',
+                                    url: API_BASE_URL + '/api/hosts/' + localStorage.id + '/property/' + propertyID + '/edit',
                                     params: { "isPenalityApproved": true },
                                     data: data,
                                     headers: { "Authorization": "Bearer " + localStorage.getItem(ACCESS_TOKEN) }
