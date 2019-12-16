@@ -85,6 +85,8 @@ class EditProperty extends Component {
 
                 //for calculating availability days
                 let adString = result.availableDays;
+                //console.log("************************");
+                //console.log(adString);
                 var count = 0;
                 let monSelected = false;
                 let tueSelected = false
@@ -93,40 +95,48 @@ class EditProperty extends Component {
                 let friSelected = false;
                 let satSelected = false;
                 let sunSelected = false;
+                var availableDaysArr = [];
                 if (adString && adString !== "") {
                     if (adString.includes("M")) {
                         console.log("Monday");
+                        availableDaysArr.push("Monday");
                         monSelected = true;
                         count = count+1;
                     }
                     console.log(adString);
                     if (adString.includes("TU")) {
                         console.log("Tuesday");
+                        availableDaysArr.push("Tuesday");
                         tueSelected = true;
                         count = count+1;
                     }
                     if (adString.includes("W")) {
                         console.log("Wednesday");
+                        availableDaysArr.push("Wednesday");
                         wedSelected = true;
                         count = count+1;
                     }
                     if (adString.includes("TH")) {
                         console.log("Thursday");
+                        availableDaysArr.push("Thursday");
                         thuSelected = true;
                         count = count +1;
                     }
                     if (adString.includes("F")) {
                         console.log("Friday");
+                        availableDaysArr.push("Friday");
                         friSelected = true;
                         count = count +1;
                     }
                     if (adString.includes("SA")) {
                         console.log("Saturday");
+                        availableDaysArr.push("Saturday");
                         satSelected = true;
                         count = count +1;
                     }
                     if (adString.includes("SU")) {
                         console.log("Sunday");
+                        availableDaysArr.push("Sunday");
                         sunSelected = true;
                         count = count + 1;
                     }
@@ -157,7 +167,7 @@ class EditProperty extends Component {
                     parkingFree: result.dailyParkingFee == 0 ? "Yes" : "No",
                     parkingCost: result.dailyParkingFee,
                     alwaysAvailable: count == 7 ? "Yes" : "No",
-                    weeklyAvailability: [],
+                    weeklyAvailability: availableDaysArr,
                     weekdayRentPrice: result.weekdayPrice,
                     weekendRentPrice: result.weekendPrice,
                     weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
