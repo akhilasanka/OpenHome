@@ -12,7 +12,7 @@ class OAuth2RedirectHandler extends Component {
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     };
 
-    render() {        
+    render() {
         const token = this.getUrlParameter('token');
         const error = this.getUrlParameter('error');
 
@@ -20,7 +20,7 @@ class OAuth2RedirectHandler extends Component {
             localStorage.setItem(ACCESS_TOKEN, token);
             axios({
                 method: 'get',
-                url: API_BASE_URL+"/user/me",
+                url: API_BASE_URL+"/api/user/me",
                 headers: {"Authorization" : `Bearer ${token}`}
             })
             .then(response => {
@@ -39,19 +39,19 @@ class OAuth2RedirectHandler extends Component {
                 }
               }).catch(error => {
                 console.log(error);
-              }); 
+              });
             return <Redirect to={{
                 pathname: "/home",
                 state: { from: this.props.location }
-            }}/>; 
+            }}/>;
         } else {
             return <Redirect to={{
                 pathname: "/login",
-                state: { 
+                state: {
                     from: this.props.location,
-                    error: error 
+                    error: error
                 }
-            }}/>; 
+            }}/>;
         }
     }
 }

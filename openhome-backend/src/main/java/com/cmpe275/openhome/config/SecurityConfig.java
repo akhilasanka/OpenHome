@@ -105,12 +105,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 		"/reservation/**",
                 		"/stats/**",
                 		"/system/**",
-                		"/login",
+                		"/login/**",
                 		"/signup",
                 		"/home",
                 		"/addpayment",
                 		"/registration-confirmation/**",
-                		"/oauth2/redirect",
+                		"/oauth2/**",
                         "/error",
                         "/favicon.ico",
                         "/**/*.png",
@@ -119,7 +119,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.jpg",
                         "/**/*.html",
                         "/**/*.css",
-                        "/**/*.js")
+                        "/**/*.js",
+                        "/static/**")
                 .permitAll()
                 .antMatchers("/api/auth/**", "/api/oauth2/**")
                 .permitAll()
