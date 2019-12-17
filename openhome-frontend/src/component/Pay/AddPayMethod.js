@@ -4,6 +4,7 @@ import {API_BASE_URL, ACCESS_TOKEN } from '../constants';
 import Alert from 'react-s-alert';
 import GuestNavigation from '../Navigation/GuestNavigation';
 import HostNavigation from '../Navigation/HostNavigation';
+import { hasValidPaymentMethod } from '../util/APIUtils';
 
 class AddPayMethod extends Component {
     constructor(props) {
@@ -13,7 +14,8 @@ class AddPayMethod extends Component {
             expiryMonth: '',
             expiryYear:'',
             cvv:'',
-            minyear:'19'
+            minyear:'19',
+            hasValidPaymentMethod: false
         };
         this.handleCardNumberChange = this.handleCardNumberChange.bind(this);
         this.handleCardExpiryMonthChange = this.handleCardExpiryMonthChange.bind(this);
@@ -63,6 +65,14 @@ class AddPayMethod extends Component {
       console.log(event.target.value);
       this.setState({expiryYear: event.target.value});
   }
+  componentDidMount(){
+    hasValidPaymentMethod()
+        .then(response => {
+          this.setState({hasValidPaymentMethod: response.hasPayMethod});
+        }).catch(error => {
+          console.log(error);
+        });
+  }
 
     render() {
         const tabContent = {
@@ -70,12 +80,19 @@ class AddPayMethod extends Component {
             "margin": "auto",
             "margin-top": "30px"
         }
+        let payAlert = null;
+        if(this.state.hasValidPaymentMethod){
+          payAlert = <div class="alert alert-primary" role="alert">
+          You already have a valid card on file. New card will override existing payment method.
+                  </div>
+        }
         const isGuest = localStorage.getItem("role") === "guest";
         let navigation = isGuest? <GuestNavigation/> : <HostNavigation/>;
         return (
           <div>
             {navigation}
             <div className="tab-content" style={tabContent}>
+              {payAlert}
               <form role="form" onSubmit={this.handleSubmit}>
               <div className="form-group">
                 <label class=" main-header-sum" for="cardNumber">Enter your card details</label>
