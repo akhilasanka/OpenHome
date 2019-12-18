@@ -344,6 +344,12 @@ class PropertyDisplay extends Component {
                 <div><h6>Weekends: <strong>${this.state.propertyDetails.weekendPrice.toFixed(2)}</strong><span> per night</span></h6></div>
         }
 
+        let parkingPrice = ""
+        if(this.state.propertyDetails.dailyParkingFee && this.state.propertyDetails.dailyParkingFee !== 0) {
+            parkingPrice =
+              <div><h6>Parking: <strong>${this.state.propertyDetails.dailyParkingFee.toFixed(2)}</strong><span> per day</span></h6></div>
+        }
+
         let reservationOrEditDiv = ""
         if(this.state.propertyDetails.owner)
             if(this.state.propertyDetails.owner.id.toString() === localStorage.id.toString()) {
@@ -459,6 +465,7 @@ class PropertyDisplay extends Component {
                             <div className="display-price">
                                 {weekdayRentPrice}
                                 {weekendRentPrice}
+                                {parkingPrice}
                             </div>
                             <div>
                                 {reservationOrEditDiv}
