@@ -81,7 +81,9 @@ class PropertyDisplay extends Component {
 
         hasValidPaymentMethod()
         .then(response => {
+          console.log("has valid");
           this.setState({hasValidPaymentMethod: response.hasPayMethod});
+          this.forceUpdate();
         }).catch(error => {
           console.log(error);
         });
